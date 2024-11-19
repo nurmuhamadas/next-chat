@@ -4,7 +4,7 @@ import Image from "next/image"
 
 const AuthLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       <div className="hidden w-full max-w-[600px] bg-primary px-16 pt-16 lg:flex-col-center">
         <div className="mx-auto flex flex-col text-white">
           <Image
@@ -31,7 +31,7 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
           />
         </div>
       </div>
-      <div className="w-full overflow-y-auto px-4 pt-32 flex-col-center sm:px-8 lg:justify-center lg:px-12 lg:py-20">
+      <div className="h-screen w-full overflow-y-auto px-4 pt-24 flex-col-center sm:px-8 lg:px-12 lg:py-20">
         <Image
           className="lg:hidden"
           src="/images/logo/logo.svg"
@@ -39,7 +39,7 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
           width={96}
           height={96}
         />
-        <main className="w-full max-w-[500px]">{children}</main>
+        <main className="w-full max-w-[500px] lg:my-auto">{children}</main>
       </div>
     </div>
   )

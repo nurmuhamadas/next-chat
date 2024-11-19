@@ -13,7 +13,7 @@ import { signInSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
 
-const SignIn = () => {
+const SignInForm = () => {
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -65,4 +65,4 @@ const SignIn = () => {
   )
 }
 
-export default SignIn
+export default SignInForm

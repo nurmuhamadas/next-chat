@@ -16,6 +16,7 @@ interface AuthFormInputProps
   extends ControllerRenderProps<{
     email: string
     password: string
+    confirmPassword: string
   }> {
   label: string
   placeholder: string
