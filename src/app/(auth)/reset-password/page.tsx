@@ -6,7 +6,9 @@ import ResetPasswordForm from "@/features/auth/components/reset-password-form"
 const ResetPasswordPage = () => {
   return (
     <div className="w-full gap-y-9 flex-col-center">
-      <h2 className="text-[36px] font-bold">Enter New Password</h2>
+      <h2 className="text-center text-h2 font-bold md:text-[36px]">
+        Enter New Password
+      </h2>
       <ResetPasswordForm />
       <p className="text-center text-body-2">
         Back to

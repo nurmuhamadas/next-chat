@@ -6,7 +6,7 @@ import SignInForm from "@/features/auth/components/sign-in-form"
 const SignInPage = () => {
   return (
     <div className="w-full gap-y-9 flex-col-center">
-      <h2 className="text-[36px] font-bold">Sign In</h2>
+      <h2 className="text-center text-h2 font-bold md:text-[36px]">Sign In</h2>
       <SignInForm />
       <p className="text-center text-body-2">
         Don&apos;t have an account?

@@ -31,9 +31,9 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
           />
         </div>
       </div>
-      <div className="h-screen w-full overflow-y-auto px-4 pt-24 flex-col-center sm:px-8 lg:px-12 lg:py-20">
+      <div className="h-screen w-full overflow-y-auto px-4 pb-12 pt-24 flex-col-center sm:px-8 lg:px-12 lg:py-20">
         <Image
-          className="lg:hidden"
+          className="mb-6 w-20 md:w-24 lg:hidden"
           src="/images/logo/logo.svg"
           alt="logo"
           width={96}

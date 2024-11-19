@@ -52,7 +52,7 @@ const ResetPasswordForm = () => {
           )}
         />
         <Button type="submit" size="xl" className="w-full">
-          Send Reset Link
+          Save Change
         </Button>
       </form>
     </Form>

@@ -49,3 +49,7 @@ export const resetPasswordSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   })
+
+export const otpSchema = z.object({
+  code: z.string().min(1, "Required").max(6),
+})

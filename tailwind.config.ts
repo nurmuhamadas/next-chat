@@ -72,6 +72,15 @@ export default {
         caption: ["12px", { fontWeight: "400", lineHeight: "16px" }],
         overline: ["10px", { fontWeight: "400", lineHeight: "14px" }],
       },
+      keyframes: {
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
+        },
+      },
+      animation: {
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
+      },
     },
   },
   plugins: [

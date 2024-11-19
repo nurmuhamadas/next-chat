@@ -12,12 +12,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-interface AuthFormInputProps
-  extends ControllerRenderProps<{
-    email: string
-    password: string
-    confirmPassword: string
-  }> {
+interface AuthFormInputProps extends ControllerRenderProps {
   label: string
   placeholder: string
   type?: HTMLInputTypeAttribute
