@@ -25,9 +25,7 @@ const OTPForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-5">
-        <p className="text-center text-body-1">
-          We&apos;ve sent a code to [EMAIL]
-        </p>
+        <p className="text-center body-1">We&apos;ve sent a code to [EMAIL]</p>
 
         <FormField
           control={form.control}

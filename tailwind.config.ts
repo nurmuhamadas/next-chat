@@ -58,20 +58,6 @@ export default {
       fontFamily: {
         "open-sans": ["var(--open-sans)"],
       },
-      fontSize: {
-        h1: ["34px", { fontWeight: "700", lineHeight: "42px" }],
-        h2: ["24px", { fontWeight: "700", lineHeight: "36px" }],
-        h3: ["20px", { fontWeight: "500", lineHeight: "28px" }],
-        h4: ["18px", { fontWeight: "500", lineHeight: "20px" }],
-        h5: ["16px", { fontWeight: "600", lineHeight: "24px" }],
-        "subtitle-1": ["16px", { fontWeight: "500", lineHeight: "24px" }],
-        "subtitle-2": ["14px", { fontWeight: "600", lineHeight: "20px" }],
-        "body-1": ["16px", { fontWeight: "400", lineHeight: "24px" }],
-        "body-2": ["14px", { fontWeight: "400", lineHeight: "20px" }],
-        button: ["14px", { fontWeight: "500", lineHeight: "20px" }],
-        caption: ["12px", { fontWeight: "400", lineHeight: "16px" }],
-        overline: ["10px", { fontWeight: "400", lineHeight: "14px" }],
-      },
       keyframes: {
         "caret-blink": {
           "0%,70%,100%": { opacity: "1" },
@@ -100,6 +86,66 @@ export default {
           display: "flex",
           alignItems: "center",
           flexDirection: "column",
+        },
+        ".h1": {
+          fontSize: "34px",
+          fontWeight: "700",
+          lineHeight: "42px",
+        },
+        ".h2": {
+          fontSize: "24px",
+          fontWeight: "700",
+          lineHeight: "36px",
+        },
+        ".h3": {
+          fontSize: "20px",
+          fontWeight: "500",
+          lineHeight: "28px",
+        },
+        ".h4": {
+          fontSize: "18px",
+          fontWeight: "500",
+          lineHeight: "20px",
+        },
+        ".h5": {
+          fontSize: "16px",
+          fontWeight: "600",
+          lineHeight: "24px",
+        },
+        ".subtitle-1": {
+          fontSize: "16px",
+          fontWeight: "500",
+          lineHeight: "24px",
+        },
+        ".subtitle-2": {
+          fontSize: "14px",
+          fontWeight: "600",
+          lineHeight: "20px",
+        },
+        ".body-1": {
+          fontSize: "16px",
+          fontWeight: "400",
+          lineHeight: "24px",
+        },
+        ".body-2": {
+          fontSize: "14px",
+          fontWeight: "400",
+          lineHeight: "20px",
+        },
+        ".button": {
+          fontSize: "14px",
+          fontWeight: "500",
+          lineHeight: "20px",
+        },
+        ".caption": {
+          fontSize: "12px",
+          fontWeight: "400",
+          lineHeight: "16px",
+        },
+        ".overline": {
+          fontSize: "20px",
+          fontWeight: "400",
+          lineHeight: "14px",
         },
       })
     }),

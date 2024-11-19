@@ -14,10 +14,8 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
             height={57}
           />
           <div className="mt-8">
-            <h1 className="text-h1">
-              Next-Level Conversations, Anytime, Anywhere.
-            </h1>
-            <p className="mt-4 text-body-1">
+            <h1 className="h1">Next-Level Conversations, Anytime, Anywhere.</h1>
+            <p className="mt-4 body-1">
               NextChat is a secure, easy-to-use messaging app for seamless
               conversations and media sharing.
             </p>

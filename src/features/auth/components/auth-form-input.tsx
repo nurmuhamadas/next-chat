@@ -30,11 +30,11 @@ const AuthFormInput = ({
 
   return (
     <FormItem className="min-h-[78px] space-y-1.5 rounded-xl bg-surface p-4">
-      <FormLabel className="text-subtitle-2">{label}</FormLabel>
+      <FormLabel className="subtitle-2">{label}</FormLabel>
       <div className="flex">
         <FormControl>
           <Input
-            className="h-auto border-none p-0 text-body-2 focus:outline-none"
+            className="h-auto border-none p-0 body-2 focus-visible:ring-0"
             placeholder={placeholder}
             type={inputType}
             {...field}
