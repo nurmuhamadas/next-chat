@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --primary: 20 80% 48%;
+    --primary: 25 80% 48%;
     --primary-hover: 23 85% 41%;
     --accent: 39 90% 68%;
     --surface: 0 0% 100%;
