@@ -39,7 +39,7 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
           width={96}
           height={96}
         />
-        <main className="max-w-[580px]">{children}</main>
+        <main className="w-full max-w-[500px]">{children}</main>
       </div>
     </div>
   )
