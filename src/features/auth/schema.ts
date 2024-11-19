@@ -25,3 +25,7 @@ export const signUpSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   })
+
+export const forgotPassworsSchema = z.object({
+  email: z.string().email().min(1, "Required"),
+})

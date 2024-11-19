@@ -1,7 +1,5 @@
 "use client"
 
-import Link from "next/link"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -9,20 +7,19 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
 
-import { signInSchema } from "../schema"
+import { forgotPassworsSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
 
-const SignInForm = () => {
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
+const ForgotPasswordForm = () => {
+  const form = useForm<z.infer<typeof forgotPassworsSchema>>({
+    resolver: zodResolver(forgotPassworsSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   })
 
-  const onSubmit = (values: z.infer<typeof signInSchema>) => {
+  const onSubmit = (values: z.infer<typeof forgotPassworsSchema>) => {
     console.log(values)
   }
 
@@ -40,29 +37,12 @@ const SignInForm = () => {
             />
           )}
         />
-        <div className="">
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <AuthFormInput
-                label="Password"
-                type="password"
-                placeholder="Enter your password"
-                {...field}
-              />
-            )}
-          />
-          <Button variant="link" className="ml-2 px-0" asChild>
-            <Link href="/forgot-password">Forgot password?</Link>
-          </Button>
-        </div>
         <Button type="submit" size="xl" className="w-full">
-          Sign In
+          Send Reset Link
         </Button>
       </form>
     </Form>
   )
 }
 
-export default SignInForm
+export default ForgotPasswordForm
