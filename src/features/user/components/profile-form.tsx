@@ -17,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -27,7 +28,6 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { profileSchema } from "@/features/user/schema"
 
-import { Input } from "../../../components/ui/input"
 import { GENDER_OPT } from "../constants"
 import { Gender } from "../type"
 

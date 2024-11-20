@@ -82,6 +82,11 @@ export default {
           alignItems: "center",
           justifyContent: "space-between",
         },
+        ".flex-center-end": {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        },
         ".flex-col-center": {
           display: "flex",
           alignItems: "center",
