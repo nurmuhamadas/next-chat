@@ -41,8 +41,8 @@ const ChatListPanel = () => {
       )}
 
       {data.length > 0 && (
-        <ScrollArea className="w-full ">
-          <ul className="flex max-w-[384px] flex-col px-1.5 pt-2">
+        <ScrollArea className="chat-list-scroll-area">
+          <ul className="flex min-w-10 flex-col px-1.5 pt-2">
             <ChatListItem />
             <ChatListItem />
             <ChatListItem />

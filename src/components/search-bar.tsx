@@ -1,21 +1,24 @@
 "use client"
 
+import { ComponentProps } from "react"
+
 import { SearchIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 import { Input } from "./ui/input"
 
-interface SearchBarProps {
+interface SearchBarProps extends ComponentProps<"input"> {
   className?: string
   placeholder?: string
-  onChange?(value: string): void
+  onValueChange?(value: string): void
 }
 
 const SearchBar = ({
   className,
   placeholder = "Search",
-  onChange,
+  onValueChange,
+  ...props
 }: SearchBarProps) => {
   return (
     <div className="relative w-full">
@@ -23,7 +26,8 @@ const SearchBar = ({
       <Input
         placeholder={placeholder}
         className={cn("h-10 rounded-full pl-11", className)}
-        onChange={(e) => onChange?.(e.target.value)}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        {...props}
       />
     </div>
   )

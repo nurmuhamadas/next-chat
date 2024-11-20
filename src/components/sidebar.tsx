@@ -1,10 +1,16 @@
+import { cn } from "@/lib/utils"
+
 import ChatListPanel from "../features/chat/components/chat-list-panel"
 
-const Sidebar = () => {
+interface SidebarProps {
+  className?: string
+}
+
+const Sidebar = ({ className }: SidebarProps) => {
   return (
-    <div className="h-screen max-w-[384px] flex-1 bg-surface">
+    <aside className={cn("h-screen bg-surface", className)}>
       <ChatListPanel />
-    </div>
+    </aside>
   )
 }
 
