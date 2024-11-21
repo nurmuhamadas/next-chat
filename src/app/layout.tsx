@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google"
 import type { Metadata } from "next"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
+import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 
 import "./globals.css"
@@ -24,12 +25,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${openSans.variable} antialiased`}>
         <NuqsAdapter>
-          <Toaster />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            disableTransitionOnChange
+          >
+            <Toaster />
 
-          {children}
+            {children}
+          </ThemeProvider>
         </NuqsAdapter>
       </body>
     </html>

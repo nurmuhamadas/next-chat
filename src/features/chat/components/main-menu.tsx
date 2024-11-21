@@ -1,6 +1,7 @@
 "use client"
 
 import { MenuIcon } from "lucide-react"
+import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +15,8 @@ import { cn } from "@/lib/utils"
 import { MAIN_MENU } from "../constants"
 
 const MainMenu = () => {
-  const isDarkMode = false
+  const { theme, setTheme } = useTheme()
+  const isDarkMode = theme === "dark"
 
   const handleMenuClick = (action: MainMenuAction) => {
     switch (action) {
@@ -23,8 +25,10 @@ const MainMenu = () => {
       case "open-saved-message":
         break
       case "switch-to-light":
+        setTheme("light")
         break
       case "switch-to-dark":
+        setTheme("dark")
         break
       case "open-blocked-user":
         break
@@ -55,7 +59,7 @@ const MainMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="focus:outline-none">
-        <Button size="icon-sm" variant="icon" className="shrink-0">
+        <Button size="icon" variant="icon" className="shrink-0">
           <MenuIcon />
         </Button>
       </DropdownMenuTrigger>

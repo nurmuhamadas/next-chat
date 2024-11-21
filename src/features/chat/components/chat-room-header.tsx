@@ -60,17 +60,19 @@ const ChatRoomHeader = () => {
       </div>
 
       <div className="flex-center-end">
-        {isSearchOpen ? (
-          <SearchBar autoFocus onBlur={() => setIsSearchOpen(false)} />
-        ) : (
-          <Button
-            variant="icon"
-            size="icon"
-            onClick={() => setIsSearchOpen(true)}
-          >
-            <SearchIcon />
-          </Button>
-        )}
+        <div className="">
+          {isSearchOpen ? (
+            <SearchBar autoFocus onBlur={() => setIsSearchOpen(false)} />
+          ) : (
+            <Button
+              variant="icon"
+              size="icon"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <SearchIcon />
+            </Button>
+          )}
+        </div>
 
         <ChatRoomMenu type={type} />
       </div>
