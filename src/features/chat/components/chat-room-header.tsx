@@ -2,14 +2,16 @@
 
 import { useState } from "react"
 
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
-import { ArrowLeftIcon, MoreVerticalIcon, SearchIcon } from "lucide-react"
+import { ArrowLeftIcon, SearchIcon } from "lucide-react"
 
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 import ChatAvatar from "./chat-avatar"
+import ChatRoomMenu from "./chat-room-menu"
 
 interface ChatRoomHeaderProps {
   onHeaderClick?(): void
@@ -17,6 +19,8 @@ interface ChatRoomHeaderProps {
 
 const ChatRoomHeader = ({ onHeaderClick }: ChatRoomHeaderProps) => {
   const router = useRouter()
+  const params = useParams()
+  const type = params.roomType as RoomType
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
@@ -40,9 +44,14 @@ const ChatRoomHeader = ({ onHeaderClick }: ChatRoomHeaderProps) => {
         </Button>
 
         <ChatAvatar className="size-10" />
-        <div className="flex flex-1 flex-col">
+
+        <div className={cn("flex flex-1 flex-col")}>
           <h2 className="line-clamp-1 h5">User Name</h2>
-          <p className="line-clamp-1 text-grey-2 caption">Last seen at 12:99</p>
+          <p className="line-clamp-1 text-grey-2 caption">
+            {type === "chat" && "Last seen at"}
+            {type === "group" && "2 members"}
+            {type === "channel" && "2 subscribers"}
+          </p>
         </div>
       </div>
 
@@ -58,9 +67,8 @@ const ChatRoomHeader = ({ onHeaderClick }: ChatRoomHeaderProps) => {
             <SearchIcon />
           </Button>
         )}
-        <Button variant="icon" size="icon">
-          <MoreVerticalIcon />
-        </Button>
+
+        <ChatRoomMenu type={type} />
       </div>
     </header>
   )
