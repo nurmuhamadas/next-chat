@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useBlockedUsersPanel } from "@/features/user/hooks/use-blocked-users-panel"
 import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
 import { cn } from "@/lib/utils"
 
@@ -20,6 +21,7 @@ const MainMenu = () => {
   const isDarkMode = theme === "dark"
 
   const { openMyProfile } = useMyProfilePanel()
+  const { openBlockedUsers } = useBlockedUsersPanel()
 
   const handleMenuClick = (action: MainMenuAction) => {
     switch (action) {
@@ -35,6 +37,7 @@ const MainMenu = () => {
         setTheme("dark")
         break
       case "open-blocked-user":
+        openBlockedUsers()
         break
       case "open-settings":
         break
