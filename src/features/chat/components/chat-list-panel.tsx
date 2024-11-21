@@ -1,15 +1,13 @@
 import Image from "next/image"
 
-import { MenuIcon } from "lucide-react"
-
 import SearchBar from "@/components/search-bar"
-import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import CreateChannelModal from "@/features/channel/components/create-channel-modal"
 import CreateGroupModal from "@/features/group/components/create-group-modal"
 
 import ChatListItem from "./chat-list-item"
 import FloatingButton from "./floating-button"
+import MainMenu from "./main-menu"
 
 const ChatListPanel = () => {
   const data = [1]
@@ -17,9 +15,7 @@ const ChatListPanel = () => {
   return (
     <div className="group/chat-list relative flex size-full flex-col border-r border-grey-1 pt-[52px]">
       <div className="absolute left-0 top-0 flex w-full items-center gap-x-4 py-1.5 pl-4 pr-2.5">
-        <Button size="icon-sm" variant="icon">
-          <MenuIcon />
-        </Button>
+        <MainMenu />
 
         <SearchBar />
       </div>
