@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Sheet,
   SheetContent,
@@ -21,7 +23,7 @@ const ProfilePanelWrapper = () => {
         "transition-all ease-linear duration-150 hidden lg:block border-l border-grey-1 ",
       )}
     >
-      <ProfilePanel onClose={closeRoomProfile} />
+      <ProfilePanel />
     </div>
   ) : (
     <Sheet open={roomProfileOpen} onOpenChange={closeRoomProfile}>
@@ -30,7 +32,7 @@ const ProfilePanelWrapper = () => {
           <SheetTitle>User name profile</SheetTitle>
         </SheetHeader>
 
-        <ProfilePanel onClose={closeRoomProfile} />
+        <ProfilePanel />
       </SheetContent>
     </Sheet>
   )

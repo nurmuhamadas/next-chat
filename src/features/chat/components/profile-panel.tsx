@@ -1,3 +1,5 @@
+"use client"
+
 import { ReactNode, useState } from "react"
 
 import {
@@ -18,16 +20,26 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Switch } from "@/components/ui/switch"
+import EditChannelModal from "@/features/channel/components/edit-channel-modal"
+import EditGroupModal from "@/features/group/components/edit-group-modal"
+import { useEditChannelModal } from "@/features/group/hooks/use-edit-channel-modal"
+import { useEditGroupModal } from "@/features/group/hooks/use-edit-group-modal"
+import { useRoomId } from "@/hooks/useRoomId"
+import { useRoomType } from "@/hooks/useRoomType"
 import { cn } from "@/lib/utils"
+
+import { useRoomProfile } from "../hooks/useRoomProfile"
 
 import ChatAvatar from "./chat-avatar"
 
-interface ProfilePanelProps {
-  onClose(): void
-  type?: RoomType
-}
+const ProfilePanel = () => {
+  const { closeRoomProfile } = useRoomProfile()
+  const type = useRoomType()
+  const id = useRoomId()
 
-const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
+  const { openEditGroup } = useEditGroupModal()
+  const { openEditChannel } = useEditChannelModal()
+
   const [isNotifActive, setIsNotifActive] = useState(true)
 
   const infoList: Record<
@@ -101,11 +113,19 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
     })
   }
 
+  const handleEdit = () => {
+    if (type === "group") {
+      openEditGroup(id)
+    } else if (type === "channel") {
+      openEditChannel(id)
+    }
+  }
+
   return (
     <div className="relative flex size-full flex-col bg-surface pt-14">
       <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
         <div className="flex items-center gap-x-4">
-          <Button variant="icon" size="icon" onClick={onClose}>
+          <Button variant="icon" size="icon" onClick={closeRoomProfile}>
             <XIcon />
           </Button>
           <h3 className="line-clamp-1 subtitle-1">
@@ -116,7 +136,7 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
 
         <div className="flex-center-end">
           {(type === "channel" || type === "group") && (
-            <Button variant="icon" size="icon">
+            <Button variant="icon" size="icon" onClick={handleEdit}>
               <PencilIcon />
             </Button>
           )}
@@ -124,22 +144,24 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
       </div>
 
       <ScrollArea className="chat-list-scroll-area">
-        {/* <AspectRatio ratio={1 / 1}> */}
         <div className="relative h-[100vw] max-h-[420] w-screen max-w-[420] lg:max-h-[384px] lg:max-w-[384px]">
           <ChatAvatar
             className="size-full rounded-none"
             fallbackClassName="rounded-none !text-[72px]"
           />
           <div className="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/25 to-black/0 p-4 text-white">
-            <p className="subtitle-2">User name</p>
+            <p className="subtitle-2">
+              {type === "chat" && "User Name"}
+              {type === "group" && "Group Name"}
+              {type === "channel" && "Channel Name"}
+            </p>
             <p className="opacity-75 caption">
-              {type === "chat" && "Last seen at"}
+              {type === "chat" && "Last seen at 17:00"}
               {type === "group" && "2 members"}
               {type === "channel" && "2 subscribers"}
             </p>
           </div>
         </div>
-        {/* </AspectRatio> */}
 
         <ul className="flex flex-col p-2">
           {infoList[type].map((info) => {
@@ -221,6 +243,9 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
           )}
         </div>
       </ScrollArea>
+
+      <EditGroupModal />
+      <EditChannelModal />
     </div>
   )
 }

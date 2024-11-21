@@ -46,7 +46,11 @@ const ChatRoomHeader = () => {
         <ChatAvatar className="size-10" />
 
         <div className={cn("flex flex-1 flex-col")}>
-          <h2 className="line-clamp-1 h5">User Name</h2>
+          <h2 className="line-clamp-1 h5">
+            {type === "chat" && "User Name"}
+            {type === "group" && "Group Name"}
+            {type === "channel" && "Channel Name"}
+          </h2>
           <p className="line-clamp-1 text-grey-2 caption">
             {type === "chat" && "Last seen at"}
             {type === "group" && "2 members"}

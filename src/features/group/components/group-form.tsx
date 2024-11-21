@@ -31,11 +31,7 @@ import { GROUP_TYPE_OPT } from "../constants"
 import { groupSchema } from "../schema"
 import { GroupType } from "../type"
 
-interface GroupFormProps {
-  buttonLabel?: string
-}
-
-const GroupForm = ({}: GroupFormProps) => {
+const GroupForm = () => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof groupSchema>>({
