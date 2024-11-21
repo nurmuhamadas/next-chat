@@ -7,3 +7,5 @@ export const imageProfileSchema = z.object({
     .enum(["image/jpeg", "image/png", "image/gif"])
     .or(z.literal("image/webp")),
 })
+
+export const ROOM_TYPES: RoomType[] = ["channel", "chat", "group"]

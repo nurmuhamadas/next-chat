@@ -12,19 +12,18 @@ import {
 } from "@/components/ui/sheet"
 import useWindowSize from "@/hooks/useWindowSize"
 
+import { useCreateGroupModal } from "../hooks/useCreateGroupModal"
+
 import GroupForm from "./group-form"
 
-interface CreateGroupModalProps {
-  open: boolean
-  onOpenChange(value: boolean): void
-}
-
-const CreateGroupModal = ({ open, onOpenChange }: CreateGroupModalProps) => {
+const CreateGroupModal = () => {
   const { width } = useWindowSize()
+
+  const { isCreateGroupOpen, closeCreateGroup } = useCreateGroupModal()
 
   if (width < 600) {
     return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={isCreateGroupOpen} onOpenChange={closeCreateGroup}>
         <SheetContent side="bottom">
           <SheetHeader>
             <SheetTitle>Create Group</SheetTitle>
@@ -37,7 +36,7 @@ const CreateGroupModal = ({ open, onOpenChange }: CreateGroupModalProps) => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isCreateGroupOpen} onOpenChange={closeCreateGroup}>
       <DialogContent>
         <DialogHeader className="pt-4">
           <DialogTitle className="text-center h2">Create Group</DialogTitle>

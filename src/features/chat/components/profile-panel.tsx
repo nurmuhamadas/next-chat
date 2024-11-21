@@ -15,7 +15,6 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Switch } from "@/components/ui/switch"
@@ -116,29 +115,31 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
         </div>
 
         <div className="flex-center-end">
-          <Button variant="icon" size="icon">
-            <PencilIcon />
-          </Button>
+          {(type === "channel" || type === "group") && (
+            <Button variant="icon" size="icon">
+              <PencilIcon />
+            </Button>
+          )}
         </div>
       </div>
 
       <ScrollArea className="chat-list-scroll-area">
-        <AspectRatio ratio={1 / 1}>
-          <div className="relative size-full">
-            <ChatAvatar
-              className="size-full rounded-none"
-              fallbackClassName="rounded-none !text-[72px]"
-            />
-            <div className="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/25 to-black/0 p-4 text-white">
-              <p className="subtitle-2">User name</p>
-              <p className="opacity-75 caption">
-                {type === "chat" && "Last seen at"}
-                {type === "group" && "2 members"}
-                {type === "channel" && "2 subscribers"}
-              </p>
-            </div>
+        {/* <AspectRatio ratio={1 / 1}> */}
+        <div className="relative h-[100vw] max-h-[420] w-screen max-w-[420] lg:max-h-[384px] lg:max-w-[384px]">
+          <ChatAvatar
+            className="size-full rounded-none"
+            fallbackClassName="rounded-none !text-[72px]"
+          />
+          <div className="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/25 to-black/0 p-4 text-white">
+            <p className="subtitle-2">User name</p>
+            <p className="opacity-75 caption">
+              {type === "chat" && "Last seen at"}
+              {type === "group" && "2 members"}
+              {type === "channel" && "2 subscribers"}
+            </p>
           </div>
-        </AspectRatio>
+        </div>
+        {/* </AspectRatio> */}
 
         <ul className="flex flex-col p-2">
           {infoList[type].map((info) => {

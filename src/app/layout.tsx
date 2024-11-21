@@ -1,6 +1,7 @@
 import { Open_Sans } from "next/font/google"
 
 import type { Metadata } from "next"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { Toaster } from "@/components/ui/sonner"
 
@@ -25,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${openSans.variable} antialiased`}>
-        <Toaster />
+        <NuqsAdapter>
+          <Toaster />
 
-        {children}
+          {children}
+        </NuqsAdapter>
       </body>
     </html>
   )

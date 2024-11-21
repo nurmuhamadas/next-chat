@@ -2,25 +2,25 @@
 
 import { useState } from "react"
 
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import { ArrowLeftIcon, SearchIcon } from "lucide-react"
 
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
+import { useRoomType } from "@/hooks/useRoomType"
 import { cn } from "@/lib/utils"
+
+import { useRoomProfile } from "../hooks/useRoomProfile"
 
 import ChatAvatar from "./chat-avatar"
 import ChatRoomMenu from "./chat-room-menu"
 
-interface ChatRoomHeaderProps {
-  onHeaderClick?(): void
-}
-
-const ChatRoomHeader = ({ onHeaderClick }: ChatRoomHeaderProps) => {
+const ChatRoomHeader = () => {
   const router = useRouter()
-  const params = useParams()
-  const type = params.roomType as RoomType
+
+  const { openRoomProfile } = useRoomProfile()
+  const type = useRoomType()
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
@@ -28,7 +28,7 @@ const ChatRoomHeader = ({ onHeaderClick }: ChatRoomHeaderProps) => {
     <header className="w-full gap-x-4 bg-surface px-4 py-2 flex-center-between">
       <div
         className="flex flex-1 cursor-pointer items-center gap-x-3"
-        onClick={onHeaderClick}
+        onClick={openRoomProfile}
         aria-label="Open profile"
       >
         <Button

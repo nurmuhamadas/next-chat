@@ -12,22 +12,18 @@ import {
 } from "@/components/ui/sheet"
 import useWindowSize from "@/hooks/useWindowSize"
 
+import { useCreateChannelModal } from "../hooks/useCreateChannelModal"
+
 import ChannelForm from "./channel-form"
 
-interface CreateChannelModalProps {
-  open: boolean
-  onOpenChange(value: boolean): void
-}
-
-const CreateChannelModal = ({
-  open,
-  onOpenChange,
-}: CreateChannelModalProps) => {
+const CreateChannelModal = () => {
   const { width } = useWindowSize()
+
+  const { isCreateChannelOpen, closeCreateChannel } = useCreateChannelModal()
 
   if (width < 600) {
     return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={isCreateChannelOpen} onOpenChange={closeCreateChannel}>
         <SheetContent side="bottom">
           <SheetHeader className="py-4">
             <SheetTitle className="text-center h2">Create Channel</SheetTitle>
@@ -39,7 +35,7 @@ const CreateChannelModal = ({
     )
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isCreateChannelOpen} onOpenChange={closeCreateChannel}>
       <DialogContent>
         <DialogHeader className="pt-4">
           <DialogTitle className="text-center h2">Create Channel</DialogTitle>
