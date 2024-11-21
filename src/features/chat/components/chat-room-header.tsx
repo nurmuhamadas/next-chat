@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 
 import { ArrowLeftIcon, SearchIcon } from "lucide-react"
 
+import ChatAvatar from "@/components/chat-avatar"
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
 import { useRoomType } from "@/hooks/use-room-type"
@@ -13,7 +14,6 @@ import { cn } from "@/lib/utils"
 
 import { useRoomProfile } from "../hooks/use-room-profile"
 
-import ChatAvatar from "./chat-avatar"
 import ChatRoomMenu from "./chat-room-menu"
 
 const ChatRoomHeader = () => {
@@ -36,7 +36,7 @@ const ChatRoomHeader = () => {
           size="icon"
           onClick={(e) => {
             e.stopPropagation()
-            router.back()
+            router.push(`/`)
           }}
           className="md:hidden"
         >

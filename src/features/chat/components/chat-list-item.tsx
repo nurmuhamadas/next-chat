@@ -5,7 +5,7 @@ import { CheckCheckIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
-import ChatAvatar from "./chat-avatar"
+import ChatAvatar from "../../../components/chat-avatar"
 
 interface ChatListItemProps {
   selected?: boolean

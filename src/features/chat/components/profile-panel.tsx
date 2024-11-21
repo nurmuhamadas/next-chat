@@ -28,9 +28,8 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
 
+import ChatAvatar from "../../../components/chat-avatar"
 import { useRoomProfile } from "../hooks/use-room-profile"
-
-import ChatAvatar from "./chat-avatar"
 
 const ProfilePanel = () => {
   const { closeRoomProfile } = useRoomProfile()

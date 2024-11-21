@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
 import { cn } from "@/lib/utils"
 
 import { MAIN_MENU } from "../constants"
@@ -18,9 +19,12 @@ const MainMenu = () => {
   const { theme, setTheme } = useTheme()
   const isDarkMode = theme === "dark"
 
+  const { openMyProfile } = useMyProfilePanel()
+
   const handleMenuClick = (action: MainMenuAction) => {
     switch (action) {
       case "open-profile":
+        openMyProfile()
         break
       case "open-saved-message":
         break
