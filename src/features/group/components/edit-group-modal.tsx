@@ -10,7 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import useWindowSize from "@/hooks/useWindowSize"
+import useWindowSize from "@/hooks/use-window-size"
 
 import { useEditGroupModal } from "../hooks/use-edit-group-modal"
 

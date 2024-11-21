@@ -9,8 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useCreateChannelModal } from "@/features/channel/hooks/useCreateChannelModal"
-import { useCreateGroupModal } from "@/features/group/hooks/useCreateGroupModal"
+import { useCreateChannelModal } from "@/features/channel/hooks/use-create-channel-modal"
+import { useCreateGroupModal } from "@/features/group/hooks/use-create-group-modal"
 
 const FloatingButton = () => {
   const [isOpen, setIsOpen] = useState(false)

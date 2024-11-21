@@ -11,7 +11,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { useEditChannelModal } from "@/features/group/hooks/use-edit-channel-modal"
-import useWindowSize from "@/hooks/useWindowSize"
+import useWindowSize from "@/hooks/use-window-size"
 
 import ChannelForm from "./channel-form"
 

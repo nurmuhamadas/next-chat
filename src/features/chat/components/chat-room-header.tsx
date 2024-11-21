@@ -8,10 +8,10 @@ import { ArrowLeftIcon, SearchIcon } from "lucide-react"
 
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
-import { useRoomType } from "@/hooks/useRoomType"
+import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
 
-import { useRoomProfile } from "../hooks/useRoomProfile"
+import { useRoomProfile } from "../hooks/use-room-profile"
 
 import ChatAvatar from "./chat-avatar"
 import ChatRoomMenu from "./chat-room-menu"

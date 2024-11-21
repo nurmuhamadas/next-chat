@@ -7,10 +7,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import ProfilePanel from "@/features/chat/components/profile-panel"
-import useWindowSize from "@/hooks/useWindowSize"
+import useWindowSize from "@/hooks/use-window-size"
 import { cn } from "@/lib/utils"
 
-import { useRoomProfile } from "../hooks/useRoomProfile"
+import { useRoomProfile } from "../hooks/use-room-profile"
 
 const ProfilePanelWrapper = () => {
   const { isDesktop } = useWindowSize()

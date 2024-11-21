@@ -24,11 +24,11 @@ import EditChannelModal from "@/features/channel/components/edit-channel-modal"
 import EditGroupModal from "@/features/group/components/edit-group-modal"
 import { useEditChannelModal } from "@/features/group/hooks/use-edit-channel-modal"
 import { useEditGroupModal } from "@/features/group/hooks/use-edit-group-modal"
-import { useRoomId } from "@/hooks/useRoomId"
-import { useRoomType } from "@/hooks/useRoomType"
+import { useRoomId } from "@/hooks/use-room-id"
+import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
 
-import { useRoomProfile } from "../hooks/useRoomProfile"
+import { useRoomProfile } from "../hooks/use-room-profile"
 
 import ChatAvatar from "./chat-avatar"
 

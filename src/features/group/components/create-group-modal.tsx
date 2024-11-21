@@ -10,9 +10,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import useWindowSize from "@/hooks/useWindowSize"
+import useWindowSize from "@/hooks/use-window-size"
 
-import { useCreateGroupModal } from "../hooks/useCreateGroupModal"
+import { useCreateGroupModal } from "../hooks/use-create-group-modal"
 
 import GroupForm from "./group-form"
 

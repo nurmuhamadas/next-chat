@@ -10,9 +10,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import useWindowSize from "@/hooks/useWindowSize"
+import useWindowSize from "@/hooks/use-window-size"
 
-import { useCreateChannelModal } from "../hooks/useCreateChannelModal"
+import { useCreateChannelModal } from "../hooks/use-create-channel-modal"
 
 import ChannelForm from "./channel-form"
 
