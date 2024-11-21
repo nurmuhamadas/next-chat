@@ -103,7 +103,7 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
   }
 
   return (
-    <div className="relative flex size-full flex-col bg-surface  pt-14">
+    <div className="relative flex size-full flex-col bg-surface pt-14">
       <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
         <div className="flex items-center gap-x-4">
           <Button variant="icon" size="icon" onClick={onClose}>
@@ -152,7 +152,7 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
                 >
                   <Icon className="size-5 shrink-0 text-grey-3" />
                   <div className="flex flex-1 flex-col overflow-hidden text-left">
-                    <p
+                    <div
                       className={cn(
                         "subtitle-2",
                         info.label !== "Bio" &&
@@ -161,7 +161,7 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
                       )}
                     >
                       {info.value}
-                    </p>
+                    </div>
                     <p className="text-grey-2 caption">{info.label}</p>
                   </div>
                 </button>
@@ -170,7 +170,7 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
           })}
 
           <li>
-            <button
+            <div
               className="flex w-full items-center gap-x-5 rounded px-1.5 py-5 hover:bg-grey-4 focus:outline-none"
               onClick={() => setIsNotifActive(!isNotifActive)}
             >
@@ -183,7 +183,7 @@ const ProfilePanel = ({ type = "chat", onClose }: ProfilePanelProps) => {
                   onCheckedChange={setIsNotifActive}
                 />
               </div>
-            </button>
+            </div>
           </li>
         </ul>
 

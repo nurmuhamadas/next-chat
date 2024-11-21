@@ -1,14 +1,8 @@
 import { z } from "zod"
 
-import { GENDER } from "./constants"
+import { imageProfileSchema } from "@/lib/constants"
 
-const imageFileSchema = z.object({
-  name: z.string(),
-  size: z.number().max(2 * 1024 * 1024, "Image size must not exceed 2MB"),
-  mimetype: z
-    .enum(["image/jpeg", "image/png", "image/gif"])
-    .or(z.literal("image/webp")),
-})
+import { GENDER } from "./constants"
 
 export const profileSchema = z.object({
   firstName: z.string().min(1, "Required"),
@@ -22,5 +16,5 @@ export const profileSchema = z.object({
     ),
   gender: z.nativeEnum(GENDER),
   bio: z.string().max(2048).optional(),
-  image: imageFileSchema.optional(),
+  image: imageProfileSchema.optional(),
 })
