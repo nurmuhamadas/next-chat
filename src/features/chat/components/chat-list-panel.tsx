@@ -12,7 +12,7 @@ const ChatListPanel = () => {
   const data = [1]
 
   return (
-    <div className="relative flex size-full flex-col pt-[52px]">
+    <div className="relative flex size-full flex-col border-r border-grey-1 pt-[52px]">
       <div className="absolute left-0 top-0 flex w-full items-center gap-x-4 py-1.5 pl-4 pr-2.5">
         <Button size="icon-sm" variant="icon">
           <MenuIcon />
