@@ -13,6 +13,7 @@ import {
 import { useBlockedUsersPanel } from "@/features/user/hooks/use-blocked-users-panel"
 import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
 import { useSettingsPanel } from "@/features/user/hooks/use-settings-panel"
+import { useComingSoonFeature } from "@/hooks/use-coming-soon-feature"
 import { cn } from "@/lib/utils"
 
 import { MAIN_MENU } from "../constants"
@@ -24,6 +25,7 @@ const MainMenu = () => {
   const { openMyProfile } = useMyProfilePanel()
   const { openBlockedUsers } = useBlockedUsersPanel()
   const { openSettings } = useSettingsPanel()
+  const { openComingSoonInfo } = useComingSoonFeature()
 
   const handleMenuClick = (action: MainMenuAction) => {
     switch (action) {
@@ -45,8 +47,10 @@ const MainMenu = () => {
         openSettings()
         break
       case "report-bug":
+        openComingSoonInfo()
         break
       case "open-about":
+        openComingSoonInfo()
         break
       case "logout":
         break
