@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useBlockedUsersPanel } from "@/features/user/hooks/use-blocked-users-panel"
 import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
+import { useSettingsPanel } from "@/features/user/hooks/use-settings-panel"
 import { cn } from "@/lib/utils"
 
 import { MAIN_MENU } from "../constants"
@@ -22,6 +23,7 @@ const MainMenu = () => {
 
   const { openMyProfile } = useMyProfilePanel()
   const { openBlockedUsers } = useBlockedUsersPanel()
+  const { openSettings } = useSettingsPanel()
 
   const handleMenuClick = (action: MainMenuAction) => {
     switch (action) {
@@ -40,6 +42,7 @@ const MainMenu = () => {
         openBlockedUsers()
         break
       case "open-settings":
+        openSettings()
         break
       case "report-bug":
         break

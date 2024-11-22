@@ -36,7 +36,8 @@
     --radius: 0.5rem;
   }
   .dark {
-    --primary: 21 80% 35%;
+    --primary: 25 80% 48%;
+    /* --primary: 21 80% 35%; */
     --primary-hover: 23 75% 55%;
     --accent: 50 59% 49%;
     --surface: 207 18% 20%;

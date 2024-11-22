@@ -36,13 +36,13 @@ const LeftPanelWrapper = ({
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
 
-        <div className="relative flex size-full flex-col bg-surface pb-8 pt-14">
+        <div className="relative flex size-full flex-col bg-surface pt-14">
           <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
             <div className="flex items-center gap-x-4">
               <Button variant="icon" size="icon" onClick={onBack}>
                 <ArrowLeftIcon />
               </Button>
-              <h3 className="line-clamp-1 subtitle-1">{title}</h3>
+              <h3 className="line-clamp-1 h3">{title}</h3>
             </div>
 
             {action && <div className="gap-x-1 flex-center-end">{action}</div>}
