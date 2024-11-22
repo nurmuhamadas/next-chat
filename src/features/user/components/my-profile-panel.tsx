@@ -16,10 +16,12 @@ import LeftPanelWrapper from "@/components/left-panel-wrapper"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
+import { useEditMyProfilePanel } from "../hooks/use-edit-my-profile-panel"
 import { useMyProfilePanel } from "../hooks/use-my-profile-panel"
 
 const MyProfilePanel = () => {
   const { isMyProfileOpen, closeMyProfile } = useMyProfilePanel()
+  const { openEditMyProfile } = useEditMyProfilePanel()
 
   const infoList: {
     label: string
@@ -64,7 +66,7 @@ const MyProfilePanel = () => {
         isOpen={isMyProfileOpen}
         onBack={closeMyProfile}
         action={
-          <Button variant="icon" size="icon" onClick={() => {}}>
+          <Button variant="icon" size="icon" onClick={openEditMyProfile}>
             <PencilIcon />
           </Button>
         }

@@ -29,7 +29,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { profileSchema } from "@/features/user/schema"
 
 import { GENDER_OPT } from "../constants"
-import { Gender } from "../type"
 
 interface ProfileFormProps {
   buttonLabel?: string
@@ -70,7 +69,7 @@ const ProfileForm = ({
             onClick={() => inputRef.current?.click()}
           >
             <AvatarImage src="" />
-            <AvatarFallback className="h1">CN</AvatarFallback>
+            <AvatarFallback className="h1"></AvatarFallback>
             <div className="absolute size-full bg-grey-3/50 flex-center">
               <CameraIcon className="size-10 text-white" />
             </div>

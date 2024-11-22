@@ -1,3 +1,8 @@
+export const GENDER: Record<Gender, Gender> = {
+  FEMALE: "FEMALE",
+  MALE: "MALE",
+}
+
 export const GENDER_OPT: {
   label: string
   value: Gender
