@@ -2,8 +2,6 @@ import Image from "next/image"
 
 import SearchBar from "@/components/search-bar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import CreateChannelModal from "@/features/channel/components/create-channel-modal"
-import CreateGroupModal from "@/features/group/components/create-group-modal"
 
 import ChatListItem from "./chat-list-item"
 import FloatingButton from "./floating-button"
@@ -68,9 +66,6 @@ const ChatListPanel = () => {
       )}
 
       <FloatingButton />
-
-      <CreateGroupModal />
-      <CreateChannelModal />
     </div>
   )
 }

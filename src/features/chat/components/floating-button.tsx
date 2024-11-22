@@ -9,14 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useCreateChannelModal } from "@/features/channel/hooks/use-create-channel-modal"
-import { useCreateGroupModal } from "@/features/group/hooks/use-create-group-modal"
+import { useCreateChannelPanel } from "@/features/channel/hooks/use-create-channel-modal"
+import { useCreateGroupPanel } from "@/features/group/hooks/use-create-group-panel"
 
 const FloatingButton = () => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const { openCreateChannel } = useCreateChannelModal()
-  const { openCreateGroup } = useCreateGroupModal()
+  const { openCreateChannel } = useCreateChannelPanel()
+  const { openCreateGroup } = useCreateGroupPanel()
 
   return (
     <div className="absolute bottom-4 right-3">

@@ -1,6 +1,6 @@
 import { parseAsBoolean, useQueryState } from "nuqs"
 
-export const useCreateGroupModal = () => {
+export const useCreateGroupPanel = () => {
   const [isCreateGroupOpen, setCreateGroupOpen] = useQueryState<boolean>(
     "create-group",
     parseAsBoolean.withDefault(false),

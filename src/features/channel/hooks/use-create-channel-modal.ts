@@ -1,6 +1,6 @@
 import { parseAsBoolean, useQueryState } from "nuqs"
 
-export const useCreateChannelModal = () => {
+export const useCreateChannelPanel = () => {
   const [isCreateChannelOpen, setCreateChannelOpen] = useQueryState<boolean>(
     "create-channel",
     parseAsBoolean.withDefault(false),
