@@ -9,3 +9,15 @@ export const imageProfileSchema = z.object({
 })
 
 export const ROOM_TYPES: RoomType[] = ["channel", "chat", "group"]
+
+export const CONFIRM_DIALOG_ACTIONS: ChatRoomMenuAction[] = [
+  "mute-chat",
+  "block-user",
+  "delete-chat",
+  "mute-group",
+  "leave-group",
+  "delete-and-exit-group",
+  "mute-channel",
+  "leave-channel",
+  "delete-and-exit-channel",
+]
