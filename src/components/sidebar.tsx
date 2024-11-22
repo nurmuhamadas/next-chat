@@ -4,11 +4,7 @@ import MyProfilePanel from "@/features/user/components/my-profile-panel"
 import SettingsPanel from "@/features/user/components/settings/panel"
 import { cn } from "@/lib/utils"
 
-interface SidebarProps {
-  className?: string
-}
-
-const Sidebar = ({ className }: SidebarProps) => {
+const Sidebar = ({ className }: PropwWithClassName) => {
   return (
     <aside className={cn("h-screen bg-surface", className)}>
       <ChatListPanel />

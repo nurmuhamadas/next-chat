@@ -1,9 +1,7 @@
-import { GroupType } from "./type"
-
-export const GROUP_TYPE = {
+export const GROUP_TYPE: Record<GroupType, GroupType> = {
   PUBLIC: "PUBLIC",
   PRIVATE: "PRIVATE",
-} as const
+}
 
 export const GROUP_TYPE_OPT: {
   label: string

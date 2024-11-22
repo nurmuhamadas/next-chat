@@ -1,6 +1,4 @@
-import { ChannelType } from "./type"
-
-export const CHANNEL_TYPE = {
+export const CHANNEL_TYPE: Record<ChannelType, ChannelType> = {
   PUBLIC: "PUBLIC",
   PRIVATE: "PRIVATE",
 } as const

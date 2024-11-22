@@ -29,7 +29,6 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { CHANNEL_TYPE_OPT } from "../constants"
 import { channelSchema } from "../schema"
-import { ChannelType } from "../type"
 
 interface ChannelFormProps {
   buttonLabel?: string

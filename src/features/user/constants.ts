@@ -1,5 +1,3 @@
-import { Gender, Language, Theme, TimeFormat } from "./type"
-
 export const GENDER_OPT: {
   label: string
   value: Gender

@@ -1,4 +1,5 @@
 import {
+  BellOffIcon,
   BookmarkIcon,
   BugIcon,
   InfoIcon,
@@ -7,6 +8,7 @@ import {
   MoonStarIcon,
   SettingsIcon,
   SunIcon,
+  TrashIcon,
   UserIcon,
   UserXIcon,
 } from "lucide-react"
@@ -62,3 +64,68 @@ export const MAIN_MENU: {
     action: "logout",
   },
 ]
+
+export const chatRoomMenu: Record<
+  RoomType,
+  {
+    label: string
+    icon: LucideIcon
+    danger?: boolean
+    action: ChatRoomMenuAction
+  }[]
+> = {
+  chat: [
+    {
+      label: "Mute",
+      icon: BellOffIcon,
+      action: "mute-chat",
+    },
+    {
+      label: "Block User",
+      icon: UserXIcon,
+      action: "block-user",
+    },
+    {
+      label: "Delete Chat",
+      icon: TrashIcon,
+      danger: true,
+      action: "delete-chat",
+    },
+  ],
+  group: [
+    {
+      label: "Mute",
+      icon: BellOffIcon,
+      action: "mute-group",
+    },
+    {
+      label: "Leave Group",
+      icon: LogOutIcon,
+      action: "leave-group",
+    },
+    {
+      label: "Delete and Exit",
+      icon: TrashIcon,
+      danger: true,
+      action: "delete-and-exit-group",
+    },
+  ],
+  channel: [
+    {
+      label: "Mute",
+      icon: BellOffIcon,
+      action: "mute-channel",
+    },
+    {
+      label: "Leave Channel",
+      icon: LogOutIcon,
+      action: "leave-channel",
+    },
+    {
+      label: "Delete and Exit",
+      icon: TrashIcon,
+      danger: true,
+      action: "delete-and-exit-channel",
+    },
+  ],
+}

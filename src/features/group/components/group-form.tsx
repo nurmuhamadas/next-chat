@@ -29,7 +29,6 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { GROUP_TYPE_OPT } from "../constants"
 import { groupSchema } from "../schema"
-import { GroupType } from "../type"
 
 const GroupForm = () => {
   const inputRef = useRef<HTMLInputElement>(null)
