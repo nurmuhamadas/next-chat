@@ -1,15 +1,16 @@
 import Image from "next/image"
 
+import RightPanel from "@/components/right-panel"
+
 import ChatInput from "./chat-input"
 import ChatRoomHeader from "./chat-room-header"
-import ProfilePanelWrapper from "./profile-panel-wrapper"
 
 const ChatRoom = () => {
   const isEmpty = true
 
   return (
     <div className="flex h-screen flex-1 overflow-x-hidden">
-      <div className="flex-1 transition-all duration-200 ease-linear flex-col-center">
+      <div className="flex-1 flex-col-center">
         <ChatRoomHeader />
 
         <div className="w-full flex-1 justify-end overflow-y-auto flex-col-center">
@@ -33,7 +34,7 @@ const ChatRoom = () => {
         </div>
       </div>
 
-      <ProfilePanelWrapper />
+      <RightPanel />
     </div>
   )
 }

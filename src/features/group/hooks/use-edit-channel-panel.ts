@@ -1,6 +1,6 @@
 import { parseAsString, useQueryState } from "nuqs"
 
-export const useEditChannelModal = () => {
+export const useEditChannelPanel = () => {
   const [channelId, setChannelId] = useQueryState<string>(
     "edit-channel",
     parseAsString.withDefault("").withOptions({

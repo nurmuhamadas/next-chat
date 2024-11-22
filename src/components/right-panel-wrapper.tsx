@@ -1,9 +1,9 @@
+"use client"
+
 import { PropsWithChildren, ReactNode } from "react"
 
-import { ArrowLeftIcon } from "lucide-react"
+import { ArrowLeftIcon, XIcon } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Sheet,
   SheetContent,
@@ -11,26 +11,31 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 
-interface LeftPanelWrapperProps extends PropsWithChildren {
+import { Button } from "./ui/button"
+import { ScrollArea } from "./ui/scroll-area"
+
+interface RightPanelWrapperProps extends PropsWithChildren {
   title: string
   isOpen: boolean
   onBack(): void
+  arrowBack?: boolean
   action?: ReactNode
 }
 
-const LeftPanelWrapper = ({
+const RightPanelWrapper = ({
   title,
   isOpen,
-  children,
+  arrowBack,
   onBack,
   action,
-}: LeftPanelWrapperProps) => {
+  children,
+}: RightPanelWrapperProps) => {
   return (
     <Sheet open={isOpen} modal={false}>
       <SheetContent
-        side="left"
-        className="w-screen max-w-[450px] p-0 sm:max-w-[450px] md:max-w-[384px]"
-        overlayClassName="md:hidden"
+        className="w-full max-w-[420px] border-none bg-surface p-0 sm:max-w-[420px] lg:max-w-[384px]"
+        overlayClassName="lg:hidden"
+        hideOverlay
       >
         <SheetHeader className="hidden">
           <SheetTitle>{title}</SheetTitle>
@@ -40,12 +45,12 @@ const LeftPanelWrapper = ({
           <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
             <div className="flex items-center gap-x-4">
               <Button variant="icon" size="icon" onClick={onBack}>
-                <ArrowLeftIcon />
+                {arrowBack ? <ArrowLeftIcon /> : <XIcon />}
               </Button>
               <h3 className="line-clamp-1 h3">{title}</h3>
             </div>
 
-            {action && <div className="gap-x-1 flex-center-end">{action}</div>}
+            <div className="gap-x-1 flex-center-end">{action}</div>
           </div>
 
           <ScrollArea className="chat-list-scroll-area">{children}</ScrollArea>
@@ -55,4 +60,4 @@ const LeftPanelWrapper = ({
   )
 }
 
-export default LeftPanelWrapper
+export default RightPanelWrapper

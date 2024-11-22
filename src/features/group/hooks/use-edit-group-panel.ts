@@ -1,6 +1,6 @@
 import { parseAsString, useQueryState } from "nuqs"
 
-export const useEditGroupModal = () => {
+export const useEditGroupPanel = () => {
   const [groupId, setGroupId] = useQueryState<string>(
     "edit-group",
     parseAsString.withDefault("").withOptions({
