@@ -10,6 +10,7 @@ import {
   SmileIcon,
 } from "lucide-react"
 
+import EmojiPopover from "@/components/emoji-popover"
 import { Button } from "@/components/ui/button"
 
 import TextEditor from "./text-editor"
@@ -24,13 +25,19 @@ const ChatInput = () => {
           {/* Replied message will be here */}
 
           <div className="flex flex-1 items-end gap-x-2">
-            <Button
-              variant="icon"
-              size="icon"
-              className="size-5 p-0 hover:text-primary"
+            <EmojiPopover
+              onSelectEmoji={(emoji) => {
+                console.log(emoji)
+              }}
             >
-              <SmileIcon />
-            </Button>
+              <Button
+                variant="icon"
+                size="icon"
+                className="size-5 p-0 hover:text-primary"
+              >
+                <SmileIcon />
+              </Button>
+            </EmojiPopover>
 
             <TextEditor onValueChange={setMessage} />
 

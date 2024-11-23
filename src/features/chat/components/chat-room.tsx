@@ -17,12 +17,12 @@ const ChatRoom = () => {
 
         <div
           className={cn(
-            "w-full flex-1 overflow-hidden px-4",
+            "w-full flex-1 overflow-hidden",
             isEmpty && "flex-col-center",
           )}
         >
           {isEmpty && (
-            <div className="m-auto gap-y-6 flex-col-center">
+            <div className="m-auto gap-y-6 px-4 flex-col-center">
               <Image
                 src="/images/no-message.svg"
                 alt="no conversation"

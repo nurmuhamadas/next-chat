@@ -110,3 +110,16 @@
     @apply bg-grey-2;
   }
 }
+
+.EmojiPickerReact.epr-main {
+  --epr-bg-color: hsl(var(--surface)) !important;
+  --epr-category-label-bg-color: hsl(var(--surface)) !important;
+  --epr-text-color: hsl(var(--foreground)) !important;
+  --epr-search-input-bg-color: hsl(var(--background)) !important;
+  --epr-search-input-bg-color-active: hsl(var(--background)) !important;
+  --epr-picker-border-color: #0000 !important;
+  --epr-emoji-hover-color: hsl(var(--grey-4));
+}
+.EmojiPickerReact.epr-main input:focus {
+  border-color: hsl(0, 0%, 74%) !important;
+}

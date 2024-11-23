@@ -18,7 +18,7 @@ const MessageList = () => {
 
   return (
     <ScrollArea ref={chatRef} className="chat-list-scroll-area size-full">
-      <div className="mx-auto flex w-full max-w-[700px] flex-col-reverse gap-y-2 pt-4">
+      <div className="mx-auto flex w-full max-w-[700px] flex-col-reverse gap-y-2 px-4 pt-4">
         <MessageItem
           name="Username"
           message="😀"
