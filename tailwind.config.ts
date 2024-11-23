@@ -31,6 +31,12 @@ export default {
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
         info: "hsl(var(--info))",
+        bubble: {
+          1: "hsl(var(--bubble-1))",
+          2: "hsl(var(--bubble-2))",
+          "reply-1": "hsl(var(--bubble-reply-1))",
+          "reply-2": "hsl(var(--bubble-reply-2))",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -147,8 +153,8 @@ export default {
           fontWeight: "400",
           lineHeight: "16px",
         },
-        ".overline": {
-          fontSize: "20px",
+        ".text-overline": {
+          fontSize: "10px",
           fontWeight: "400",
           lineHeight: "14px",
         },

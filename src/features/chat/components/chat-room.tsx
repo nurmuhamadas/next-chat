@@ -4,16 +4,17 @@ import RightPanel from "@/components/right-panel"
 
 import ChatInput from "./chat-input"
 import ChatRoomHeader from "./chat-room-header"
+import MessageList from "./message-list"
 
 const ChatRoom = () => {
-  const isEmpty = true
+  const isEmpty = false
 
   return (
     <div className="flex h-screen flex-1 overflow-x-hidden">
-      <div className="flex-1 flex-col-center">
+      <div className="h-full flex-1 flex-col-center">
         <ChatRoomHeader />
 
-        <div className="w-full flex-1 justify-end overflow-y-auto flex-col-center">
+        <div className="h-[calc(100vh-128px)] w-full justify-end flex-col-center">
           {isEmpty && (
             <div className="m-auto gap-y-6 flex-col-center">
               <Image
@@ -30,8 +31,10 @@ const ChatRoom = () => {
             </div>
           )}
 
-          <ChatInput />
+          {!isEmpty && <MessageList />}
         </div>
+
+        <ChatInput />
       </div>
 
       <RightPanel />

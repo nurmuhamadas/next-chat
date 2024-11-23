@@ -6,7 +6,7 @@
   :root {
     --primary: 25 80% 48%;
     --primary-hover: 23 85% 41%;
-    --accent: 39 90% 68%;
+    --accent: 40, 70%, 85%;
     --surface: 0 0% 100%;
     --background: 200 13% 95%;
     --foreground: 204 4% 25%;
@@ -20,6 +20,11 @@
     --success: 123 41% 45%;
     --warning: 49 98% 60%;
     --info: 210 79% 46%;
+
+    --bubble-1: 0 0% 100%;
+    --bubble-2: 40, 70%, 85%;
+    --bubble-reply-1: 210, 25%, 95%;
+    --bubble-reply-2: 40, 60%, 90%;
 
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -39,7 +44,7 @@
     --primary: 25 80% 48%;
     /* --primary: 21 80% 35%; */
     --primary-hover: 23 75% 55%;
-    --accent: 50 59% 49%;
+    --accent: 200, 50%, 35%;
     --surface: 207 18% 20%;
     --background: 205 20% 16%;
     --foreground: 0 0% 88%;
@@ -53,6 +58,11 @@
     --success: 123 41% 45%;
     --warning: 49 98% 60%;
     --info: 210 79% 46%;
+
+    --bubble-1: 207 18% 20%;
+    --bubble-2: 200, 50%, 35%;
+    --bubble-reply-1: 210, 15%, 25%;
+    --bubble-reply-2: 200, 40%, 30%;
 
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
@@ -79,5 +89,24 @@
 
   .chat-list-scroll-area > div > div {
     display: block !important;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-grey-2;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-grey-2;
   }
 }
