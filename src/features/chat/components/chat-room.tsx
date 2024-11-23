@@ -1,6 +1,7 @@
 import Image from "next/image"
 
 import RightPanel from "@/components/right-panel"
+import { cn } from "@/lib/utils"
 
 import ChatInput from "./chat-input"
 import ChatRoomHeader from "./chat-room-header"
@@ -14,7 +15,12 @@ const ChatRoom = () => {
       <div className="h-full flex-1 flex-col-center">
         <ChatRoomHeader />
 
-        <div className="h-[calc(100vh-128px)] w-full justify-end flex-col-center">
+        <div
+          className={cn(
+            "w-full flex-1 overflow-hidden px-4",
+            isEmpty && "flex-col-center",
+          )}
+        >
           {isEmpty && (
             <div className="m-auto gap-y-6 flex-col-center">
               <Image
