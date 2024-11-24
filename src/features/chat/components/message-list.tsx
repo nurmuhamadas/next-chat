@@ -4,10 +4,14 @@ import { useEffect, useRef } from "react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
+
 import MessageItem from "./message-item"
 
 const MessageList = () => {
   const chatRef = useRef<HTMLDivElement>(null)
+
+  const { selectedMessageIds } = useSelectedMessageIds()
 
   useEffect(() => {
     const chatContainer = chatRef.current
@@ -20,8 +24,11 @@ const MessageList = () => {
     <ScrollArea ref={chatRef} className="chat-list-scroll-area size-full">
       <div className="mx-auto flex w-full max-w-[700px] flex-col-reverse gap-y-2 px-4 pt-4">
         <MessageItem
-          name="Username"
-          message="😀"
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "😀",
+          }}
           time="12:17"
           isForwarded={false}
           isSender={false}
@@ -31,18 +38,27 @@ const MessageList = () => {
             name: "Parent",
             message: "Lorem ipsum dolor sit amet",
           }}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
           time="12:17"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           isForwarded
           isSender
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          name="Username"
           time="12:17"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           isForwarded={false}
           isSender
           attachments={[]}
@@ -51,24 +67,37 @@ const MessageList = () => {
             name: "Parent",
             message: "Lorem ipsum dolor sit amet",
           }}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           time="12:17"
           isForwarded
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          message="😀"
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "😀",
+          }}
           time="12:17"
           isForwarded
-          name="Usernme"
           type="group"
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          name="Username"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           time="12:17"
           isForwarded={false}
           isSender={false}
@@ -78,18 +107,27 @@ const MessageList = () => {
             name: "Parent",
             message: "Lorem ipsum dolor sit amet",
           }}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
           time="12:17"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           isForwarded
           isSender
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          name="Username"
           time="12:17"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           isForwarded={false}
           isSender
           attachments={[]}
@@ -98,24 +136,37 @@ const MessageList = () => {
             name: "Parent",
             message: "Lorem ipsum dolor sit amet",
           }}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           time="12:17"
           isForwarded
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           time="12:17"
           isForwarded
-          name="Usernme"
           type="group"
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          name="Username"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           time="12:17"
           isForwarded={false}
           isSender={false}
@@ -125,18 +176,27 @@ const MessageList = () => {
             name: "Parent",
             message: "Lorem ipsum dolor sit amet",
           }}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
           time="12:17"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           isForwarded
           isSender
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          name="Username"
           time="12:17"
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           isForwarded={false}
           isSender
           attachments={[]}
@@ -145,20 +205,30 @@ const MessageList = () => {
             name: "Parent",
             message: "Lorem ipsum dolor sit amet",
           }}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          message="Lorem ipsum dolor sit amet "
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "Lorem ipsum dolor sit amet ",
+          }}
           time="12:17"
           isForwarded
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
         <MessageItem
-          message="😀"
+          message={{
+            id: "123",
+            name: "User Name",
+            message: "😀",
+          }}
           time="12:17"
           isForwarded
-          name="Usernme"
           type="group"
           attachments={[]}
+          isSelected={selectedMessageIds.includes("123")}
         />
       </div>
     </ScrollArea>

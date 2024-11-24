@@ -1,12 +1,14 @@
-import { ChevronDownIcon } from "lucide-react"
-
 import ChatAvatar from "@/components/chat-avatar"
+import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
+
+import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
+
+import MessageMenu from "./message-menu"
 
 interface MessageItemProps {
   classNames?: string
-  name?: string
-  message: string
+  message: Message
   time: string
   type?: "private" | "group" | "channel"
   isSender?: boolean
@@ -17,11 +19,11 @@ interface MessageItemProps {
     message: string
   }
   attachments?: []
+  isSelected?: boolean
 }
 
 const MessageItem = ({
   classNames,
-  name,
   message,
   time,
   type = "private",
@@ -29,31 +31,46 @@ const MessageItem = ({
   isForwarded,
   parentMessage,
   attachments,
+  isSelected = false,
 }: MessageItemProps) => {
+  const { isSelectMode, toggleSelectMessage } = useSelectedMessageIds()
+
   // TODO: check if emoji and 1 character
-  const isOnlyEmoji = message.length === 2
+  const isOnlyEmoji = message.message.length === 2
 
   return (
     <div
       className={cn(
-        "flex w-full",
+        "flex w-full  rounded-md",
         isSender ? "justify-end" : "justify-start",
+        isSelectMode && "hover:bg-black/10",
         classNames,
       )}
+      onClick={() => {
+        if (isSelectMode) {
+          toggleSelectMessage(message.id)
+        }
+      }}
     >
+      {isSelectMode && (
+        <div className={cn("pt-4 pl-2", isSender ? "mr-auto" : "mr-4")}>
+          <Checkbox checked={isSelected} />
+        </div>
+      )}
+
       <div className="flex gap-x-2">
         {type !== "private" && <ChatAvatar className="size-8" />}
         <div
           className={cn(
-            "pt-1 px-2.5 pb-1.5 rounded-lg w-full max-w-[475px]",
+            "pt-1 px-2.5 pb-1 rounded-lg w-full max-w-[475px]",
             isSender ? "bg-bubble-2" : "bg-bubble-1",
           )}
         >
           <div className="gap-x-8 flex-center-between">
             <div className="flex items-center gap-x-1">
-              {name && !isSender && type !== "private" && (
+              {!isSender && type !== "private" && (
                 <span className="line-clamp-1 !font-medium text-primary caption">
-                  {name}
+                  {message.name}
                 </span>
               )}
 
@@ -65,8 +82,7 @@ const MessageItem = ({
             </div>
 
             <div className="gap-x-2 flex-center-end">
-              <span className="text-foreground/50 caption">{time}</span>
-              <ChevronDownIcon className="size-4" />
+              <MessageMenu isSender={isSender} message={message} />
             </div>
           </div>
 
@@ -91,8 +107,13 @@ const MessageItem = ({
           {/* <Image src="" /> */}
 
           <p className={cn("mt-1", isOnlyEmoji ? "text-[72px]" : "body-2")}>
-            {message}
+            {message.message}
           </p>
+
+          <div className="mt-1.5 flex-center-between">
+            <div className="">{/* Reaction here */}</div>
+            <span className="ml-auto text-foreground/50 caption">{time}</span>
+          </div>
         </div>
       </div>
     </div>

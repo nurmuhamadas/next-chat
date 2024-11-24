@@ -1,14 +1,42 @@
+"use client"
+
 import Image from "next/image"
 
 import RightPanel from "@/components/right-panel"
 import { cn } from "@/lib/utils"
 
+import { useEditedMessageId } from "../hooks/use-edited-message-id"
+import { useRepliedMessageId } from "../hooks/use-replied-message-id"
+import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
+
 import ChatInput from "./chat-input"
 import ChatRoomHeader from "./chat-room-header"
 import MessageList from "./message-list"
+import SelectedMessageMenu from "./selected-messages-menu"
 
 const ChatRoom = () => {
+  const { repliedMessageId } = useRepliedMessageId()
+  const { editedMessageId } = useEditedMessageId()
+  const { isSelectMode } = useSelectedMessageIds()
+
   const isEmpty = false
+
+  // TODO:
+  const repliedMessage = repliedMessageId
+    ? {
+        id: repliedMessageId,
+        name: "User Replied",
+        message: "Dolor sit amet",
+      }
+    : undefined
+  // TODO:
+  const editedMessage = editedMessageId
+    ? {
+        id: repliedMessageId,
+        name: "User Replied",
+        message: "Dolor sit amet",
+      }
+    : undefined
 
   return (
     <div className="flex h-screen flex-1 overflow-x-hidden">
@@ -40,7 +68,14 @@ const ChatRoom = () => {
           {!isEmpty && <MessageList />}
         </div>
 
-        <ChatInput />
+        {isSelectMode ? (
+          <SelectedMessageMenu />
+        ) : (
+          <ChatInput
+            repliedMessage={repliedMessage}
+            editedMessage={editedMessage}
+          />
+        )}
       </div>
 
       <RightPanel />

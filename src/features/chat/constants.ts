@@ -2,10 +2,16 @@ import {
   BellOffIcon,
   BookmarkIcon,
   BugIcon,
+  CircleCheckIcon,
+  CopyIcon,
+  ForwardIcon,
   InfoIcon,
   LogOutIcon,
   LucideIcon,
   MoonStarIcon,
+  PencilIcon,
+  PinIcon,
+  ReplyIcon,
   SettingsIcon,
   SunIcon,
   TrashIcon,
@@ -129,3 +135,47 @@ export const chatRoomMenu: Record<
     },
   ],
 }
+
+export const messageItemMenu: {
+  label: string
+  icon: LucideIcon
+  danger?: boolean
+  action: MessageItemMenuAction
+}[] = [
+  {
+    label: "Reply",
+    icon: ReplyIcon,
+    action: "reply",
+  },
+  {
+    label: "Edit",
+    icon: PencilIcon,
+    action: "edit",
+  },
+  {
+    label: "Copy Text",
+    icon: CopyIcon,
+    action: "copy-text",
+  },
+  {
+    label: "Pin",
+    icon: PinIcon,
+    action: "pin",
+  },
+  {
+    label: "Forward",
+    icon: ForwardIcon,
+    action: "forward",
+  },
+  {
+    label: "Select",
+    icon: CircleCheckIcon,
+    action: "select",
+  },
+  {
+    label: "Delete",
+    icon: TrashIcon,
+    action: "delete",
+    danger: true,
+  },
+]

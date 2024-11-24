@@ -22,6 +22,15 @@ declare type ChatRoomMenuAction =
   | "leave-channel"
   | "delete-and-exit-channel"
 
+declare type MessageItemMenuAction =
+  | "reply"
+  | "edit"
+  | "copy-text"
+  | "pin"
+  | "forward"
+  | "select"
+  | "delete"
+
 declare type ChannelType = "PUBLIC" | "PRIVATE"
 
 declare type GroupType = "PUBLIC" | "PRIVATE"
