@@ -11,6 +11,7 @@ import { cn, copyMessage } from "@/lib/utils"
 
 import { messageItemMenu } from "../constants"
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
+import { useForwardMessage } from "../hooks/use-forward-message"
 import { useRepliedMessageId } from "../hooks/use-replied-message-id"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
@@ -23,6 +24,7 @@ const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
   const { replyMessage, cancelReplyMessage } = useRepliedMessageId()
   const { editMessage, cancelEditMessage } = useEditedMessageId()
   const { toggleSelectMessage } = useSelectedMessageIds()
+  const { forwardMessage } = useForwardMessage()
 
   const [Dialog, confirm] = useConfirm()
 
@@ -46,6 +48,7 @@ const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
       case "pin":
         break
       case "forward":
+        forwardMessage(message.id)
         break
       case "select":
         toggleSelectMessage(message.id)

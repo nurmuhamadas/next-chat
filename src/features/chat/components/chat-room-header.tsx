@@ -51,7 +51,7 @@ const ChatRoomHeader = () => {
             {type === "group" && "Group Name"}
             {type === "channel" && "Channel Name"}
           </h2>
-          <p className="line-clamp-1 text-grey-2 caption">
+          <p className="line-clamp-1 text-muted-foreground caption">
             {type === "chat" && "Last seen at"}
             {type === "group" && "2 members"}
             {type === "channel" && "2 subscribers"}

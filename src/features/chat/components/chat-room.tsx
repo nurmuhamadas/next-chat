@@ -11,6 +11,7 @@ import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
 import ChatInput from "./chat-input"
 import ChatRoomHeader from "./chat-room-header"
+import ForwardMessageModal from "./forward-message-modal"
 import MessageList from "./message-list"
 import SelectedMessageMenu from "./selected-messages-menu"
 
@@ -45,7 +46,7 @@ const ChatRoom = () => {
 
         <div
           className={cn(
-            "w-full flex-1 overflow-hidden",
+            "w-full flex-1 overflow-hidden py-1",
             isEmpty && "flex-col-center",
           )}
         >
@@ -79,6 +80,8 @@ const ChatRoom = () => {
       </div>
 
       <RightPanel />
+
+      <ForwardMessageModal />
     </div>
   )
 }

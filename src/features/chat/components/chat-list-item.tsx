@@ -33,7 +33,7 @@ const ChatListItem = ({ selected = false }: ChatListItemProps) => {
           <div className="flex items-center gap-x-3">
             <p
               className={cn(
-                "flex-1 truncate text-grey-3 body-1",
+                "flex-1 truncate text-muted-foreground body-1",
                 selected && "text-grey-4",
               )}
             >
