@@ -30,6 +30,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { GROUP_TYPE_OPT } from "../constants"
 import { groupSchema } from "../schema"
 
+import SelectUsers from "./select-users"
+
 const GroupForm = () => {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -39,6 +41,7 @@ const GroupForm = () => {
       name: "",
       description: "",
       type: "PUBLIC",
+      members: [],
     },
   })
 
@@ -130,6 +133,21 @@ const GroupForm = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="members"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Members</FormLabel>
+              <SelectUsers
+                selectedIds={field.value}
+                onValuesChange={(ids) => form.setValue("members", ids)}
+              />
               <FormMessage />
             </FormItem>
           )}
