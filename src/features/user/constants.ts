@@ -41,11 +41,11 @@ export const TIME_FORMAT_OPT: {
 }[] = [
   {
     label: "12 Hour",
-    value: "12-HOURS",
+    value: "12-HOUR",
   },
   {
     label: "24 Hour",
-    value: "24-HOURS",
+    value: "24-HOUR",
   },
 ]
 
@@ -55,11 +55,11 @@ export const LANGUAGE_OPT: {
 }[] = [
   {
     label: "English",
-    value: "EN",
+    value: "en_US",
   },
   {
     label: "Bahasa Indonesia",
-    value: "ID",
+    value: "id_ID",
   },
 ]
 

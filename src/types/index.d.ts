@@ -30,15 +30,3 @@ declare type MessageItemMenuAction =
   | "forward"
   | "select"
   | "delete"
-
-declare type ChannelType = "PUBLIC" | "PRIVATE"
-
-declare type GroupType = "PUBLIC" | "PRIVATE"
-
-declare type Gender = "MALE" | "FEMALE"
-
-declare type Theme = "LIGHT" | "DARK" | "SYSTEM"
-
-declare type TimeFormat = "12-HOURS" | "24-HOURS"
-
-declare type Language = "EN" | "ID"
