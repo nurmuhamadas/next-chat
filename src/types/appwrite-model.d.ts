@@ -14,6 +14,7 @@ declare interface UserModel extends AppwriteDocument {
   username: string
   gender: Gender
   bio?: string
+  imageUrl?: string
   lastSeenAt?: Date
 }
 

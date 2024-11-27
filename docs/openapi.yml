@@ -1,0 +1,525 @@
+openapi: 3.0.0
+info:
+  title: "NextChat"
+  version: "1.0.0"
+  contact:
+    name: Nur Muhamad Ash Shidiqi
+    email: nurmuhamad.a.13@gmail.com
+    url: https://nurmuhamadas.me/
+tags:
+  - name: Authentication
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: next-chat-session
+
+paths:
+  /auth/register:
+    post:
+      operationId: createAccount
+      summary: Register a new user
+      tags: ["Authentication"]
+      requestBody:
+        description: User data for registration
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                  maxLength: 256
+                password:
+                  type: string
+                  pattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)$
+                  minLength: 8
+                  maxLength: 256
+                  example: Password123
+              required:
+                - email
+                - password
+
+      responses:
+        201:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                  message:
+                    type: string
+                    enum:
+                      - USER_REGISTERED
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - EMAIL_REQUIRED
+                          - INVALID_EMAIL
+                          - EMAIL_ALREADY_REGISTERED
+                          - EMAIL_TOO_LONG
+                          - PASSWORD_REQUIRED
+                          - PASSWORD_TOO_SHORT
+                          - INVALID_PASSWORD_FORMAT
+                          - PASSWORD_TOO_LONG
+
+  /auth/login:
+    post:
+      operationId: login
+      summary: Login with credentials
+      tags: ["Authentication"]
+      requestBody:
+        description: User data for login
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  example: Password123
+              required:
+                - email
+                - password
+
+      responses:
+        200:
+          description: User logged in
+          headers:
+            Set-Cookie:
+              description: Session cookie containing the authentication token
+              schema:
+                type: string
+                example: sessionid=abc123xyz; Path=/; HttpOnly; Secure; SameSite=Strict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                  message:
+                    type: string
+                    enum:
+                      - LOGGED_IN
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - EMAIL_NOT_REGISTERED
+                          - INVALID_CREDENTIALS
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      summary: Request link to reset password
+      tags: ["Authentication"]
+      requestBody:
+        description: Registered email to send the reset link
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+              required:
+                - email
+
+      responses:
+        200:
+          description: Reset link sent to email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                  message:
+                    type: string
+                    enum:
+                      - RESET_LINK_SENT
+
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - EMAIL_NOT_REGISTERED
+
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      summary: Create new password
+      tags: ["Authentication"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  pattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)$
+                  minLength: 8
+                  maxLength: 256
+                  example: Password123
+                token:
+                  type: string
+
+              required:
+                - email
+                - token
+
+      responses:
+        200:
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                  message:
+                    type: string
+                    enum:
+                      - PASSWORD_RESET
+
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - PASSWORD_REQUIRED
+                          - PASSWORD_TOO_SHORT
+                          - INVALID_PASSWORD_FORMAT
+                          - PASSWORD_TOO_LONG
+                          - INVALID_TOKEN
+                          - TOKEN_EXPIRED
+
+  /auth/verify-otp:
+    post:
+      operationId: verifyOTP
+      summary: Verify user credentials with OTP
+      tags: ["Authentication"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+                  example: 12AK90
+                token:
+                  type: string
+
+              required:
+                - code
+                - token
+
+      responses:
+        200:
+          description: OTP verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                  message:
+                    type: string
+                    enum:
+                      - OTP_VERIFIED
+
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - INVALID_CODE
+                          - INVALID_TOKEN
+                          - TOKEN_EXPIRED
+
+  /user/profile:
+    post:
+      operationId: registerUser
+      summary: Register a new user profile
+      tags: ["User Management"]
+      security:
+        - cookieAuth: []
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  minLength: 3
+                  maxLength: 256
+                  example: John
+                lastName:
+                  type: string
+                  minLength: 3
+                  maxLength: 256
+                  example: John
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 256
+                  pattern: ^[a-zA-Z0-9_]+$
+                  example: john_doe_123
+                gender:
+                  type: string
+                  enum:
+                    - MALE
+                    - FEMALE
+                bio:
+                  type: string
+                  maxLength: 1024
+                image:
+                  type: string
+                  format: binary
+                  description: Profile image (PNG, JPG, JPEG), max size 2MB
+
+              required:
+                - firstName
+                - username
+                - gender
+
+      responses:
+        201:
+          description: User profile created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      username:
+                        type: string
+                      gender:
+                        type: string
+                      bio:
+                        type: string
+                      image:
+                        type: string
+                  message:
+                    type: string
+                    enum:
+                      - USER_PROFILE_REGISTERED
+
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - FIELD_REQUIRED
+                          - FIELD_TOO_LONG
+                          - FIELD_TOO_SHORT
+                          - USERNAME_ALREADY_EXIST
+                          - INVALID_GENDER
+    patch:
+      operationId: updateUser
+      summary: Update user profile partially
+      tags: ["User Management"]
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  minLength: 3
+                  maxLength: 256
+                  example: John
+                lastName:
+                  type: string
+                  minLength: 3
+                  maxLength: 256
+                  example: John
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 256
+                  pattern: ^[a-zA-Z0-9_]+$
+                  example: john_doe_123
+                gender:
+                  type: string
+                  enum:
+                    - MALE
+                    - FEMALE
+                bio:
+                  type: string
+                  maxLength: 1024
+                image:
+                  type: string
+                  format: binary
+                  description: Profile image (PNG, JPG, JPEG), max size 2MB
+
+      responses:
+        200:
+          description: User profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      username:
+                        type: string
+                      gender:
+                        type: string
+                      bio:
+                        type: string
+                      image:
+                        type: string
+                  message:
+                    type: string
+                    enum:
+                      - USER_PROFILE_UPDATED
+
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - FIELD_TOO_LONG
+                          - FIELD_TOO_SHORT
+                          - USERNAME_ALREADY_EXIST
+                          - INVALID_GENDER
+
+  /user/last-seen:
+    get:
+      operationId: getUserLastSeen
+      summary: Get user last seen data
+      tags: ["User Management"]
+      security:
+        - cookieAuth: []
+
+      responses:
+        200:
+          description: Get last seen
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    format: datetime
+    put:
+      operationId: updateUserLastSeen
+      summary: Update user last seen data
+      tags: ["User Management"]
+      security:
+        - cookieAuth: []
+
+      responses:
+        200:
+          description: Last seen updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                  message:
+                    type: string
+                    enum:
+                      - LAST_SEEN_UPDATED

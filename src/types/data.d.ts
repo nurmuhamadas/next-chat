@@ -24,6 +24,7 @@ declare interface User {
   username: string
   gender: Gender
   bio?: string
+  imageUrl?: string
   lastSeenAt?: Date
   createdAt: Date
   updatedAt?: Date
