@@ -25,39 +25,44 @@ declare interface User {
   gender: Gender
   bio?: string
   imageUrl?: string
-  lastSeenAt?: Date
-  createdAt: Date
-  updatedAt?: Date
+  lastSeenAt?: string
+}
+
+declare interface LastMessage {
+  id: string
+  name: string
+  message: string
+  time: string
 }
 
 declare interface Conversation {
   id: string
-  userId1: string
-  userId2: string
-  createdAt: Date
-  updatedAt?: Date
+  type: RoomType
+  name: string
+  imageUrl?: string
+  totalUnreadMessages: number
+  lastMessage?: LastMessage
 }
 
 declare interface ConversationOption {
-  id: string
   conversationId: string
   notification: boolean
-  createdAt: Date
-  updatedAt?: Date
 }
 
 declare interface BlockedUser {
   id: string
-  userId: string
-  blockedUserId: string
-  createdAt: Date
-  updatedAt?: Date
+  name: string
+  imageUrl?: string
 }
 
 declare interface Message {
   id: string
   message: string
-  userId: string
+  user: {
+    id: string
+    name: string
+    imageUrl?: string
+  }
   conversationId?: string
   parentMessageId?: string
   parentMessageName?: string
@@ -68,8 +73,8 @@ declare interface Message {
   isEmojiOnly?: boolean
   isRead?: boolean
   status: MessageStatus
-  createdAt: Date
-  updatedAt?: Date
+  createdAt: string
+  updatedAt?: string
 }
 
 declare interface Reaction {
@@ -77,8 +82,6 @@ declare interface Reaction {
   reaction: string
   messageId: string
   userId: string
-  createdAt: Date
-  updatedAt?: Date
 }
 
 declare interface Attachment {
@@ -88,8 +91,6 @@ declare interface Attachment {
   type: AttachmentType
   size: number
   messageId: string
-  createdAt: Date
-  updatedAt?: Date
 }
 
 declare interface Group {
@@ -97,18 +98,28 @@ declare interface Group {
   name: string
   description?: string
   type: GroupType
-  createdBy: string
+  owner: {
+    id: string
+    name: string
+    imageUrl?: string
+  }
   imageUrl?: string
-  createdAt: Date
-  updatedAt?: Date
+  inviteCode: string
+  lastMessage: LastMessage
+}
+
+declare interface GroupMember {
+  id: string
+  name: string
+  imageUrl?: string
+  isAdmin: boolean
+  lastSeenAt: string
 }
 
 declare interface GroupOption {
   id: string
   groupId: string
   notification: boolean
-  createdAt: Date
-  updatedAt?: Date
 }
 
 declare interface Channel {
@@ -116,18 +127,28 @@ declare interface Channel {
   name: string
   description?: string
   type: ChannelType
-  createdBy: string
+  owner: {
+    id: string
+    name: string
+    imageUrl?: string
+  }
   imageUrl?: string
-  createdAt: Date
-  updatedAt?: Date
+  inviteCode: string
+  lastMessage: LastMessage
+}
+
+declare interface ChannelSubscriber {
+  id: string
+  name: string
+  imageUrl?: string
+  isAdmin: boolean
+  lastSeenAt: string
 }
 
 declare interface ChannelOption {
   id: string
   channelId: string
   notification: boolean
-  createdAt: Date
-  updatedAt?: Date
 }
 
 declare interface Setting {
@@ -139,6 +160,4 @@ declare interface Setting {
   enable2FA?: boolean
   showLastSeen?: boolean
   allowToAddToGroup?: boolean
-  createdAt: Date
-  updatedAt?: Date
 }

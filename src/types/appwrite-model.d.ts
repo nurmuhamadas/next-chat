@@ -66,7 +66,7 @@ declare interface GroupModel extends AppwriteDocument {
   name: string
   description?: string
   type: GroupType
-  createdBy: string
+  ownerId: string
   imageUrl?: string
 }
 
@@ -79,7 +79,7 @@ declare interface ChannelModel extends AppwriteDocument {
   name: string
   description?: string
   type: ChannelType
-  createdBy: string
+  ownerId: string
   imageUrl?: string
 }
 

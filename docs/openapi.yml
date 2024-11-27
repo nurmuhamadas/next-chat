@@ -15,6 +15,109 @@ components:
       type: apiKey
       in: cookie
       name: next-chat-session
+  responses:
+    UnauthorizeError:
+      description: Unauthorize
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    enum:
+                      - UNAUTHORIZE
+    ForbiddenError:
+      description: Forbidden error due to have no access to the resource
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    enum:
+                      - FORBIDDEN
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        gender:
+          type: string
+        bio:
+          type: string
+        imageUrl:
+          type: string
+        lastSeenAt:
+          type: string
+          format: datetime
+      required:
+        - id
+        - email
+        - firstName
+        - username
+        - gender
+        - lastSeenAt
+    LastMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        message:
+          type: string
+        time:
+          type: string
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+            - PUBLIC
+            - PRIVATE
+        owner:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            imageUrl:
+              type: string
+          required:
+            - id
+            - name
+        imageUrl:
+          type: string
+        inviteCode:
+          type: string
+        lastMessage:
+          $ref: "#/components/schemas/LastMessage"
 
 paths:
   /auth/register:
@@ -54,10 +157,7 @@ paths:
                 properties:
                   data:
                     type: boolean
-                  message:
-                    type: string
-                    enum:
-                      - USER_REGISTERED
+
         400:
           description: Bad request due to invalid input
           content:
@@ -119,10 +219,7 @@ paths:
                 properties:
                   data:
                     type: boolean
-                  message:
-                    type: string
-                    enum:
-                      - LOGGED_IN
+
         400:
           description: Bad request due to invalid input
           content:
@@ -168,10 +265,6 @@ paths:
                 properties:
                   data:
                     type: boolean
-                  message:
-                    type: string
-                    enum:
-                      - RESET_LINK_SENT
 
         400:
           description: Bad request due to invalid input
@@ -222,10 +315,6 @@ paths:
                 properties:
                   data:
                     type: boolean
-                  message:
-                    type: string
-                    enum:
-                      - PASSWORD_RESET
 
         400:
           description: Bad request due to invalid input
@@ -280,10 +369,6 @@ paths:
                 properties:
                   data:
                     type: boolean
-                  message:
-                    type: string
-                    enum:
-                      - OTP_VERIFIED
 
         400:
           description: Bad request due to invalid input
@@ -302,7 +387,61 @@ paths:
                           - INVALID_TOKEN
                           - TOKEN_EXPIRED
 
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: Logout session
+      tags: ["Authentication"]
+
+      responses:
+        200:
+          description: Logged Out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+
   /user/profile:
+    get:
+      operationId: getUser
+      summary: Get it own user data
+      tags: ["User Management"]
+      security:
+        - cookieAuth: []
+
+      responses:
+        200:
+          description: User data fetched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/User"
+
+        400:
+          description: Bad request due to invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        enum:
+                          - FIELD_REQUIRED
+                          - FIELD_TOO_LONG
+                          - FIELD_TOO_SHORT
+                          - USERNAME_ALREADY_EXIST
+                          - INVALID_GENDER
     post:
       operationId: registerUser
       summary: Register a new user profile
@@ -360,23 +499,7 @@ paths:
                 properties:
                   data:
                     type: object
-                    properties:
-                      firstName:
-                        type: string
-                      lastName:
-                        type: string
-                      username:
-                        type: string
-                      gender:
-                        type: string
-                      bio:
-                        type: string
-                      image:
-                        type: string
-                  message:
-                    type: string
-                    enum:
-                      - USER_PROFILE_REGISTERED
+                    $ref: "#/components/schemas/User"
 
         400:
           description: Bad request due to invalid input
@@ -447,24 +570,7 @@ paths:
                 properties:
                   data:
                     type: object
-                    properties:
-                      firstName:
-                        type: string
-                      lastName:
-                        type: string
-                      username:
-                        type: string
-                      gender:
-                        type: string
-                      bio:
-                        type: string
-                      image:
-                        type: string
-                  message:
-                    type: string
-                    enum:
-                      - USER_PROFILE_UPDATED
-
+                    $ref: "#/components/schemas/User"
         400:
           description: Bad request due to invalid input
           content:
@@ -523,3 +629,132 @@ paths:
                     type: string
                     enum:
                       - LAST_SEEN_UPDATED
+
+  /users:
+    get:
+      operationId: getUsers
+      summary: Search users by name
+      tags: ["User Management"]
+      security:
+        - cookieAuth: []
+
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search user by name
+
+      responses:
+        200:
+          description: Get last seen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    imageUrl:
+                      type: string
+                    lastSeenAt:
+                      type: string
+                  required:
+                    - id
+                    - name
+                    - lastSeenAt
+
+  /blocked-users:
+    get:
+      operationId: getBlockedUsers
+      summary: Get list of blocked users
+      tags: ["Blocked Users"]
+      security:
+        - cookieAuth: []
+
+      responses:
+        200:
+          description: Get blocked users successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    imageUrl:
+                      type: string
+                  required:
+                    - id
+                    - name
+
+  /blocked-user:
+    post:
+      operationId: blockUsers
+      summary: Block user by id
+      tags: ["Blocked Users"]
+      security:
+        - cookieAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+
+      responses:
+        201:
+          description: Block user successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+
+        401:
+          $ref: "#/components/responses/UnauthorizeError"
+
+        403:
+          $ref: "#/components/responses/ForbiddenError"
+
+    delete:
+      operationId: unblockUsers
+      summary: Unblock user by id
+      tags: ["Blocked Users"]
+      security:
+        - cookieAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+
+      responses:
+        200:
+          description: Unblock user successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+
+        401:
+          $ref: "#/components/responses/UnauthorizeError"
+
+        403:
+          $ref: "#/components/responses/ForbiddenError"
