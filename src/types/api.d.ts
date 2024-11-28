@@ -1,12 +1,17 @@
+declare interface ErrorResponse {
+  success: false
+  error: {
+    message: string
+    path?: (string | number)[]
+  }
+}
+
 declare type ApiResponse<T> =
   | {
+      success: true
       data: T
     }
-  | {
-      error: {
-        message: string
-      }
-    }
+  | ErrorResponse
 
 // AUTH API
 declare type RegisterResponse = ApiResponse<boolean>

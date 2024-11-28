@@ -1,55 +1,63 @@
 import { z } from "zod"
 
+import { ERROR } from "@/constants/error"
+
 export const signInSchema = z.object({
-  email: z.string().email().min(1, "Required"),
-  password: z.string().min(1, "Required"),
+  email: z.string().email(ERROR.INVALID_EMAIL).min(1, ERROR.EMAIL_REQUIRED),
+  password: z.string().min(1, ERROR.PASSWORD_REQUIRED),
 })
 
 export const signUpSchema = z
   .object({
-    email: z.string().email().min(1, "Required"),
+    email: z
+      .string()
+      .email()
+      .min(1, ERROR.EMAIL_REQUIRED)
+      .max(256, ERROR.EMAIL_TOO_LONG),
     password: z
       .string()
-      .min(1, "Required")
-      .min(8, { message: "Password must be at least 8 characters long" })
+      .min(1, ERROR.PASSWORD_REQUIRED)
+      .min(8, { message: ERROR.PASSWORD_TOO_SHORT })
+      .max(256, { message: ERROR.PASSWORD_TOO_LONG })
       .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter",
+        message: ERROR.PASSWORD_CONTAIN_LOWERCASE,
       })
       .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
+        message: ERROR.PASSWORD_CONTAIN_UPPERCASE,
       })
-      .regex(/\d/, { message: "Password must contain at least one number" }),
-    confirmPassword: z.string().min(1, "Required"),
+      .regex(/\d/, { message: ERROR.PASSWORD_CONTAIN_NUMBER }),
+    confirmPassword: z.string().min(1, ERROR.CONFIRM_PASSWORD_REQUIRED),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: ERROR.PASSWORD_DONT_MATCH,
     path: ["confirmPassword"],
   })
 
 export const forgotPassworsSchema = z.object({
-  email: z.string().email().min(1, "Required"),
+  email: z.string().email().min(1, ERROR.EMAIL_REQUIRED),
 })
 
 export const resetPasswordSchema = z
   .object({
     password: z
       .string()
-      .min(1, "Required")
-      .min(8, { message: "Password must be at least 8 characters long" })
+      .min(1, ERROR.PASSWORD_REQUIRED)
+      .min(8, { message: ERROR.PASSWORD_TOO_SHORT })
+      .max(256, { message: ERROR.PASSWORD_TOO_LONG })
       .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter",
+        message: ERROR.PASSWORD_CONTAIN_LOWERCASE,
       })
       .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
+        message: ERROR.PASSWORD_CONTAIN_UPPERCASE,
       })
-      .regex(/\d/, { message: "Password must contain at least one number" }),
-    confirmPassword: z.string().min(1, "Required"),
+      .regex(/\d/, { message: ERROR.PASSWORD_CONTAIN_NUMBER }),
+    confirmPassword: z.string().min(1, ERROR.CONFIRM_PASSWORD_REQUIRED),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: ERROR.PASSWORD_DONT_MATCH,
     path: ["confirmPassword"],
   })
 
 export const otpSchema = z.object({
-  code: z.string().min(1, "Required").max(6),
+  code: z.string().min(1, ERROR.OTP_REQUIRED).max(6),
 })

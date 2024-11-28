@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { imageProfileSchema } from "@/lib/constants"
+import { imageProfileSchema } from "@/constants"
 
 import { GENDER } from "./constants"
 

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import ChatRoom from "@/features/chat/components/chat-room"
-import { ROOM_TYPES } from "@/lib/constants"
+import { ROOM_TYPES } from "@/constants"
 
 interface ChatRoomPageProps {
   params: Promise<{ roomType: RoomType; roomId: string }>

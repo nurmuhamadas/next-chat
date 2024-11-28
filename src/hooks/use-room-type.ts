@@ -1,6 +1,6 @@
 import { useParams } from "next/navigation"
 
-import { ROOM_TYPES } from "@/lib/constants"
+import { ROOM_TYPES } from "@/constants"
 
 export const useRoomType = (): RoomType => {
   const params = useParams()
