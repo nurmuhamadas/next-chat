@@ -12,3 +12,18 @@ export const checkUsernameIsExist = async (
 
   return result.total > 0
 }
+
+export const getUserProfileById = async (
+  databases: Databases,
+  userId: string,
+) => {
+  try {
+    return await databases.getDocument<UserModel>(
+      DATABASE_ID,
+      APPWRITE_USERS_ID,
+      userId,
+    )
+  } catch {
+    return null
+  }
+}

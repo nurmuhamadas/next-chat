@@ -17,3 +17,13 @@ export const uploadImage = async ({
 
   return file
 }
+
+export const deleteImage = async ({
+  id,
+  storage,
+}: {
+  id: string
+  storage: Storage
+}) => {
+  await storage.deleteFile(STORAGE_ID, id)
+}

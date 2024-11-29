@@ -61,6 +61,10 @@ export const constructFileUrl = (bucketFileId: string) => {
   return `${APPWRITE_ENDPOINT}/storage/buckets/${STORAGE_ID}/files/${bucketFileId}/view?project=${APPWRITE_PROJECT_ID}`
 }
 
+export const destructFileId = (fileUrl: string) => {
+  return fileUrl.split(APPWRITE_ENDPOINT)[1].split("/")[5]
+}
+
 export const constructDownloadUrl = (bucketFileId: string) => {
   return `${APPWRITE_ENDPOINT}/storage/buckets/${STORAGE_ID}/files/${bucketFileId}/download?project=${APPWRITE_PROJECT_ID}`
 }
