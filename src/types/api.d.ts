@@ -13,6 +13,14 @@ declare type ApiResponse<T> =
     }
   | ErrorResponse
 
+declare type ApiCollectionResponse<T> =
+  | {
+      success: true
+      data: T
+      total: number
+    }
+  | ErrorResponse
+
 // AUTH API
 declare type RegisterResponse = ApiResponse<boolean>
 
@@ -35,14 +43,7 @@ declare type PatchUserProfileResponse = ApiResponse<User>
 
 declare type GetUserProfileResponse = ApiResponse<User>
 
-declare type SearchUsersResponse = ApiResponse<
-  {
-    id: string
-    name: string
-    imageUrl?: string
-    lastSeenAt: Date
-  }[]
->
+declare type SearchUsersResponse = ApiCollectionResponse<UserSearch[]>
 
 declare type GetUserLastSeenResponse = ApiResponse<string>
 

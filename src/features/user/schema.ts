@@ -21,3 +21,21 @@ export const profileSchema = z.object({
   bio: z.string().max(2048, ERROR.BIO_TOO_LONG).trim().optional(),
   image: imageProfileSchema,
 })
+
+export const searchQuerySchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (!v ? undefined : v)),
+  limit: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (isNaN(Number(v)) ? 20 : Number(v))),
+  offset: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (isNaN(Number(v)) ? 0 : Number(v))),
+})

@@ -25,7 +25,14 @@ declare interface User {
   gender: Gender
   bio?: string
   imageUrl?: string
-  lastSeenAt?: string
+  lastSeenAt?: Date
+}
+
+declare interface UserSearch {
+  id: string
+  name: string
+  imageUrl?: string
+  lastSeenAt?: Date
 }
 
 declare interface LastMessage {

@@ -18,9 +18,13 @@ import { deleteImage, uploadImage } from "@/lib/uploadImage"
 import { createError } from "@/lib/utils"
 import { zodErrorHandler } from "@/lib/zodErrorHandler"
 
-import { checkUsernameIsExist, getUserProfileById } from "../lib/queries"
-import { mapUserModelToUser } from "../lib/utils"
-import { profileSchema as profileSchema } from "../schema"
+import {
+  checkUsernameIsExist,
+  getUserProfileById,
+  searchUser,
+} from "../lib/queries"
+import { mapSearchResult, mapUserModelToUser } from "../lib/utils"
+import { profileSchema as profileSchema, searchQuerySchema } from "../schema"
 
 const userApp = new Hono()
   .get("/check-username/:username", sessionMiddleware, async (c) => {
@@ -156,6 +160,25 @@ const userApp = new Hono()
 
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
+    },
+  )
+  .get(
+    "/search",
+    sessionMiddleware,
+    zValidator("query", searchQuerySchema),
+    async (c) => {
+      const { query, limit, offset } = c.req.valid("query")
+
+      const { databases } = await createSessionClient()
+
+      const result = await searchUser(databases, { query, limit, offset })
+      const response: SearchUsersResponse = {
+        success: true,
+        data: result.documents.map(mapSearchResult),
+        total: result.total,
+      }
+
+      return c.json(response)
     },
   )
   .get("/:userId", sessionMiddleware, async (c) => {
