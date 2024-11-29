@@ -5,12 +5,12 @@ export const mapUserModelToUser = (user: UserModel): User => {
     id: user.$id,
     email: user.email,
     firstName: user.firstName,
-    lastName: user.lastName ?? undefined,
+    lastName: user.lastName ?? null,
     username: user.username,
     gender: user.gender,
-    bio: user.bio ?? undefined,
-    imageUrl: user.imageUrl ?? undefined,
-    lastSeenAt: user.lastSeenAt ?? undefined,
+    bio: user.bio ?? null,
+    imageUrl: user.imageUrl ?? null,
+    lastSeenAt: user.lastSeenAt ?? null,
   }
 }
 
@@ -18,7 +18,7 @@ export const mapSearchResult = (user: SearchUserQueryResult): UserSearch => {
   return {
     id: user.$id,
     name: user.firstName + (user.lastName ? ` ${user.lastName}` : ""),
-    imageUrl: user.imageUrl ?? undefined,
-    lastSeenAt: user.lastSeenAt ?? undefined,
+    imageUrl: user.imageUrl ?? null,
+    lastSeenAt: user.lastSeenAt ?? null,
   }
 }

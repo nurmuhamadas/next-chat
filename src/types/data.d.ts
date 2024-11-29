@@ -20,19 +20,19 @@ declare interface User {
   id: string
   email: string
   firstName: string
-  lastName?: string
+  lastName: string | null
   username: string
   gender: Gender
-  bio?: string
-  imageUrl?: string
-  lastSeenAt?: string
+  bio: string | null
+  imageUrl: string | null
+  lastSeenAt: string | null
 }
 
 declare interface UserSearch {
   id: string
   name: string
-  imageUrl?: string
-  lastSeenAt?: string
+  imageUrl: string | null
+  lastSeenAt: string | null
 }
 
 declare interface LastMessage {
@@ -46,9 +46,9 @@ declare interface Conversation {
   id: string
   type: RoomType
   name: string
-  imageUrl?: string
+  imageUrl: string | null
   totalUnreadMessages: number
-  lastMessage?: LastMessage
+  lastMessage: LastMessage | null
 }
 
 declare interface ConversationOption {
@@ -59,7 +59,7 @@ declare interface ConversationOption {
 declare interface BlockedUser {
   id: string
   name: string
-  imageUrl?: string
+  imageUrl: string | null
 }
 
 declare interface Message {
@@ -68,20 +68,20 @@ declare interface Message {
   user: {
     id: string
     name: string
-    imageUrl?: string
+    imageUrl: string | null
   }
-  conversationId?: string
-  parentMessageId?: string
-  parentMessageName?: string
-  parentMessageText?: string
-  groupId?: string
-  channelId?: string
-  originalMessageId?: string
-  isEmojiOnly?: boolean
-  isRead?: boolean
+  conversationId: string | null
+  parentMessageId: string | null
+  parentMessageName: string | null
+  parentMessageText: string | null
+  groupId: string | null
+  channelId: string | null
+  originalMessageId: string | null
+  isEmojiOnly: boolean | null
+  isRead: boolean | null
   status: MessageStatus
   createdAt: string
-  updatedAt?: string
+  updatedAt: string | null
 }
 
 declare interface Reaction {
@@ -103,14 +103,14 @@ declare interface Attachment {
 declare interface Group {
   id: string
   name: string
-  description?: string
+  description: string | null
   type: GroupType
   owner: {
     id: string
     name: string
-    imageUrl?: string
+    imageUrl: string | null
   }
-  imageUrl?: string
+  imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage
 }
@@ -118,7 +118,7 @@ declare interface Group {
 declare interface GroupMember {
   id: string
   name: string
-  imageUrl?: string
+  imageUrl: string | null
   isAdmin: boolean
   lastSeenAt: string
 }
@@ -132,14 +132,14 @@ declare interface GroupOption {
 declare interface Channel {
   id: string
   name: string
-  description?: string
+  description: string | null
   type: ChannelType
   owner: {
     id: string
     name: string
-    imageUrl?: string
+    imageUrl: string | null
   }
-  imageUrl?: string
+  imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage
 }
@@ -147,7 +147,7 @@ declare interface Channel {
 declare interface ChannelSubscriber {
   id: string
   name: string
-  imageUrl?: string
+  imageUrl: string | null
   isAdmin: boolean
   lastSeenAt: string
 }
@@ -161,10 +161,10 @@ declare interface ChannelOption {
 declare interface Setting {
   id: string
   userId: string
-  timeFormat?: TimeFormat
-  language?: Language
-  notifications?: NotificationType[]
-  enable2FA?: boolean
-  showLastSeen?: boolean
-  allowToAddToGroup?: boolean
+  timeFormat: TimeFormat | null
+  language: Language | null
+  notifications: NotificationType[] | null
+  enable2FA: boolean | null
+  showLastSeen: boolean | null
+  allowToAddToGroup: boolean | null
 }
