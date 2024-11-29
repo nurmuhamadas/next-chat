@@ -1,16 +1,17 @@
+import "server-only"
+
 import { cookies } from "next/headers"
 
 import { Account, Client, Databases, Storage, Users } from "node-appwrite"
 
 import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
 
-import "server-only"
-
 import {
   APPWRITE_ENDPOINT,
   APPWRITE_PROJECT_ID,
   APPWRITE_SECRET_KEY,
-} from "./constants"
+  STORAGE_ID,
+} from "./config"
 
 export async function createAdminClient() {
   const client = new Client()
@@ -52,4 +53,14 @@ export const createSessionClient = async () => {
       return new Storage(client)
     },
   }
+}
+
+// APPWRITE URL UTILS
+// Construct appwrite file URL - https://appwrite.io/docs/apis/rest#images
+export const constructFileUrl = (bucketFileId: string) => {
+  return `${APPWRITE_ENDPOINT}/storage/buckets/${STORAGE_ID}/files/${bucketFileId}/view?project=${APPWRITE_PROJECT_ID}`
+}
+
+export const constructDownloadUrl = (bucketFileId: string) => {
+  return `${APPWRITE_ENDPOINT}/storage/buckets/${STORAGE_ID}/files/${bucketFileId}/download?project=${APPWRITE_PROJECT_ID}`
 }

@@ -1,11 +1,19 @@
 import { z } from "zod"
 
-export const imageProfileSchema = z.object({
-  name: z.string(),
-  size: z.number().max(2 * 1024 * 1024, "Image size must not exceed 2MB"),
-  mimetype: z
-    .enum(["image/jpeg", "image/png", "image/gif"])
-    .or(z.literal("image/webp")),
-})
+import { ERROR } from "./error"
+
+export const imageProfileSchema = z
+  .any()
+  .optional()
+  .refine(
+    (file) =>
+      ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
+        file.type,
+      ),
+    { message: ERROR.INVALID_IMAGE_TYPE },
+  )
+  .refine((file) => file.size <= 2 * 1024 * 1024, {
+    message: ERROR.IMAGE_TOO_LARGE,
+  })
 
 export const ROOM_TYPES: RoomType[] = ["channel", "chat", "group"]

@@ -1,6 +1,8 @@
 import { Context, Env } from "hono"
 import { ZodError } from "zod"
 
+import { createError } from "./utils"
+
 type Result =
   | {
       success: true
@@ -13,14 +15,11 @@ type Result =
 
 export const zodErrorHandler = (result: Result, c: Context<Env, string>) => {
   if (!result.success) {
-    const response: ErrorResponse = {
-      success: false,
-      error: {
-        message: result.error.errors[0]?.message,
-        path: result.error.errors[0]?.path,
-      },
-    }
+    const response = createError(
+      result.error.errors[0]?.message,
+      result.error.errors[0]?.path,
+    )
 
-    c.json(response)
+    return c.json(response, 400)
   }
 }

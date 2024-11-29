@@ -1,3 +1,5 @@
+import "server-only"
+
 import { createMiddleware } from "hono/factory"
 import {
   type Account as AccountType,
@@ -8,8 +10,6 @@ import {
 } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
-
-import "server-only"
 
 import { createSessionClient } from "./appwrite"
 import { createError } from "./utils"

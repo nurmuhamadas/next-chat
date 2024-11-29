@@ -27,6 +27,8 @@ declare type VerifyOTPResponse = ApiResponse<boolean>
 declare type LogoutResponse = ApiResponse<boolean>
 
 // USER API
+declare type CheckUsernameResponse = ApiResponse<boolean>
+
 declare type CreateUserProfileResponse = ApiResponse<User>
 
 declare type PatchUserProfileResponse = ApiResponse<User>
