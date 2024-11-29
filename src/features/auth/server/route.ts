@@ -5,9 +5,9 @@ import { AppwriteException, ID } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
 import { createAdminClient } from "@/lib/appwrite"
-import { sessionMiddleware } from "@/lib/sessionMiddleware"
+import { sessionMiddleware } from "@/lib/session-middleware"
 import { createError } from "@/lib/utils"
-import { zodErrorHandler } from "@/lib/zodErrorHandler"
+import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import { AUTH_COOKIE_KEY } from "../constants"
 import { signInSchema, signUpSchema } from "../schema"

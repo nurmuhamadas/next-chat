@@ -13,10 +13,10 @@ import {
   DATABASE_ID,
   STORAGE_ID,
 } from "@/lib/appwrite/config"
-import { sessionMiddleware } from "@/lib/sessionMiddleware"
-import { deleteImage, uploadImage } from "@/lib/uploadImage"
+import { sessionMiddleware } from "@/lib/session-middleware"
+import { deleteImage, uploadImage } from "@/lib/upload-image"
 import { createError } from "@/lib/utils"
-import { zodErrorHandler } from "@/lib/zodErrorHandler"
+import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import {
   checkUsernameIsExist,
