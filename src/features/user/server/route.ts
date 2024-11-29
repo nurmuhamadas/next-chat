@@ -16,6 +16,7 @@ import {
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteImage, uploadImage } from "@/lib/upload-image"
 import { createError } from "@/lib/utils"
+import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import {
@@ -94,6 +95,7 @@ const userApp = new Hono()
   .patch(
     "/:userId",
     sessionMiddleware,
+    validateProfileMiddleware,
     zValidator("form", profileSchema.partial(), zodErrorHandler),
     async (c) => {
       const { userId } = c.req.param()
@@ -165,6 +167,7 @@ const userApp = new Hono()
   .get(
     "/search",
     sessionMiddleware,
+    validateProfileMiddleware,
     zValidator("query", searchQuerySchema),
     async (c) => {
       const { query, limit, offset } = c.req.valid("query")
@@ -181,7 +184,7 @@ const userApp = new Hono()
       return c.json(response)
     },
   )
-  .get("/:userId", sessionMiddleware, async (c) => {
+  .get("/:userId", sessionMiddleware, validateProfileMiddleware, async (c) => {
     const { userId } = c.req.param()
 
     const { databases } = await createSessionClient()
