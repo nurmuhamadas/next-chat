@@ -158,5 +158,22 @@ const userApp = new Hono()
       }
     },
   )
+  .get("/:userId", sessionMiddleware, async (c) => {
+    const { userId } = c.req.param()
+
+    const { databases } = await createSessionClient()
+
+    const currentProfile = await getUserProfileById(databases, userId)
+    if (!currentProfile) {
+      return c.json(createError(ERROR.PROFILE_NOT_FOUND), 404)
+    }
+
+    const response: GetUserProfileResponse = {
+      success: true,
+      data: mapUserModelToUser(currentProfile),
+    }
+
+    return c.json(response)
+  })
 
 export default userApp

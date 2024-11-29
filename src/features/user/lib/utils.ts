@@ -8,6 +8,6 @@ export const mapUserModelToUser = (user: UserModel): User => {
     gender: user.gender,
     bio: user.bio ?? undefined,
     imageUrl: user.imageUrl ?? undefined,
-    lastSeenAt: user.lastSeenAt?.toISOString(),
+    lastSeenAt: user.lastSeenAt ?? undefined,
   }
 }
