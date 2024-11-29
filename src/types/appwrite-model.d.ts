@@ -15,7 +15,7 @@ declare interface UserModel extends AppwriteDocument {
   gender: Gender
   bio?: string
   imageUrl?: string
-  lastSeenAt?: Date
+  lastSeenAt?: string
 }
 
 declare interface ConversationModel extends AppwriteDocument {
@@ -75,12 +75,28 @@ declare interface GroupOptionModel extends AppwriteDocument {
   notification: boolean
 }
 
+declare interface GroupMemberModel extends AppwriteDocument {
+  groupId: string
+  userId: string
+  joinedAt: string
+  leftAt?: string
+  isAdmin: boolean
+}
+
 declare interface ChannelModel extends AppwriteDocument {
   name: string
   description?: string
   type: ChannelType
   ownerId: string
   imageUrl?: string
+}
+
+declare interface ChannelSubscriberModel extends AppwriteDocument {
+  channelId: string
+  userId: string
+  subscribedAt: string
+  unsubscribedAt?: string
+  isAdmin: boolean
 }
 
 declare interface ChannelOptionModel extends AppwriteDocument {
