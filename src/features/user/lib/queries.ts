@@ -67,3 +67,21 @@ export const searchUser = async (
     }
   }
 }
+
+export const getUsers = async (
+  databases: Databases,
+  queries: string[] = [],
+) => {
+  try {
+    return await databases.listDocuments<UserModel>(
+      DATABASE_ID,
+      APPWRITE_USERS_ID,
+      queries,
+    )
+  } catch {
+    return {
+      total: 0,
+      documents: [],
+    }
+  }
+}

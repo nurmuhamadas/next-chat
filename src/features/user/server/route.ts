@@ -1,13 +1,9 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
-import { ID } from "node-appwrite"
+import { ID, Query } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
-import {
-  constructFileUrl,
-  createSessionClient,
-  destructFileId,
-} from "@/lib/appwrite"
+import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import {
   APPWRITE_USERS_ID,
   DATABASE_ID,
@@ -22,6 +18,7 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 import {
   checkUsernameIsExist,
   getUserProfileById,
+  getUsers,
   searchUser,
 } from "../lib/queries"
 import { mapSearchResult, mapUserModelToUser } from "../lib/utils"
@@ -31,7 +28,8 @@ const userApp = new Hono()
   .get("/check-username/:username", sessionMiddleware, async (c) => {
     const { username } = c.req.param()
 
-    const { databases } = await createSessionClient()
+    const databases = c.get("databases")
+
     const isUsernameExist = await checkUsernameIsExist(databases, username)
 
     const response: CheckUsernameResponse = {
@@ -48,7 +46,9 @@ const userApp = new Hono()
       const { username, image, ...form } = c.req.valid("form")
       const imageFile = image as unknown as File
 
-      const { databases, storage, account } = await createSessionClient()
+      const databases = c.get("databases")
+      const storage = c.get("storage")
+      const account = c.get("account")
 
       const isUsernameExist = await checkUsernameIsExist(databases, username)
       if (isUsernameExist) {
@@ -100,7 +100,9 @@ const userApp = new Hono()
     async (c) => {
       const { userId } = c.req.param()
 
-      const { databases, storage, account } = await createSessionClient()
+      const databases = c.get("databases")
+      const storage = c.get("storage")
+      const account = c.get("account")
 
       const currentProfile = await getUserProfileById(databases, userId)
       if (!currentProfile) {
@@ -172,7 +174,7 @@ const userApp = new Hono()
     async (c) => {
       const { query, limit, offset } = c.req.valid("query")
 
-      const { databases } = await createSessionClient()
+      const databases = c.get("databases")
 
       const result = await searchUser(databases, { query, limit, offset })
       const response: SearchUsersResponse = {
@@ -184,10 +186,83 @@ const userApp = new Hono()
       return c.json(response)
     },
   )
+  .get(
+    "/last-seen",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      const databases = c.get("databases")
+      const account = c.get("account")
+
+      const user = await account.get()
+
+      const profile = await getUsers(databases, [
+        Query.equal("email", user.email),
+      ])
+
+      const response: GetUserLastSeenResponse = {
+        success: true,
+        data: profile.documents[0]?.lastSeenAt ?? null,
+      }
+
+      return c.json(response)
+    },
+  )
+  .get(
+    "/last-seen/:userId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      const { userId } = c.req.param()
+      const databases = c.get("databases")
+
+      const profile = await getUserProfileById(databases, userId)
+
+      const response: GetUserLastSeenResponse = {
+        success: true,
+        data: profile?.lastSeenAt ?? null,
+      }
+
+      return c.json(response)
+    },
+  )
+  .put(
+    "/last-seen",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      const databases = c.get("databases")
+      const account = c.get("account")
+
+      const user = await account.get()
+
+      const currentProfile = await getUsers(databases, [
+        Query.equal("email", user.email),
+      ])
+
+      try {
+        const updatedProfile = await databases.updateDocument<UserModel>(
+          DATABASE_ID,
+          APPWRITE_USERS_ID,
+          currentProfile.documents[0].$id,
+          { lastSeenAt: new Date() },
+        )
+
+        const response: UpdateUserLastSeenResponse = {
+          success: true,
+          data: updatedProfile.lastSeenAt!,
+        }
+
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
   .get("/:userId", sessionMiddleware, validateProfileMiddleware, async (c) => {
     const { userId } = c.req.param()
 
-    const { databases } = await createSessionClient()
+    const databases = c.get("databases")
 
     const currentProfile = await getUserProfileById(databases, userId)
     if (!currentProfile) {
