@@ -7,14 +7,19 @@ import { GENDER } from "./constants"
 
 export const profileSchema = z.object({
   firstName: z
-    .string({ message: ERROR.FIRST_NAME_REQUIRED })
+    .string({ required_error: ERROR.FIRST_NAME_REQUIRED })
     .trim()
-    .min(1, ERROR.FIRST_NAME_REQUIRED)
+    .min(3, ERROR.FIRST_NAME_TOO_SHORT)
     .max(256, ERROR.FIRST_NAME_TOO_LONG),
-  lastName: z.string().max(256, ERROR.LAST_NAME_TOO_LONG).trim().optional(),
+  lastName: z
+    .string()
+    .min(3, ERROR.LAST_NAME_TOO_SHORT)
+    .max(256, ERROR.LAST_NAME_TOO_LONG)
+    .trim()
+    .optional(),
   username: z
-    .string({ message: ERROR.USERNAME_REQUIRED })
-    .min(1, ERROR.USERNAME_REQUIRED)
+    .string({ required_error: ERROR.USERNAME_REQUIRED })
+    .min(3, ERROR.USERNAME_TOO_SHORT)
     .max(256, ERROR.USERNAME_TOO_LONG)
     .regex(/^[a-zA-Z0-9._-]+$/, ERROR.INVALID_USERNAME_FORMAT),
   gender: z.nativeEnum(GENDER, { message: ERROR.INVALID_GENDER }),

@@ -45,6 +45,41 @@ export const getBlockedUsersByUserId = async (
   }
 }
 
+export const getBlockedUsers = async (
+  databases: Databases,
+  { queries }: { queries: string[] },
+): Promise<Models.DocumentList<BlockedUserResult & Models.Document>> => {
+  try {
+    const result = await databases.listDocuments<BlockedUserAWModel>(
+      DATABASE_ID,
+      APPWRITE_BLOCKED_USERS_ID,
+      queries,
+    )
+
+    if (result.total === 0) {
+      return {
+        total: 0,
+        documents: [],
+      }
+    }
+
+    const blockedUserIds = result.documents.map((v) => v.blockedUserId)
+    const blockedResult = await getUsers(databases, {
+      queries: [
+        Query.contains("$id", blockedUserIds),
+        Query.select(["$id", "firstName", "lastName", "imageUrl"]),
+      ],
+    })
+
+    return blockedResult
+  } catch {
+    return {
+      total: 0,
+      documents: [],
+    }
+  }
+}
+
 export const getBlockedUser = async (
   databases: Databases,
   data: BlockedUserModel,

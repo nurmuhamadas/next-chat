@@ -98,12 +98,15 @@ declare interface GroupOptionModel {
 
 declare interface GroupMemberAWModel
   extends AppwriteDocument,
-    GroupMemberModel {}
+    GroupMemberModel {
+  joinedAt: string
+  leftAt?: string
+}
 declare interface GroupMemberModel {
   groupId: string
   userId: string
-  joinedAt: string
-  leftAt?: string
+  joinedAt: Date
+  leftAt?: Date
   isAdmin: boolean
 }
 

@@ -22,6 +22,36 @@ export const createError = (
   }
 }
 
+export const successResponse = <T>(data: T): ApiResponse<T> => {
+  return {
+    success: true,
+    data,
+  }
+}
+
+export const successCollectionResponse = <T>(
+  data: T,
+  total: number,
+): ApiCollectionResponse<T> => {
+  return {
+    success: true,
+    data,
+    total,
+  }
+}
+
 export const mergeName = (firstName: string, lastName?: string) => {
   return firstName + (lastName ? ` ${lastName}` : "")
+}
+
+export const generateInviteCode = (length = 10) => {
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  let result = ""
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length)
+    result += characters[randomIndex]
+  }
+
+  return result
 }

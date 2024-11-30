@@ -41,7 +41,7 @@ const GroupForm = () => {
       name: "",
       description: "",
       type: "PUBLIC",
-      members: [],
+      memberIds: [],
     },
   })
 
@@ -140,13 +140,13 @@ const GroupForm = () => {
 
         <FormField
           control={form.control}
-          name="members"
+          name="memberIds"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Members</FormLabel>
               <SelectUsers
                 selectedIds={field.value}
-                onValuesChange={(ids) => form.setValue("members", ids)}
+                onValuesChange={(ids) => form.setValue("memberIds", ids)}
               />
               <FormMessage />
             </FormItem>

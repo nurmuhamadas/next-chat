@@ -100,19 +100,21 @@ declare interface Attachment {
   messageId: string
 }
 
+declare interface GroupOwner {
+  id: string
+  name: string
+  imageUrl: string | null
+}
+
 declare interface Group {
   id: string
   name: string
   description: string | null
   type: GroupType
-  owner: {
-    id: string
-    name: string
-    imageUrl: string | null
-  }
+  owner: GroupOwner
   imageUrl: string | null
   inviteCode: string
-  lastMessage: LastMessage
+  lastMessage: LastMessage | null
 }
 
 declare interface GroupMember {
