@@ -21,3 +21,7 @@ export const createError = (
     error: { message, path },
   }
 }
+
+export const mergeName = (firstName: string, lastName?: string) => {
+  return firstName + (lastName ? ` ${lastName}` : "")
+}
