@@ -26,66 +26,74 @@ import { profileSchema as profileSchema, searchQuerySchema } from "../schema"
 
 const userApp = new Hono()
   .get("/check-username/:username", sessionMiddleware, async (c) => {
-    const { username } = c.req.param()
+    try {
+      const { username } = c.req.param()
 
-    const databases = c.get("databases")
+      const databases = c.get("databases")
 
-    const isUsernameExist = await checkUsernameIsExist(databases, username)
+      const isUsernameExist = await checkUsernameIsExist(databases, username)
 
-    const response: CheckUsernameResponse = {
-      success: true,
-      data: isUsernameExist,
+      const response: CheckUsernameResponse = {
+        success: true,
+        data: isUsernameExist,
+      }
+      return c.json(response)
+    } catch {
+      return c.json(createError(ERROR.INTERNAL_SERVER_ERROR))
     }
-    return c.json(response)
   })
   .post(
     "/",
     sessionMiddleware,
     zValidator("form", profileSchema, zodErrorHandler),
     async (c) => {
-      const { username, image, ...form } = c.req.valid("form")
-      const imageFile = image as unknown as File
-
-      const databases = c.get("databases")
-      const storage = c.get("storage")
-      const userAccount = c.get("userAccount")
-
-      const isUsernameExist = await checkUsernameIsExist(databases, username)
-      if (isUsernameExist) {
-        return c.json(createError(ERROR.USERNAME_ALREADY_EXIST), 400)
-      }
-
-      let imageUrl: string | undefined
-      let fileId: string | undefined
-      if (imageFile) {
-        const file = await uploadImage({ image: imageFile, storage })
-        fileId = file.$id
-        imageUrl = constructFileUrl(file.$id)
-      }
-
       try {
-        const result = await databases.createDocument<UserModel>(
-          DATABASE_ID,
-          APPWRITE_USERS_ID,
-          ID.unique(),
-          {
-            ...form,
-            email: userAccount.email,
-            username,
-            imageUrl,
-          },
-        )
+        const { username, image, ...form } = c.req.valid("form")
+        const imageFile = image as unknown as File
 
-        const response: CreateUserProfileResponse = {
-          success: true,
-          data: mapUserModelToUser(result),
+        const databases = c.get("databases")
+        const storage = c.get("storage")
+        const userAccount = c.get("userAccount")
+
+        const isUsernameExist = await checkUsernameIsExist(databases, username)
+        if (isUsernameExist) {
+          return c.json(createError(ERROR.USERNAME_ALREADY_EXIST), 400)
         }
-        return c.json(response)
+
+        let imageUrl: string | undefined
+        let fileId: string | undefined
+        if (imageFile) {
+          const file = await uploadImage({ image: imageFile, storage })
+          fileId = file.$id
+          imageUrl = constructFileUrl(file.$id)
+        }
+
+        try {
+          const result = await databases.createDocument<UserModel>(
+            DATABASE_ID,
+            APPWRITE_USERS_ID,
+            ID.unique(),
+            {
+              ...form,
+              email: userAccount.email,
+              username,
+              imageUrl,
+            },
+          )
+
+          const response: CreateUserProfileResponse = {
+            success: true,
+            data: mapUserModelToUser(result),
+          }
+          return c.json(response)
+        } catch {
+          if (fileId) {
+            await storage.deleteFile(STORAGE_ID, fileId)
+          }
+
+          return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+        }
       } catch {
-        if (fileId) {
-          await storage.deleteFile(STORAGE_ID, fileId)
-        }
-
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -96,63 +104,69 @@ const userApp = new Hono()
     validateProfileMiddleware,
     zValidator("form", profileSchema.partial(), zodErrorHandler),
     async (c) => {
-      const databases = c.get("databases")
-      const storage = c.get("storage")
-      const userAccount = c.get("userAccount")
-      const currentProfile = c.get("userProfile")
-
-      if (userAccount.email !== currentProfile.email) {
-        return c.json(createError(ERROR.UNAUTHORIZE), 401)
-      }
-
-      const { username, image, ...form } = c.req.valid("form")
-      const imageFile = image ? (image as unknown as File) : undefined
-
-      if (username) {
-        const isUsernameExist = await checkUsernameIsExist(databases, username)
-        if (username !== currentProfile.username && isUsernameExist) {
-          return c.json(createError(ERROR.USERNAME_ALREADY_EXIST), 400)
-        }
-      }
-
-      let imageUrl = currentProfile.imageUrl
-      let fileId: string | undefined
-      if (imageFile) {
-        const file = await uploadImage({ image: imageFile, storage })
-        fileId = file.$id
-        imageUrl = constructFileUrl(file.$id)
-      }
-
       try {
-        const result = await databases.updateDocument<UserModel>(
-          DATABASE_ID,
-          APPWRITE_USERS_ID,
-          currentProfile.$id,
-          {
-            ...form,
+        const databases = c.get("databases")
+        const storage = c.get("storage")
+        const userAccount = c.get("userAccount")
+        const currentProfile = c.get("userProfile")
+
+        if (userAccount.email !== currentProfile.email) {
+          return c.json(createError(ERROR.UNAUTHORIZE), 401)
+        }
+
+        const { username, image, ...form } = c.req.valid("form")
+        const imageFile = image ? (image as unknown as File) : undefined
+
+        if (username) {
+          const isUsernameExist = await checkUsernameIsExist(
+            databases,
             username,
-            imageUrl,
-          },
-        )
-
-        const response: PatchUserProfileResponse = {
-          success: true,
-          data: mapUserModelToUser(result),
+          )
+          if (username !== currentProfile.username && isUsernameExist) {
+            return c.json(createError(ERROR.USERNAME_ALREADY_EXIST), 400)
+          }
         }
 
-        // DELETE OLD IMAGE IF NEW IMAGE UPLOADED
-        if (fileId && currentProfile.imageUrl) {
-          const oldFileId = destructFileId(currentProfile.imageUrl)
-          await deleteImage({ id: oldFileId, storage })
+        let imageUrl = currentProfile.imageUrl
+        let fileId: string | undefined
+        if (imageFile) {
+          const file = await uploadImage({ image: imageFile, storage })
+          fileId = file.$id
+          imageUrl = constructFileUrl(file.$id)
         }
 
-        return c.json(response)
-      } catch (error) {
-        if (fileId) {
-          await storage.deleteFile(STORAGE_ID, fileId)
-        }
-        console.log(error)
+        try {
+          const result = await databases.updateDocument<UserModel>(
+            DATABASE_ID,
+            APPWRITE_USERS_ID,
+            currentProfile.$id,
+            {
+              ...form,
+              username,
+              imageUrl,
+            },
+          )
 
+          const response: PatchUserProfileResponse = {
+            success: true,
+            data: mapUserModelToUser(result),
+          }
+
+          // DELETE OLD IMAGE IF NEW IMAGE UPLOADED
+          if (fileId && currentProfile.imageUrl) {
+            const oldFileId = destructFileId(currentProfile.imageUrl)
+            await deleteImage({ id: oldFileId, storage })
+          }
+
+          return c.json(response)
+        } catch {
+          if (fileId) {
+            await storage.deleteFile(STORAGE_ID, fileId)
+          }
+
+          return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+        }
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -163,18 +177,22 @@ const userApp = new Hono()
     validateProfileMiddleware,
     zValidator("query", searchQuerySchema),
     async (c) => {
-      const { query, limit, offset } = c.req.valid("query")
+      try {
+        const { query, limit, offset } = c.req.valid("query")
 
-      const databases = c.get("databases")
+        const databases = c.get("databases")
 
-      const result = await searchUser(databases, { query, limit, offset })
-      const response: SearchUsersResponse = {
-        success: true,
-        data: result.documents.map(mapSearchResult),
-        total: result.total,
+        const result = await searchUser(databases, { query, limit, offset })
+        const response: SearchUsersResponse = {
+          success: true,
+          data: result.documents.map(mapSearchResult),
+          total: result.total,
+        }
+
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
-
-      return c.json(response)
     },
   )
   .get(
@@ -197,17 +215,21 @@ const userApp = new Hono()
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
-      const { userId } = c.req.param()
-      const databases = c.get("databases")
+      try {
+        const { userId } = c.req.param()
+        const databases = c.get("databases")
 
-      const profile = await getUserProfileById(databases, userId)
+        const profile = await getUserProfileById(databases, userId)
 
-      const response: GetUserLastSeenResponse = {
-        success: true,
-        data: profile?.lastSeenAt ?? null,
+        const response: GetUserLastSeenResponse = {
+          success: true,
+          data: profile?.lastSeenAt ?? null,
+        }
+
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
-
-      return c.json(response)
     },
   )
   .put(
@@ -215,24 +237,24 @@ const userApp = new Hono()
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
-      const databases = c.get("databases")
-      const currentProfile = c.get("userProfile")
+      try {
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
 
-      const lastSeenAt = await updateLastSeenByUserId(
-        databases,
-        currentProfile.$id,
-      )
+        const lastSeenAt = await updateLastSeenByUserId(
+          databases,
+          currentProfile.$id,
+        )
 
-      if (!lastSeenAt) {
+        const response: UpdateUserLastSeenResponse = {
+          success: true,
+          data: lastSeenAt,
+        }
+
+        return c.json(response)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
-
-      const response: UpdateUserLastSeenResponse = {
-        success: true,
-        data: lastSeenAt,
-      }
-
-      return c.json(response)
     },
   )
   .get(
@@ -251,21 +273,25 @@ const userApp = new Hono()
     },
   )
   .get("/:userId", sessionMiddleware, validateProfileMiddleware, async (c) => {
-    const { userId } = c.req.param()
+    try {
+      const { userId } = c.req.param()
 
-    const databases = c.get("databases")
+      const databases = c.get("databases")
 
-    const profile = await getUserProfileById(databases, userId)
-    if (!profile) {
-      return c.json(createError(ERROR.PROFILE_NOT_FOUND), 404)
+      const profile = await getUserProfileById(databases, userId)
+      if (!profile) {
+        return c.json(createError(ERROR.PROFILE_NOT_FOUND), 404)
+      }
+
+      const response: GetUserProfileResponse = {
+        success: true,
+        data: mapUserModelToUser(profile),
+      }
+
+      return c.json(response)
+    } catch {
+      return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
     }
-
-    const response: GetUserProfileResponse = {
-      success: true,
-      data: mapUserModelToUser(profile),
-    }
-
-    return c.json(response)
   })
 
 export default userApp

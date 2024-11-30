@@ -1,3 +1,5 @@
+import "server-only"
+
 import { Databases, Models, Query } from "node-appwrite"
 
 import { APPWRITE_USERS_ID, DATABASE_ID } from "@/lib/appwrite/config"
@@ -104,16 +106,12 @@ export const updateLastSeenByUserId = async (
   databases: Databases,
   id: string,
 ) => {
-  try {
-    const updatedProfile = await databases.updateDocument<UserModel>(
-      DATABASE_ID,
-      APPWRITE_USERS_ID,
-      id,
-      { lastSeenAt: new Date() },
-    )
+  const updatedProfile = await databases.updateDocument<UserModel>(
+    DATABASE_ID,
+    APPWRITE_USERS_ID,
+    id,
+    { lastSeenAt: new Date() },
+  )
 
-    return updatedProfile.lastSeenAt!
-  } catch {
-    return null
-  }
+  return updatedProfile.lastSeenAt!
 }

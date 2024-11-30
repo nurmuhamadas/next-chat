@@ -17,24 +17,28 @@ const authApp = new Hono()
     "/register",
     zValidator("json", signUpSchema, zodErrorHandler),
     async (c) => {
-      const { email, password } = c.req.valid("json")
+      try {
+        const { email, password } = c.req.valid("json")
 
-      const { account, users } = await createAdminClient()
+        const { account, users } = await createAdminClient()
 
-      const existingUsers = await users.list()
-      const existingUser = existingUsers.users.find(
-        (user) => user.email === email,
-      )
+        const existingUsers = await users.list()
+        const existingUser = existingUsers.users.find(
+          (user) => user.email === email,
+        )
 
-      if (existingUser) {
-        const response = createError(ERROR.EMAIL_ALREADY_EXIST)
-        return c.json(response, 400)
+        if (existingUser) {
+          const response = createError(ERROR.EMAIL_ALREADY_EXIST)
+          return c.json(response, 400)
+        }
+
+        account.create(ID.unique(), email, password)
+
+        const response: RegisterResponse = { success: true, data: true }
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
-
-      account.create(ID.unique(), email, password)
-
-      const response: RegisterResponse = { success: true, data: true }
-      return c.json(response)
     },
   )
   .post(
@@ -79,8 +83,8 @@ const authApp = new Hono()
             return c.json(response, 401)
           }
         }
-        const response = createError(ERROR.INTERNAL_SERVER_ERROR)
-        return c.json(response, 500)
+
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
   )

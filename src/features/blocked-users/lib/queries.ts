@@ -1,12 +1,19 @@
+import "server-only"
+
 import { Databases, ID, Models, Query } from "node-appwrite"
 
 import { getUsers } from "@/features/user/lib/queries"
 import { APPWRITE_BLOCKED_USERS_ID, DATABASE_ID } from "@/lib/appwrite/config"
 
+export type BlockedUserResult = Pick<
+  UserModel,
+  "$id" | "firstName" | "lastName" | "imageUrl"
+>
+
 export const getBlockedUsersByUserId = async (
   databases: Databases,
   userId: string,
-): Promise<Models.DocumentList<UserModel>> => {
+): Promise<Models.DocumentList<BlockedUserResult & Models.Document>> => {
   try {
     const result = await databases.listDocuments<BlockedUserModel>(
       DATABASE_ID,
@@ -66,22 +73,14 @@ export const blockUser = async (
   userId: string,
   blockedUserId: string,
 ) => {
-  try {
-    return await databases.createDocument<BlockedUserModel>(
-      DATABASE_ID,
-      APPWRITE_BLOCKED_USERS_ID,
-      ID.unique(),
-      { blockedUserId, userId },
-    )
-  } catch {
-    return null
-  }
+  return await databases.createDocument<BlockedUserModel>(
+    DATABASE_ID,
+    APPWRITE_BLOCKED_USERS_ID,
+    ID.unique(),
+    { blockedUserId, userId },
+  )
 }
 
 export const unblockUser = async (databases: Databases, id: string) => {
-  try {
-    await databases.deleteDocument(DATABASE_ID, APPWRITE_BLOCKED_USERS_ID, id)
-  } catch {
-    return null
-  }
+  await databases.deleteDocument(DATABASE_ID, APPWRITE_BLOCKED_USERS_ID, id)
 }

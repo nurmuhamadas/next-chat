@@ -1,6 +1,10 @@
 import { mergeName } from "@/lib/utils"
 
-export const mapUserModelToBlockedUser = (user: UserModel): BlockedUser => {
+import { BlockedUserResult } from "./queries"
+
+export const mapUserModelToBlockedUser = (
+  user: BlockedUserResult,
+): BlockedUser => {
   return {
     id: user.$id,
     name: mergeName(user.firstName, user.lastName),
