@@ -85,3 +85,35 @@ export const getUsers = async (
     }
   }
 }
+
+export const getUserByEmail = async (databases: Databases, email: string) => {
+  try {
+    const result = await databases.listDocuments<UserModel>(
+      DATABASE_ID,
+      APPWRITE_USERS_ID,
+      [Query.equal("email", email)],
+    )
+
+    return result.documents[0] ?? null
+  } catch {
+    return null
+  }
+}
+
+export const updateLastSeenByUserId = async (
+  databases: Databases,
+  id: string,
+) => {
+  try {
+    const updatedProfile = await databases.updateDocument<UserModel>(
+      DATABASE_ID,
+      APPWRITE_USERS_ID,
+      id,
+      { lastSeenAt: new Date() },
+    )
+
+    return updatedProfile.lastSeenAt!
+  } catch {
+    return null
+  }
+}

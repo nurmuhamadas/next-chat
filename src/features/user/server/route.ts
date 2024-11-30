@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
-import { ID, Query } from "node-appwrite"
+import { ID } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
 import { constructFileUrl, destructFileId } from "@/lib/appwrite"
@@ -18,8 +18,8 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 import {
   checkUsernameIsExist,
   getUserProfileById,
-  getUsers,
   searchUser,
+  updateLastSeenByUserId,
 } from "../lib/queries"
 import { mapSearchResult, mapUserModelToUser } from "../lib/utils"
 import { profileSchema as profileSchema, searchQuerySchema } from "../schema"
@@ -48,7 +48,7 @@ const userApp = new Hono()
 
       const databases = c.get("databases")
       const storage = c.get("storage")
-      const account = c.get("account")
+      const userAccount = c.get("userAccount")
 
       const isUsernameExist = await checkUsernameIsExist(databases, username)
       if (isUsernameExist) {
@@ -63,8 +63,6 @@ const userApp = new Hono()
         imageUrl = constructFileUrl(file.$id)
       }
 
-      const user = await account.get()
-
       try {
         const result = await databases.createDocument<UserModel>(
           DATABASE_ID,
@@ -72,7 +70,7 @@ const userApp = new Hono()
           ID.unique(),
           {
             ...form,
-            email: user.email,
+            email: userAccount.email,
             username,
             imageUrl,
           },
@@ -93,24 +91,17 @@ const userApp = new Hono()
     },
   )
   .patch(
-    "/:userId",
+    "/",
     sessionMiddleware,
     validateProfileMiddleware,
     zValidator("form", profileSchema.partial(), zodErrorHandler),
     async (c) => {
-      const { userId } = c.req.param()
-
       const databases = c.get("databases")
       const storage = c.get("storage")
-      const account = c.get("account")
+      const userAccount = c.get("userAccount")
+      const currentProfile = c.get("userProfile")
 
-      const currentProfile = await getUserProfileById(databases, userId)
-      if (!currentProfile) {
-        return c.json(createError(ERROR.PROFILE_NOT_FOUND), 404)
-      }
-
-      const currentUser = await account.get()
-      if (currentUser.email !== currentProfile.email) {
+      if (userAccount.email !== currentProfile.email) {
         return c.json(createError(ERROR.UNAUTHORIZE), 401)
       }
 
@@ -191,18 +182,11 @@ const userApp = new Hono()
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
-      const databases = c.get("databases")
-      const account = c.get("account")
-
-      const user = await account.get()
-
-      const profile = await getUsers(databases, [
-        Query.equal("email", user.email),
-      ])
+      const profile = c.get("userProfile")
 
       const response: GetUserLastSeenResponse = {
         success: true,
-        data: profile.documents[0]?.lastSeenAt ?? null,
+        data: profile.lastSeenAt ?? null,
       }
 
       return c.json(response)
@@ -232,31 +216,38 @@ const userApp = new Hono()
     validateProfileMiddleware,
     async (c) => {
       const databases = c.get("databases")
-      const account = c.get("account")
+      const currentProfile = c.get("userProfile")
 
-      const user = await account.get()
+      const lastSeenAt = await updateLastSeenByUserId(
+        databases,
+        currentProfile.$id,
+      )
 
-      const currentProfile = await getUsers(databases, [
-        Query.equal("email", user.email),
-      ])
-
-      try {
-        const updatedProfile = await databases.updateDocument<UserModel>(
-          DATABASE_ID,
-          APPWRITE_USERS_ID,
-          currentProfile.documents[0].$id,
-          { lastSeenAt: new Date() },
-        )
-
-        const response: UpdateUserLastSeenResponse = {
-          success: true,
-          data: updatedProfile.lastSeenAt!,
-        }
-
-        return c.json(response)
-      } catch {
+      if (!lastSeenAt) {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
+
+      const response: UpdateUserLastSeenResponse = {
+        success: true,
+        data: lastSeenAt,
+      }
+
+      return c.json(response)
+    },
+  )
+  .get(
+    "/my-profile",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      const userProfile = c.get("userProfile")
+
+      const response: GetMyProfileResponse = {
+        success: true,
+        data: mapUserModelToUser(userProfile),
+      }
+
+      return c.json(response)
     },
   )
   .get("/:userId", sessionMiddleware, validateProfileMiddleware, async (c) => {
@@ -264,14 +255,14 @@ const userApp = new Hono()
 
     const databases = c.get("databases")
 
-    const currentProfile = await getUserProfileById(databases, userId)
-    if (!currentProfile) {
+    const profile = await getUserProfileById(databases, userId)
+    if (!profile) {
       return c.json(createError(ERROR.PROFILE_NOT_FOUND), 404)
     }
 
     const response: GetUserProfileResponse = {
       success: true,
-      data: mapUserModelToUser(currentProfile),
+      data: mapUserModelToUser(profile),
     }
 
     return c.json(response)

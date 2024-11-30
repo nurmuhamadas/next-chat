@@ -43,6 +43,8 @@ declare type PatchUserProfileResponse = ApiResponse<User>
 
 declare type GetUserProfileResponse = ApiResponse<User>
 
+declare type GetMyProfileResponse = ApiResponse<User>
+
 declare type SearchUsersResponse = ApiCollectionResponse<UserSearch[]>
 
 declare type GetUserLastSeenResponse = ApiResponse<string | null>
