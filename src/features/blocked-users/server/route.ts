@@ -2,7 +2,11 @@ import { Hono } from "hono"
 
 import { ERROR } from "@/constants/error"
 import { sessionMiddleware } from "@/lib/session-middleware"
-import { createError } from "@/lib/utils"
+import {
+  createError,
+  successCollectionResponse,
+  successResponse,
+} from "@/lib/utils"
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 
 import {
@@ -19,15 +23,14 @@ const blockedUserApp = new Hono()
       const databases = c.get("databases")
       const currentProfile = c.get("userProfile")
 
-      const blockedUsers = await getBlockedUsersByUserId(
-        databases,
-        currentProfile.$id,
-      )
+      const blockedUsers = await getBlockedUsersByUserId(databases, {
+        userId: currentProfile.$id,
+      })
 
-      const response: GetBlockedUsersResponse = {
-        success: true,
-        data: blockedUsers.documents.map(mapUserModelToBlockedUser),
-      }
+      const response: GetBlockedUsersResponse = successCollectionResponse(
+        blockedUsers.documents.map(mapUserModelToBlockedUser),
+        blockedUsers.total,
+      )
 
       return c.json(response)
     } catch {
@@ -44,27 +47,20 @@ const blockedUserApp = new Hono()
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
 
-        const blockedUser = await getBlockedUser(
-          databases,
-          currentProfile.$id,
+        const blockedUser = await getBlockedUser(databases, {
+          userId: currentProfile.$id,
           blockedUserId,
-        )
+        })
         if (blockedUser) {
           return c.json(createError(ERROR.USER_ALREADY_BLOCKED), 400)
         }
 
-        const result = await blockUser(
-          databases,
-          currentProfile.$id,
+        const result = await blockUser(databases, {
+          userId: currentProfile.$id,
           blockedUserId,
-        )
+        })
 
-        const response: BlockUserResponse = {
-          success: true,
-          data: {
-            id: result.$id,
-          },
-        }
+        const response: BlockUserResponse = successResponse({ id: result.$id })
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
@@ -81,23 +77,19 @@ const blockedUserApp = new Hono()
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
 
-        const blockedUser = await getBlockedUser(
-          databases,
-          currentProfile.$id,
+        const blockedUser = await getBlockedUser(databases, {
+          userId: currentProfile.$id,
           blockedUserId,
-        )
+        })
         if (!blockedUser) {
           return c.json(createError(ERROR.BLOCKED_USER_NOT_FOUND))
         }
 
-        await unblockUser(databases, blockedUser.$id)
+        await unblockUser(databases, { id: blockedUser.$id })
 
-        const response: UnblockUserResponse = {
-          success: true,
-          data: {
-            id: blockedUser.$id,
-          },
-        }
+        const response: UnblockUserResponse = successResponse({
+          id: blockedUser.$id,
+        })
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

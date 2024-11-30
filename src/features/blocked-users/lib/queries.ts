@@ -6,16 +6,16 @@ import { getUsers } from "@/features/user/lib/queries"
 import { APPWRITE_BLOCKED_USERS_ID, DATABASE_ID } from "@/lib/appwrite/config"
 
 export type BlockedUserResult = Pick<
-  UserModel,
+  UserAWModel,
   "$id" | "firstName" | "lastName" | "imageUrl"
 >
 
 export const getBlockedUsersByUserId = async (
   databases: Databases,
-  userId: string,
+  { userId }: { userId: string },
 ): Promise<Models.DocumentList<BlockedUserResult & Models.Document>> => {
   try {
-    const result = await databases.listDocuments<BlockedUserModel>(
+    const result = await databases.listDocuments<BlockedUserAWModel>(
       DATABASE_ID,
       APPWRITE_BLOCKED_USERS_ID,
       [Query.equal("userId", userId)],
@@ -29,10 +29,12 @@ export const getBlockedUsersByUserId = async (
     }
 
     const blockedUserIds = result.documents.map((v) => v.blockedUserId)
-    const blockedResult = await getUsers(databases, [
-      Query.contains("$id", blockedUserIds),
-      Query.select(["$id", "firstName", "lastName", "imageUrl"]),
-    ])
+    const blockedResult = await getUsers(databases, {
+      queries: [
+        Query.contains("$id", blockedUserIds),
+        Query.select(["$id", "firstName", "lastName", "imageUrl"]),
+      ],
+    })
 
     return blockedResult
   } catch {
@@ -45,17 +47,16 @@ export const getBlockedUsersByUserId = async (
 
 export const getBlockedUser = async (
   databases: Databases,
-  userId: string,
-  blockedUserId: string,
+  data: BlockedUserModel,
 ) => {
   try {
-    const result = await databases.listDocuments<BlockedUserModel>(
+    const result = await databases.listDocuments<BlockedUserAWModel>(
       DATABASE_ID,
       APPWRITE_BLOCKED_USERS_ID,
       [
         Query.or([
-          Query.equal("userId", userId),
-          Query.equal("blockedUserId", blockedUserId),
+          Query.equal("userId", data.userId),
+          Query.equal("blockedUserId", data.blockedUserId),
         ]),
       ],
     )
@@ -70,17 +71,19 @@ export const getBlockedUser = async (
 
 export const blockUser = async (
   databases: Databases,
-  userId: string,
-  blockedUserId: string,
+  data: BlockedUserModel,
 ) => {
-  return await databases.createDocument<BlockedUserModel>(
+  return await databases.createDocument<BlockedUserAWModel>(
     DATABASE_ID,
     APPWRITE_BLOCKED_USERS_ID,
     ID.unique(),
-    { blockedUserId, userId },
+    data,
   )
 }
 
-export const unblockUser = async (databases: Databases, id: string) => {
+export const unblockUser = async (
+  databases: Databases,
+  { id }: { id: string },
+) => {
   await databases.deleteDocument(DATABASE_ID, APPWRITE_BLOCKED_USERS_ID, id)
 }

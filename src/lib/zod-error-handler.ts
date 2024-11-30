@@ -14,6 +14,7 @@ type Result =
     }
 
 export const zodErrorHandler = (result: Result, c: Context<Env, string>) => {
+  console.log(result)
   if (!result.success) {
     const response = createError(
       result.error.errors[0]?.message,

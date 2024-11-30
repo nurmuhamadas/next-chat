@@ -1,26 +1,51 @@
 import "server-only"
 
-import { Databases, Models, Query } from "node-appwrite"
+import { Databases, ID, Query } from "node-appwrite"
 
 import { APPWRITE_USERS_ID, DATABASE_ID } from "@/lib/appwrite/config"
 
 export const checkUsernameIsExist = async (
   databases: Databases,
-  username: string,
+  { username }: { username: string },
 ) => {
   const result = await databases.listDocuments(DATABASE_ID, APPWRITE_USERS_ID, [
     Query.equal("username", username),
   ])
 
-  return result.total > 0
+  return result.total === 0
+}
+
+export const createUserProfile = async (
+  databases: Databases,
+  form: UserModel,
+) => {
+  return await databases.createDocument<UserAWModel>(
+    DATABASE_ID,
+    APPWRITE_USERS_ID,
+    ID.unique(),
+    form,
+  )
+}
+
+export const updateUserProfile = async (
+  databases: Databases,
+  id: string,
+  form: Partial<UserModel>,
+) => {
+  return await databases.updateDocument<UserAWModel>(
+    DATABASE_ID,
+    APPWRITE_USERS_ID,
+    id,
+    form,
+  )
 }
 
 export const getUserProfileById = async (
   databases: Databases,
-  userId: string,
+  { userId }: { userId: string },
 ) => {
   try {
-    return await databases.getDocument<UserModel>(
+    return await databases.getDocument<UserAWModel>(
       DATABASE_ID,
       APPWRITE_USERS_ID,
       userId,
@@ -39,7 +64,7 @@ export type SearchUserQueryResult = Pick<
 export const searchUser = async (
   databases: Databases,
   { query, limit, offset }: { query?: string; limit: number; offset: number },
-): Promise<Models.DocumentList<SearchUserQueryResult>> => {
+) => {
   const queries = [
     Query.limit(limit),
     Query.offset(offset),
@@ -57,7 +82,7 @@ export const searchUser = async (
   }
 
   try {
-    return await databases.listDocuments<UserModel>(
+    return await databases.listDocuments<SearchUserQueryResult>(
       DATABASE_ID,
       APPWRITE_USERS_ID,
       queries,
@@ -72,10 +97,10 @@ export const searchUser = async (
 
 export const getUsers = async (
   databases: Databases,
-  queries: string[] = [],
+  { queries = [] }: { queries?: string[] },
 ) => {
   try {
-    return await databases.listDocuments<UserModel>(
+    return await databases.listDocuments<UserAWModel>(
       DATABASE_ID,
       APPWRITE_USERS_ID,
       queries,
@@ -88,9 +113,12 @@ export const getUsers = async (
   }
 }
 
-export const getUserByEmail = async (databases: Databases, email: string) => {
+export const getUserByEmail = async (
+  databases: Databases,
+  { email }: { email: string },
+) => {
   try {
-    const result = await databases.listDocuments<UserModel>(
+    const result = await databases.listDocuments<UserAWModel>(
       DATABASE_ID,
       APPWRITE_USERS_ID,
       [Query.equal("email", email)],
@@ -104,9 +132,9 @@ export const getUserByEmail = async (databases: Databases, email: string) => {
 
 export const updateLastSeenByUserId = async (
   databases: Databases,
-  id: string,
+  { id }: { id: string },
 ) => {
-  const updatedProfile = await databases.updateDocument<UserModel>(
+  const updatedProfile = await databases.updateDocument<UserAWModel>(
     DATABASE_ID,
     APPWRITE_USERS_ID,
     id,

@@ -1,6 +1,6 @@
 import { SearchUserQueryResult } from "./queries"
 
-export const mapUserModelToUser = (user: UserModel): User => {
+export const mapUserModelToUser = (user: UserAWModel): User => {
   return {
     id: user.$id,
     email: user.email,

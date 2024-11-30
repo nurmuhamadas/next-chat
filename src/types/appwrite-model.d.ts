@@ -7,7 +7,10 @@ declare interface AppwriteDocument {
   $permissions: string[]
 }
 
-declare interface UserModel extends AppwriteDocument {
+declare interface UserAWModel extends AppwriteDocument, UserModel {
+  lastSeenAt?: string
+}
+declare interface UserModel {
   email: string
   firstName: string
   lastName?: string
@@ -15,25 +18,35 @@ declare interface UserModel extends AppwriteDocument {
   gender: Gender
   bio?: string
   imageUrl?: string
-  lastSeenAt?: string
+  lastSeenAt?: Date
 }
 
-declare interface ConversationModel extends AppwriteDocument {
+declare interface ConversationAWModel
+  extends AppwriteDocument,
+    ConversationModel {}
+declare interface ConversationModel {
   userId1: string
   userId2: string
 }
 
-declare interface ConversationOptionModel extends AppwriteDocument {
+declare interface ConversationOptionAWModel
+  extends AppwriteDocument,
+    ConversationOptionModel {}
+declare interface ConversationOptionModel {
   conversationId: string
   notification: boolean
 }
 
-declare interface BlockedUserModel extends AppwriteDocument {
+declare interface BlockedUserAWModel
+  extends AppwriteDocument,
+    BlockedUserModel {}
+declare interface BlockedUserModel {
   userId: string
   blockedUserId: string
 }
 
-declare interface MessageModel extends AppwriteDocument {
+declare interface MessageAWModel extends AppwriteDocument, MessageModel {}
+declare interface MessageModel {
   message: string
   userId: string
   conversationId?: string
@@ -48,13 +61,15 @@ declare interface MessageModel extends AppwriteDocument {
   status: MessageStatus
 }
 
-declare interface ReactionModel extends AppwriteDocument {
+declare interface ReactionAWModel extends AppwriteDocument, ReactionModel {}
+declare interface ReactionModel {
   reaction: string
   messageId: string
   userId: string
 }
 
-declare interface AttachmentModel extends AppwriteDocument {
+declare interface AttachmentAWModel extends AppwriteDocument, AttachmentModel {}
+declare interface AttachmentModel {
   url: string
   name: string
   type: AttachmentType
@@ -62,20 +77,29 @@ declare interface AttachmentModel extends AppwriteDocument {
   messageId: string
 }
 
-declare interface GroupModel extends AppwriteDocument {
+declare interface GroupAWModel extends AppwriteDocument, GroupModel {}
+declare interface GroupModel {
   name: string
   description?: string
   type: GroupType
-  ownerId: string
   imageUrl?: string
+  ownerId: string
+  inviteCode: string
+  lastMessageId?: string
 }
 
-declare interface GroupOptionModel extends AppwriteDocument {
+declare interface GroupOptionAWModel
+  extends AppwriteDocument,
+    GroupOptionModel {}
+declare interface GroupOptionModel {
   groupId: string
   notification: boolean
 }
 
-declare interface GroupMemberModel extends AppwriteDocument {
+declare interface GroupMemberAWModel
+  extends AppwriteDocument,
+    GroupMemberModel {}
+declare interface GroupMemberModel {
   groupId: string
   userId: string
   joinedAt: string
@@ -83,7 +107,8 @@ declare interface GroupMemberModel extends AppwriteDocument {
   isAdmin: boolean
 }
 
-declare interface ChannelModel extends AppwriteDocument {
+declare interface ChannelAWModel extends AppwriteDocument, ChannelModel {}
+declare interface ChannelModel {
   name: string
   description?: string
   type: ChannelType
@@ -91,7 +116,10 @@ declare interface ChannelModel extends AppwriteDocument {
   imageUrl?: string
 }
 
-declare interface ChannelSubscriberModel extends AppwriteDocument {
+declare interface ChannelSubscriberAWModel
+  extends AppwriteDocument,
+    ChannelSubscriberModel {}
+declare interface ChannelSubscriberModel {
   channelId: string
   userId: string
   subscribedAt: string
@@ -99,12 +127,16 @@ declare interface ChannelSubscriberModel extends AppwriteDocument {
   isAdmin: boolean
 }
 
-declare interface ChannelOptionModel extends AppwriteDocument {
+declare interface ChannelOptionAWModel
+  extends AppwriteDocument,
+    ChannelOptionModel {}
+declare interface ChannelOptionModel {
   channelId: string
   notification: boolean
 }
 
-declare interface SettingModel extends AppwriteDocument {
+declare interface SettingAWModel extends AppwriteDocument, SettingModel {}
+declare interface SettingModel {
   userId: string
   timeFormat?: TimeFormat
   language?: Language
