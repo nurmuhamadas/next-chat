@@ -30,7 +30,7 @@ export const successResponse = <T>(data: T): ApiResponse<T> => {
 }
 
 export const successCollectionResponse = <T>(
-  data: T,
+  data: T[],
   total: number,
 ): ApiCollectionResponse<T> => {
   return {

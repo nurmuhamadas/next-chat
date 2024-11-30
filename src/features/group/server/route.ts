@@ -4,10 +4,15 @@ import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 
 import { ERROR } from "@/constants/error"
+import { getUserProfileById } from "@/features/user/lib/queries"
 import { constructFileUrl } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteImage, uploadImage } from "@/lib/upload-image"
-import { createError, successResponse } from "@/lib/utils"
+import {
+  createError,
+  successCollectionResponse,
+  successResponse,
+} from "@/lib/utils"
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
@@ -16,13 +21,87 @@ import {
   createGroupInviteCode,
   createGroupMember,
   createGroupOption,
+  getGroupById,
+  getGroupOwnersByUserIds,
+  getGroupsByUserId,
   validateGroupData,
+  validateGroupMember,
 } from "../lib/queries"
 import { mapGroupModelToGroup, mapUserModelToGroupOwner } from "../lib/utils"
 import { groupSchema } from "../schema"
 
 const groupApp = new Hono()
-  .get("/")
+  .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
+    try {
+      const databases = c.get("databases")
+      const currentProfile = c.get("userProfile")
+
+      const result = await getGroupsByUserId(databases, {
+        userId: currentProfile.$id,
+      })
+
+      const ownerIds = result.documents.map((v) => v.ownerId)
+      const owners = await getGroupOwnersByUserIds(databases, {
+        userIds: ownerIds,
+      })
+
+      const mappedGroup: Group[] = result.documents.map((group) =>
+        mapGroupModelToGroup(
+          group,
+          owners.find((user) => user.id === group.ownerId)!,
+          // TODO: Add last message
+        ),
+      )
+
+      const response: GetGroupsResponse = successCollectionResponse(
+        mappedGroup,
+        result.total,
+      )
+      return c.json(response)
+    } catch {
+      return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+    }
+  })
+  .get("/:groupId", sessionMiddleware, validateProfileMiddleware, async (c) => {
+    try {
+      const { groupId } = c.req.param()
+
+      const databases = c.get("databases")
+      const profile = c.get("userProfile")
+
+      const group = await getGroupById(databases, {
+        id: groupId,
+      })
+      if (!group) {
+        return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+      }
+
+      const isMember = await validateGroupMember(databases, {
+        userId: profile.$id,
+        groupId,
+      })
+      if (group.type === "PRIVATE" && !isMember) {
+        return c.json(createError(ERROR.NOT_ALLOWED), 403)
+      }
+
+      const owner = await getUserProfileById(databases, {
+        userId: group.ownerId,
+      })
+      if (!owner) {
+        return c.json(createError(ERROR.GROUP_OWNER_NOT_FOUND), 404)
+      }
+
+      const mappedGroup: Group = mapGroupModelToGroup(
+        group,
+        mapUserModelToGroupOwner(owner),
+      )
+
+      const response: GetGroupResponse = successResponse(mappedGroup)
+      return c.json(response)
+    } catch {
+      return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+    }
+  })
   .post(
     "/",
     sessionMiddleware,

@@ -16,7 +16,7 @@ declare type ApiResponse<T> =
 declare type ApiCollectionResponse<T> =
   | {
       success: true
-      data: T
+      data: T[]
       total: number
     }
   | ErrorResponse
@@ -45,7 +45,7 @@ declare type GetUserProfileResponse = ApiResponse<User>
 
 declare type GetMyProfileResponse = ApiResponse<User>
 
-declare type SearchUsersResponse = ApiCollectionResponse<UserSearch[]>
+declare type SearchUsersResponse = ApiCollectionResponse<UserSearch>
 
 declare type GetUserLastSeenResponse = ApiResponse<string | null>
 
@@ -62,6 +62,8 @@ declare type UnblockUserResponse = ApiResponse<{ id: string }>
 declare type CreateGroupResponse = ApiResponse<Group>
 
 declare type PatchGroupResponse = ApiResponse<Group>
+
+declare type GetGroupsResponse = ApiCollectionResponse<Group>
 
 declare type GetGroupResponse = ApiResponse<Group>
 
