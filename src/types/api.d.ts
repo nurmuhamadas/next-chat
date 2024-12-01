@@ -69,14 +69,7 @@ declare type GetGroupResponse = ApiResponse<Group>
 
 declare type GetGroupMembersResponse = ApiResponse<GroupMember[]>
 
-declare type SearchGroupsResponse = ApiResponse<
-  {
-    id: string
-    name: string
-    imageUrl?: string
-    totalMember: number
-  }[]
->
+declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
 
 declare type DeleteGroupResponse = ApiResponse<{ id: string }>
 

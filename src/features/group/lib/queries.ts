@@ -266,3 +266,63 @@ export const getGroupMembers = async (
     }
   }
 }
+
+export const searchGroup = async (
+  databases: Databases,
+  {
+    query,
+    limit,
+    offset,
+  }: { query?: string; limit: number; offset: number } = {
+    limit: 20,
+    offset: 0,
+  },
+): Promise<QueryResult<GroupSearch>> => {
+  const queries = [
+    Query.limit(limit),
+    Query.offset(offset),
+    Query.select(["$id", "name", "imageUrl"]),
+  ]
+
+  if (query) {
+    queries.push(Query.search("name", query))
+  }
+
+  try {
+    const result = await databases.listDocuments<GroupAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUPS_ID,
+      queries,
+    )
+    const groupIds = result.documents.map((v) => v.$id)
+
+    const memberResult = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [
+        Query.contains("groupId", groupIds),
+        Query.isNull("leftAt"),
+        Query.select(["groupId"]),
+      ],
+    )
+
+    const searchResult: GroupSearch[] = result.documents.map((group) => ({
+      id: group.$id,
+      name: group.name,
+      imageUrl: group.imageUrl,
+      totalMember:
+        memberResult.documents.filter((member) => member.groupId === group.$id)
+          .length ?? 0,
+    }))
+
+    return {
+      total: result.total,
+      data: searchResult,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}

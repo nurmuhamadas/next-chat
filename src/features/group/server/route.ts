@@ -3,6 +3,7 @@ import "server-only"
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 
+import { searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
 import { getUserProfileById } from "@/features/user/lib/queries"
 import { constructFileUrl } from "@/lib/appwrite"
@@ -25,6 +26,7 @@ import {
   getGroupMembers,
   getGroupOwnersByUserIds,
   getGroupsByUserId,
+  searchGroup,
   validateGroupData,
   validateGroupMember,
 } from "../lib/queries"
@@ -63,6 +65,29 @@ const groupApp = new Hono()
       return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
     }
   })
+  .get(
+    "/search",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("query", searchQuerySchema),
+    async (c) => {
+      try {
+        const { query, limit, offset } = c.req.valid("query")
+
+        const databases = c.get("databases")
+
+        const result = await searchGroup(databases, { query, limit, offset })
+
+        const response: SearchGroupsResponse = successCollectionResponse(
+          result.data,
+          result.total,
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
   .get("/:groupId", sessionMiddleware, validateProfileMiddleware, async (c) => {
     try {
       const { groupId } = c.req.param()

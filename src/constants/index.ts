@@ -26,4 +26,22 @@ export const imageProfileSchema = z
     },
   )
 
+export const searchQuerySchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (!v ? undefined : v)),
+  limit: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (isNaN(Number(v)) ? 20 : Number(v))),
+  offset: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (isNaN(Number(v)) ? 0 : Number(v))),
+})
+
 export const ROOM_TYPES: RoomType[] = ["channel", "chat", "group"]

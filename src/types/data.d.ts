@@ -16,6 +16,11 @@ declare type NotificationType = "CONVERSATION" | "GROUP" | "CHANNEL"
 
 declare type Theme = "LIGHT" | "DARK" | "SYSTEM"
 
+declare interface QueryResult<T> {
+  total: number
+  data: T[]
+}
+
 declare interface User {
   id: string
   email: string
@@ -115,6 +120,13 @@ declare interface Group {
   imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage | null
+}
+
+declare interface GroupSearch {
+  id: string
+  name: string
+  imageUrl?: string
+  totalMember: number
 }
 
 declare interface GroupMember {
