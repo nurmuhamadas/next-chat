@@ -22,6 +22,7 @@ import {
   createGroupMember,
   createGroupOption,
   getGroupById,
+  getGroupMembers,
   getGroupOwnersByUserIds,
   getGroupsByUserId,
   validateGroupData,
@@ -102,6 +103,44 @@ const groupApp = new Hono()
       return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
     }
   })
+  .get(
+    "/:groupId/members",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const profile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isMember = await validateGroupMember(databases, {
+          userId: profile.$id,
+          groupId,
+        })
+        if (group.type === "PRIVATE" && !isMember) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 403)
+        }
+
+        const result = await getGroupMembers(databases, { groupId })
+
+        const response: GetGroupMembersResponse = successCollectionResponse(
+          result.documents,
+          result.total,
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
   .post(
     "/",
     sessionMiddleware,

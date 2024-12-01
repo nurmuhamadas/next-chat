@@ -17,7 +17,10 @@ import { generateInviteCode } from "@/lib/utils"
 
 import { groupSchema } from "../schema"
 
-import { mapUserModelToGroupOwner } from "./utils"
+import {
+  mapGroupMemberModelToGroupMember,
+  mapUserModelToGroupOwner,
+} from "./utils"
 
 export const checkGroupNameAvailablity = async (
   databases: Databases,
@@ -180,7 +183,10 @@ export const getGroupOwnersByUserIds = async (
   { userIds }: { userIds: string[] },
 ) => {
   const result = await getUsers(databases, {
-    queries: [Query.contains("$id", userIds)],
+    queries: [
+      Query.contains("$id", userIds),
+      Query.select(["$id", "firstName", "lastName", "imageUrl"]),
+    ],
   })
 
   return result.documents.map(mapUserModelToGroupOwner)
@@ -212,4 +218,51 @@ export const validateGroupMember = async (
   )
 
   return result.total > 1
+}
+
+export const getGroupMembers = async (
+  databases: Databases,
+  { groupId }: { groupId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [Query.equal("groupId", groupId)],
+    )
+    const memberIds = result.documents.map((v) => v.userId)
+
+    const memberProfiles = await getUsers(databases, {
+      queries: [
+        Query.contains("$id", memberIds),
+        Query.select([
+          "$id",
+          "firstName",
+          "lastName",
+          "imageUrl",
+          "lastSeenAt",
+        ]),
+      ],
+    })
+    const memberProfileIds = memberProfiles.documents.map((v) => v.$id)
+
+    const members = result.documents
+      .filter((member) => memberProfileIds.includes(member.userId))
+      .map((member) => {
+        const profile = memberProfiles.documents.find(
+          (v) => v.$id === member.userId,
+        )
+        return mapGroupMemberModelToGroupMember(member, profile!)
+      })
+
+    return {
+      total: members.length,
+      documents: members,
+    }
+  } catch {
+    return {
+      total: 0,
+      documents: [],
+    }
+  }
 }

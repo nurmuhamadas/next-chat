@@ -122,7 +122,7 @@ declare interface GroupMember {
   name: string
   imageUrl: string | null
   isAdmin: boolean
-  lastSeenAt: string
+  lastSeenAt: string | null
 }
 
 declare interface GroupOption {

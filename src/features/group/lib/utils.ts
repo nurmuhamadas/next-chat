@@ -24,3 +24,16 @@ export const mapUserModelToGroupOwner = (user: UserAWModel): GroupOwner => {
     imageUrl: user.imageUrl ?? null,
   }
 }
+
+export const mapGroupMemberModelToGroupMember = (
+  member: GroupMemberAWModel,
+  user: UserAWModel,
+): GroupMember => {
+  return {
+    id: member.$id,
+    name: mergeName(user.firstName, user.lastName),
+    imageUrl: user.imageUrl ?? null,
+    isAdmin: member.isAdmin,
+    lastSeenAt: user.lastSeenAt ?? null,
+  }
+}
