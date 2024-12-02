@@ -214,10 +214,14 @@ export const validateGroupMember = async (
   const result = await databases.listDocuments<GroupMemberAWModel>(
     DATABASE_ID,
     APPWRITE_GROUP_MEMBERS_ID,
-    [Query.equal("userId", userId), Query.equal("groupId", groupId)],
+    [
+      Query.equal("userId", userId),
+      Query.equal("groupId", groupId),
+      Query.isNull("leftAt"),
+    ],
   )
 
-  return result.total > 1
+  return result.total > 0
 }
 
 export const getGroupMembers = async (
@@ -277,7 +281,7 @@ export const searchGroup = async (
     limit: 20,
     offset: 0,
   },
-): Promise<QueryResult<GroupSearch>> => {
+): Promise<QueryResults<GroupSearch>> => {
   const queries = [
     Query.limit(limit),
     Query.offset(offset),
@@ -325,4 +329,42 @@ export const searchGroup = async (
       data: [],
     }
   }
+}
+
+export const validateJoinCode = async (
+  databases: Databases,
+  { groupId, code }: { groupId: string; code: string },
+) => {
+  const result = await databases.getDocument<GroupAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUPS_ID,
+    groupId,
+    [Query.select(["inviteCode"])],
+  )
+
+  return result.inviteCode === code
+}
+
+export const leftGroupMember = async (
+  databases: Databases,
+  { groupId, userId }: { groupId: string; userId: string },
+) => {
+  const result = await databases.listDocuments(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    [
+      Query.equal("groupId", groupId),
+      Query.equal("userId", userId),
+      Query.isNull("leftAt"),
+    ],
+  )
+
+  return await databases.updateDocument<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    result.documents[0]?.$id,
+    {
+      leftAt: new Date(),
+    },
+  )
 }

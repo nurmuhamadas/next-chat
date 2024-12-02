@@ -16,9 +16,13 @@ declare type NotificationType = "CONVERSATION" | "GROUP" | "CHANNEL"
 
 declare type Theme = "LIGHT" | "DARK" | "SYSTEM"
 
-declare interface QueryResult<T> {
+declare interface QueryResults<T> {
   total: number
   data: T[]
+}
+
+declare interface QueryResult<T> {
+  data: T
 }
 
 declare interface User {

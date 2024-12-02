@@ -26,12 +26,14 @@ import {
   getGroupMembers,
   getGroupOwnersByUserIds,
   getGroupsByUserId,
+  leftGroupMember,
   searchGroup,
   validateGroupData,
   validateGroupMember,
+  validateJoinCode,
 } from "../lib/queries"
 import { mapGroupModelToGroup, mapUserModelToGroupOwner } from "../lib/utils"
-import { groupSchema } from "../schema"
+import { groupSchema, joinGroupSchema } from "../schema"
 
 const groupApp = new Hono()
   .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
@@ -69,7 +71,7 @@ const groupApp = new Hono()
     "/search",
     sessionMiddleware,
     validateProfileMiddleware,
-    zValidator("query", searchQuerySchema),
+    zValidator("query", searchQuerySchema, zodErrorHandler),
     async (c) => {
       try {
         const { query, limit, offset } = c.req.valid("query")
@@ -243,6 +245,94 @@ const groupApp = new Hono()
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/:groupId/join",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("json", joinGroupSchema, zodErrorHandler),
+    async (c) => {
+      try {
+        const { code } = c.req.valid("json")
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isMember = await validateGroupMember(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (isMember) {
+          return c.json(createError(ERROR.ALREADY_MEMBER), 403)
+        }
+
+        const isJoinCodeValid = await validateJoinCode(databases, {
+          groupId,
+          code,
+        })
+        if (!isJoinCodeValid) {
+          return c.json(createError(ERROR.INVALID_JOIN_CODE), 400)
+        }
+
+        await createGroupMember(databases, {
+          groupId,
+          userId: currentProfile.$id,
+          isAdmin: false,
+          joinedAt: new Date(),
+        })
+
+        const response: JoinGroupResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:groupId/left",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isMember = await validateGroupMember(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isMember) {
+          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
+        }
+
+        await leftGroupMember(databases, {
+          groupId: group.$id,
+          userId: currentProfile.$id,
+        })
+
+        const response: LeaveGroupResponse = successResponse(true)
+        return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }

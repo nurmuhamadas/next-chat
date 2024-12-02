@@ -25,11 +25,19 @@ export const groupSchema = z.object({
     .optional()
     .default("")
     .transform((str) => {
-      console.log(str)
       if (!str) return []
 
       const memberIds = str.split(",").map((v) => v.trim())
       return memberIds
     }),
   image: imageProfileSchema,
+})
+
+export const joinGroupSchema = z.object({
+  code: z
+    .string({
+      required_error: ERROR.JOIN_CODE_REQUIRED,
+      invalid_type_error: ERROR.INVALID_JOIN_CODE,
+    })
+    .length(10, ERROR.INVALID_JOIN_CODE),
 })
