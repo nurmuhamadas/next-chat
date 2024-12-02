@@ -145,19 +145,28 @@ declare interface GroupOption {
   notification: boolean
 }
 
+declare interface ChannelOwner {
+  id: string
+  name: string
+  imageUrl: string | null
+}
+
 declare interface Channel {
   id: string
   name: string
   description: string | null
   type: ChannelType
-  owner: {
-    id: string
-    name: string
-    imageUrl: string | null
-  }
+  owner: ChannelOwner
   imageUrl: string | null
   inviteCode: string
-  lastMessage: LastMessage
+  lastMessage: LastMessage | null
+}
+
+declare interface ChannelSearch {
+  id: string
+  name: string
+  imageUrl?: string
+  totalSubscribers: number
 }
 
 declare interface ChannelSubscriber {

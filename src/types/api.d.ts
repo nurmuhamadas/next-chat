@@ -71,10 +71,13 @@ declare type GetGroupMembersResponse = ApiResponse<GroupMember[]>
 
 declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
 
+// TODO:
 declare type DeleteGroupResponse = ApiResponse<{ id: string }>
 
+// TODO:
 declare type GetGroupMessagesResponse = ApiResponse<Message[]>
 
+// TODO:
 declare type MarkGroupMessagesAsReadResponse = ApiResponse<boolean>
 
 declare type JoinGroupResponse = ApiResponse<boolean>
@@ -94,18 +97,13 @@ declare type CreateChannelResponse = ApiResponse<Channel>
 
 declare type PatchChannelResponse = ApiResponse<Channel>
 
+declare type GetChannelsResponse = ApiCollectionResponse<Channel>
+
 declare type GetChannelResponse = ApiResponse<Channel>
 
 declare type GetChannelSubscribersResponse = ApiResponse<ChannelSubscriber[]>
 
-declare type SearchChannelsResponse = ApiResponse<
-  {
-    id: string
-    name: string
-    imageUrl?: string
-    totalSubscribers: number
-  }[]
->
+declare type SearchChannelsResponse = ApiCollectionResponse<ChannelSearch>
 
 declare type DeleteChannelResponse = ApiResponse<{ id: string }>
 

@@ -117,6 +117,8 @@ declare interface ChannelModel {
   type: ChannelType
   ownerId: string
   imageUrl?: string
+  inviteCode: string
+  lastMessageId?: string
 }
 
 declare interface ChannelSubscriberAWModel
