@@ -21,9 +21,7 @@ declare interface QueryResults<T> {
   data: T[]
 }
 
-declare interface QueryResult<T> {
-  data: T
-}
+declare type QueryResult<T> = T | null
 
 declare interface User {
   id: string

@@ -9,7 +9,6 @@ import { getBlockedUsers } from "@/features/blocked-users/lib/queries"
 import { getUsers } from "@/features/user/lib/queries"
 import {
   APPWRITE_GROUP_MEMBERS_ID,
-  APPWRITE_GROUP_OPTIONS_ID,
   APPWRITE_GROUPS_ID,
   DATABASE_ID,
 } from "@/lib/appwrite/config"
@@ -17,10 +16,8 @@ import { generateInviteCode } from "@/lib/utils"
 
 import { groupSchema } from "../schema"
 
-import {
-  mapGroupMemberModelToGroupMember,
-  mapUserModelToGroupOwner,
-} from "./utils"
+import { getGroupMembersByUserId } from "./group-member-queries"
+import { mapUserModelToGroupOwner } from "./utils"
 
 export const checkGroupNameAvailablity = async (
   databases: Databases,
@@ -62,33 +59,6 @@ export const createGroup = async (
     APPWRITE_GROUPS_ID,
     ID.unique(),
     formData,
-  )
-}
-
-export const createGroupOption = async (
-  databases: Databases,
-  formData: GroupOptionModel,
-) => {
-  return await databases.createDocument<GroupOptionAWModel>(
-    DATABASE_ID,
-    APPWRITE_GROUP_OPTIONS_ID,
-    ID.unique(),
-    formData,
-  )
-}
-
-export const createGroupMember = async (
-  databases: Databases,
-  data: Omit<GroupMemberModel, "leftAt" | "joinedAt">,
-) => {
-  return await databases.createDocument<GroupMemberAWModel>(
-    DATABASE_ID,
-    APPWRITE_GROUP_MEMBERS_ID,
-    ID.unique(),
-    {
-      ...data,
-      joinedAt: new Date(),
-    },
   )
 }
 
@@ -159,12 +129,8 @@ export const getGroupsByUserId = async (
   { userId }: { userId: string },
 ) => {
   try {
-    const members = await databases.listDocuments<GroupMemberAWModel>(
-      DATABASE_ID,
-      APPWRITE_GROUP_MEMBERS_ID,
-      [Query.equal("userId", userId), Query.isNull("leftAt")],
-    )
-    const groupIds = members.documents.map((v) => v.groupId)
+    const members = await getGroupMembersByUserId(databases, { userId })
+    const groupIds = members.data.map((v) => v.groupId)
 
     const groups = await databases.listDocuments<GroupAWModel>(
       DATABASE_ID,
@@ -184,7 +150,7 @@ export const getGroupsByUserId = async (
 export const getGroupOwnersByUserIds = async (
   databases: Databases,
   { userIds }: { userIds: string[] },
-) => {
+): Promise<QueryResults<GroupOwner>> => {
   const result = await getUsers(databases, {
     queries: [
       Query.contains("$id", userIds),
@@ -192,7 +158,10 @@ export const getGroupOwnersByUserIds = async (
     ],
   })
 
-  return result.documents.map(mapUserModelToGroupOwner)
+  return {
+    total: result.total,
+    data: result.documents.map(mapUserModelToGroupOwner),
+  }
 }
 
 export const getGroupById = async (
@@ -207,70 +176,6 @@ export const getGroupById = async (
     )
   } catch {
     return null
-  }
-}
-
-export const validateGroupMember = async (
-  databases: Databases,
-  { userId, groupId }: { userId: string; groupId: string },
-) => {
-  const result = await databases.listDocuments<GroupMemberAWModel>(
-    DATABASE_ID,
-    APPWRITE_GROUP_MEMBERS_ID,
-    [
-      Query.equal("userId", userId),
-      Query.equal("groupId", groupId),
-      Query.isNull("leftAt"),
-    ],
-  )
-
-  return result.total > 0
-}
-
-export const getGroupMembers = async (
-  databases: Databases,
-  { groupId }: { groupId: string },
-) => {
-  try {
-    const result = await databases.listDocuments<GroupMemberAWModel>(
-      DATABASE_ID,
-      APPWRITE_GROUP_MEMBERS_ID,
-      [Query.equal("groupId", groupId)],
-    )
-    const memberIds = result.documents.map((v) => v.userId)
-
-    const memberProfiles = await getUsers(databases, {
-      queries: [
-        Query.contains("$id", memberIds),
-        Query.select([
-          "$id",
-          "firstName",
-          "lastName",
-          "imageUrl",
-          "lastSeenAt",
-        ]),
-      ],
-    })
-    const memberProfileIds = memberProfiles.documents.map((v) => v.$id)
-
-    const members = result.documents
-      .filter((member) => memberProfileIds.includes(member.userId))
-      .map((member) => {
-        const profile = memberProfiles.documents.find(
-          (v) => v.$id === member.userId,
-        )
-        return mapGroupMemberModelToGroupMember(member, profile!)
-      })
-
-    return {
-      total: members.length,
-      documents: members,
-    }
-  } catch {
-    return {
-      total: 0,
-      documents: [],
-    }
   }
 }
 
@@ -346,45 +251,4 @@ export const validateJoinCode = async (
   )
 
   return result.inviteCode === code
-}
-
-export const leftGroupMember = async (
-  databases: Databases,
-  { groupId, userId }: { groupId: string; userId: string },
-) => {
-  const result = await databases.listDocuments(
-    DATABASE_ID,
-    APPWRITE_GROUP_MEMBERS_ID,
-    [
-      Query.equal("groupId", groupId),
-      Query.equal("userId", userId),
-      Query.isNull("leftAt"),
-    ],
-  )
-
-  return await databases.updateDocument<GroupMemberAWModel>(
-    DATABASE_ID,
-    APPWRITE_GROUP_MEMBERS_ID,
-    result.documents[0]?.$id,
-    {
-      leftAt: new Date(),
-    },
-  )
-}
-
-export const validateGroupAdmin = async (
-  databases: Databases,
-  { userId, groupId }: { userId: string; groupId: string },
-) => {
-  const result = await databases.listDocuments<GroupMemberAWModel>(
-    DATABASE_ID,
-    APPWRITE_GROUP_MEMBERS_ID,
-    [
-      Query.equal("userId", userId),
-      Query.equal("groupId", groupId),
-      Query.isNull("leftAt"),
-    ],
-  )
-
-  return result.documents[0]?.isAdmin ?? false
 }

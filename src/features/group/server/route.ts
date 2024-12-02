@@ -19,21 +19,23 @@ import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import {
+  createGroupMember,
+  getGroupMembers,
+  leftGroupMember,
+  validateGroupAdmin,
+  validateGroupMember,
+} from "../lib/group-member-queries"
+import { createGroupOption } from "../lib/group-option-queries"
+import {
   createGroup,
   createGroupInviteCode,
-  createGroupMember,
-  createGroupOption,
   getGroupById,
-  getGroupMembers,
   getGroupOwnersByUserIds,
   getGroupsByUserId,
-  leftGroupMember,
   searchGroup,
-  validateGroupAdmin,
   validateGroupData,
-  validateGroupMember,
   validateJoinCode,
-} from "../lib/queries"
+} from "../lib/group-queries"
 import { mapGroupModelToGroup, mapUserModelToGroupOwner } from "../lib/utils"
 import { groupSchema, joinGroupSchema } from "../schema"
 
@@ -48,7 +50,7 @@ const groupApp = new Hono()
       })
 
       const ownerIds = result.documents.map((v) => v.ownerId)
-      const owners = await getGroupOwnersByUserIds(databases, {
+      const { data: owners } = await getGroupOwnersByUserIds(databases, {
         userIds: ownerIds,
       })
 
@@ -241,7 +243,7 @@ const groupApp = new Hono()
         const result = await getGroupMembers(databases, { groupId })
 
         const response: GetGroupMembersResponse = successCollectionResponse(
-          result.documents,
+          result.data,
           result.total,
         )
         return c.json(response)
