@@ -174,7 +174,7 @@ declare interface ChannelSubscriber {
   name: string
   imageUrl: string | null
   isAdmin: boolean
-  lastSeenAt: string
+  lastSeenAt: string | null
 }
 
 declare interface ChannelOption {

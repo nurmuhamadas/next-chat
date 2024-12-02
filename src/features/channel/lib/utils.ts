@@ -24,3 +24,16 @@ export const mapUserModelToChannelOwner = (user: UserAWModel): ChannelOwner => {
     imageUrl: user.imageUrl ?? null,
   }
 }
+
+export const mapChannelSubModelToChannelSub = (
+  subs: ChannelSubscriberAWModel,
+  user: UserAWModel,
+): ChannelSubscriber => {
+  return {
+    id: user.$id,
+    name: mergeName(user.firstName, user.lastName),
+    imageUrl: user.imageUrl ?? null,
+    isAdmin: subs.isAdmin,
+    lastSeenAt: user.lastSeenAt ?? null,
+  }
+}

@@ -1,9 +1,12 @@
 import { Databases, ID, Query } from "node-appwrite"
 
+import { getUsers } from "@/features/user/lib/queries"
 import {
   APPWRITE_CHANNEL_SUBSCRIBERS_ID,
   DATABASE_ID,
 } from "@/lib/appwrite/config"
+
+import { mapChannelSubModelToChannelSub } from "./utils"
 
 export const createChannelSubscriber = async (
   databases: Databases,
@@ -55,4 +58,51 @@ export const validateChannelSubs = async (
   )
 
   return result.total > 0
+}
+
+export const getChannelSubs = async (
+  databases: Databases,
+  { channelId }: { channelId: string },
+): Promise<QueryResults<ChannelSubscriber>> => {
+  try {
+    const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+      DATABASE_ID,
+      APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+      [Query.equal("channelId", channelId), Query.isNull("unsubscribedAt")],
+    )
+    const memberIds = result.documents.map((v) => v.userId)
+
+    const memberProfiles = await getUsers(databases, {
+      queries: [
+        Query.contains("$id", memberIds),
+        Query.select([
+          "$id",
+          "firstName",
+          "lastName",
+          "imageUrl",
+          "lastSeenAt",
+        ]),
+      ],
+    })
+    const memberProfileIds = memberProfiles.documents.map((v) => v.$id)
+
+    const members = result.documents
+      .filter((member) => memberProfileIds.includes(member.userId))
+      .map((member) => {
+        const profile = memberProfiles.documents.find(
+          (v) => v.$id === member.userId,
+        )
+        return mapChannelSubModelToChannelSub(member, profile!)
+      })
+
+    return {
+      total: members.length,
+      data: members,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
 }

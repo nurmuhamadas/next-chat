@@ -27,6 +27,7 @@ import {
 } from "../lib/channel-queries"
 import {
   createChannelSubscriber,
+  getChannelSubs,
   validateChannelSubs,
 } from "../lib/channel-subscribers-queries"
 import {
@@ -200,6 +201,42 @@ const channelApp = new Hono()
         return c.json(response)
       } catch (e) {
         console.log(e)
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:channelId/subscribers",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const profile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isMember = await validateChannelSubs(databases, {
+          userId: profile.$id,
+          channelId,
+        })
+        if (channel.type === "PRIVATE" && !isMember) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 403)
+        }
+
+        const result = await getChannelSubs(databases, { channelId })
+
+        const response: GetChannelSubscribersResponse =
+          successCollectionResponse(result.data, result.total)
+        return c.json(response)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
