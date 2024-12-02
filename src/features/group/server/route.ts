@@ -550,6 +550,25 @@ const groupApp = new Hono()
           return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
         }
 
+        const isAdmin = await validateGroupMember(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (isAdmin) {
+          const members = await getGroupMembers(databases, { groupId })
+          const admins = members.data.filter((v) => v.isAdmin)
+          if (admins.length === 1 && members.total > 1) {
+            const membersWithoutUser = members.data.filter(
+              (v) => v.id !== currentProfile.$id,
+            )
+
+            await setUserAsAdmin(databases, {
+              userId: membersWithoutUser[0].id,
+              groupId,
+            })
+          }
+        }
+
         await leftGroupMember(databases, {
           groupId: group.$id,
           userId: currentProfile.$id,

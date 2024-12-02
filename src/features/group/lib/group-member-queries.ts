@@ -70,7 +70,7 @@ export const getGroupMembers = async (
     const result = await databases.listDocuments<GroupMemberAWModel>(
       DATABASE_ID,
       APPWRITE_GROUP_MEMBERS_ID,
-      [Query.equal("groupId", groupId)],
+      [Query.equal("groupId", groupId), Query.isNull("leftAt")],
     )
     const memberIds = result.documents.map((v) => v.userId)
 
@@ -128,6 +128,7 @@ export const leftGroupMember = async (
     APPWRITE_GROUP_MEMBERS_ID,
     result.documents[0]?.$id,
     {
+      isAdmin: false,
       leftAt: new Date(),
     },
   )
@@ -196,4 +197,31 @@ export const unsetUserAdmin = async (
     result.documents[0]?.$id,
     { isAdmin: false },
   )
+}
+
+export const getGroupAdmins = async (
+  databases: Databases,
+  { groupId }: { groupId: string },
+): Promise<QueryResults<GroupMemberAWModel>> => {
+  try {
+    const result = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [
+        Query.equal("groupId", groupId),
+        Query.equal("isAdmin", true),
+        Query.isNull("leftAt"),
+      ],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
 }

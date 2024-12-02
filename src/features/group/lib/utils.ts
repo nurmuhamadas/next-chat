@@ -30,7 +30,7 @@ export const mapGroupMemberModelToGroupMember = (
   user: UserAWModel,
 ): GroupMember => {
   return {
-    id: member.$id,
+    id: user.$id,
     name: mergeName(user.firstName, user.lastName),
     imageUrl: user.imageUrl ?? null,
     isAdmin: member.isAdmin,
