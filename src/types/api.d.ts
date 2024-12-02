@@ -87,6 +87,8 @@ declare type KickGroupMemberResponse = ApiResponse<boolean>
 
 declare type SetAdminGroupResponse = ApiResponse<boolean>
 
+declare type UnsetAdminGroupResponse = ApiResponse<boolean>
+
 // CHANNEL API
 declare type CreateChannelResponse = ApiResponse<Channel>
 

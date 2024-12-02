@@ -149,3 +149,51 @@ export const validateGroupAdmin = async (
 
   return result.documents[0]?.isAdmin ?? false
 }
+
+export const setUserAsAdmin = async (
+  databases: Databases,
+  { userId, groupId }: { userId: string; groupId: string },
+) => {
+  const result = await databases.listDocuments<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    [
+      Query.equal("userId", userId),
+      Query.equal("groupId", groupId),
+      Query.isNull("leftAt"),
+    ],
+  )
+
+  if (result.total === 0) throw Error()
+
+  return await databases.updateDocument<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    result.documents[0]?.$id,
+    { isAdmin: true },
+  )
+}
+
+export const unsetUserAdmin = async (
+  databases: Databases,
+  { userId, groupId }: { userId: string; groupId: string },
+) => {
+  const result = await databases.listDocuments<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    [
+      Query.equal("userId", userId),
+      Query.equal("groupId", groupId),
+      Query.isNull("leftAt"),
+    ],
+  )
+
+  if (result.total === 0) throw Error()
+
+  return await databases.updateDocument<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    result.documents[0]?.$id,
+    { isAdmin: false },
+  )
+}

@@ -22,6 +22,8 @@ import {
   createGroupMember,
   getGroupMembers,
   leftGroupMember,
+  setUserAsAdmin,
+  unsetUserAdmin,
   validateGroupAdmin,
   validateGroupMember,
 } from "../lib/group-member-queries"
@@ -318,8 +320,7 @@ const groupApp = new Hono()
 
         const response: AddGroupMemberResponse = successResponse(true)
         return c.json(response)
-      } catch (error) {
-        console.log(error)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -366,6 +367,108 @@ const groupApp = new Hono()
         await leftGroupMember(databases, { userId, groupId })
 
         const response: KickGroupMemberResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/:groupId/members/:userId/admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId, userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateGroupAdmin(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_ADD_MEMBER), 403)
+        }
+
+        const isMember = await validateGroupMember(databases, {
+          userId,
+          groupId,
+        })
+        if (!isMember) {
+          return c.json(createError(ERROR.USER_IS_NOT_MEMBER), 403)
+        }
+
+        const isAlreadyAdmin = await validateGroupAdmin(databases, {
+          userId,
+          groupId,
+        })
+        if (isAlreadyAdmin) {
+          return c.json(createError(ERROR.USER_ALREADY_ADMIN), 400)
+        }
+
+        await setUserAsAdmin(databases, { userId, groupId })
+
+        const response: SetAdminGroupResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:groupId/members/:userId/admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId, userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateGroupAdmin(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_REMOVE_MEMBER), 403)
+        }
+
+        const isMember = await validateGroupMember(databases, {
+          userId,
+          groupId,
+        })
+        if (!isMember) {
+          return c.json(createError(ERROR.USER_IS_NOT_MEMBER), 403)
+        }
+
+        const isAlreadyAdmin = await validateGroupAdmin(databases, {
+          userId,
+          groupId,
+        })
+        if (!isAlreadyAdmin) {
+          return c.json(createError(ERROR.USER_IS_NOT_ADMIN), 400)
+        }
+
+        await unsetUserAdmin(databases, { userId, groupId })
+
+        const response: UnsetAdminGroupResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
