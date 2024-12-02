@@ -21,7 +21,7 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 import {
   createGroupMember,
   getGroupMembers,
-  leftGroupMember,
+  leaveGroup,
   setUserAsAdmin,
   unsetUserAdmin,
   validateGroupAdmin,
@@ -364,7 +364,7 @@ const groupApp = new Hono()
           return c.json(createError(ERROR.REMOVED_USER_IS_NOT_MEMBER), 400)
         }
 
-        await leftGroupMember(databases, { userId, groupId })
+        await leaveGroup(databases, { userId, groupId })
 
         const response: KickGroupMemberResponse = successResponse(true)
         return c.json(response)
@@ -550,7 +550,7 @@ const groupApp = new Hono()
           return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
         }
 
-        const isAdmin = await validateGroupMember(databases, {
+        const isAdmin = await validateGroupAdmin(databases, {
           userId: currentProfile.$id,
           groupId,
         })
@@ -569,7 +569,7 @@ const groupApp = new Hono()
           }
         }
 
-        await leftGroupMember(databases, {
+        await leaveGroup(databases, {
           groupId: group.$id,
           userId: currentProfile.$id,
         })

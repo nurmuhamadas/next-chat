@@ -169,3 +169,17 @@ export const getChannelById = async (
     return null
   }
 }
+
+export const validateJoinCode = async (
+  databases: Databases,
+  { channelId, code }: { channelId: string; code: string },
+) => {
+  const result = await databases.getDocument<ChannelAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNELS_ID,
+    channelId,
+    [Query.select(["inviteCode"])],
+  )
+
+  return result.inviteCode === code
+}

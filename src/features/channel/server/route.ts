@@ -24,10 +24,12 @@ import {
   getChannelOwnersByUserIds,
   getChannelsByUserId,
   searchChannels,
+  validateJoinCode,
 } from "../lib/channel-queries"
 import {
   createChannelSubscriber,
   getChannelSubs,
+  leaveChannel,
   setUserAsAdmin,
   unsetUserAdmin,
   validateChannelAdmin,
@@ -37,7 +39,7 @@ import {
   mapChannelModelToChannel,
   mapUserModelToChannelOwner,
 } from "../lib/utils"
-import { channelSchema } from "../schema"
+import { channelSchema, joinChannelSchema } from "../schema"
 
 const channelApp = new Hono()
   .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
@@ -118,7 +120,7 @@ const channelApp = new Hono()
           await createChannelSubscriber(databases, {
             userId: currentProfile.$id,
             channelId: createdChannel.$id,
-            isAdmin: false,
+            isAdmin: true,
           })
 
           const channelResult = mapChannelModelToChannel(
@@ -267,7 +269,7 @@ const channelApp = new Hono()
           channelId,
         })
         if (!isAdmin) {
-          return c.json(createError(ERROR.ONLY_ADMIN_ADD_MEMBER), 403)
+          return c.json(createError(ERROR.ONLY_ADMIN_CAN_ADD_ADMIN), 403)
         }
 
         const isSubs = await validateChannelSubs(databases, {
@@ -290,7 +292,8 @@ const channelApp = new Hono()
 
         const response: SetAdminChannelResponse = successResponse(true)
         return c.json(response)
-      } catch {
+      } catch (e) {
+        console.log(e)
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -340,6 +343,112 @@ const channelApp = new Hono()
         await unsetUserAdmin(databases, { userId, channelId })
 
         const response: UnsetAdminChannelResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/:channelId/join",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("json", joinChannelSchema, zodErrorHandler),
+    async (c) => {
+      try {
+        const { code } = c.req.valid("json")
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isMember = await validateChannelSubs(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (isMember) {
+          return c.json(createError(ERROR.ALREADY_SUBSRIBER), 403)
+        }
+
+        const isJoinCodeValid = await validateJoinCode(databases, {
+          channelId,
+          code,
+        })
+        if (!isJoinCodeValid) {
+          return c.json(createError(ERROR.INVALID_JOIN_CODE), 400)
+        }
+
+        await createChannelSubscriber(databases, {
+          channelId,
+          userId: currentProfile.$id,
+          isAdmin: false,
+        })
+
+        const response: JoinChannelResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:channelId/left",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isSubs = await validateChannelSubs(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (!isSubs) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const isAdmin = await validateChannelAdmin(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (isAdmin) {
+          const subs = await getChannelSubs(databases, { channelId })
+          const admins = subs.data.filter((v) => v.isAdmin)
+          if (admins.length === 1 && subs.total > 1) {
+            const subsWithoutUser = subs.data.filter(
+              (v) => v.id !== currentProfile.$id,
+            )
+
+            await setUserAsAdmin(databases, {
+              userId: subsWithoutUser[0].id,
+              channelId,
+            })
+          }
+        }
+
+        await leaveChannel(databases, {
+          channelId: channel.$id,
+          userId: currentProfile.$id,
+        })
+
+        const response: LeaveChannelResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

@@ -109,7 +109,7 @@ export const getGroupMembers = async (
   }
 }
 
-export const leftGroupMember = async (
+export const leaveGroup = async (
   databases: Databases,
   { groupId, userId }: { groupId: string; userId: string },
 ) => {

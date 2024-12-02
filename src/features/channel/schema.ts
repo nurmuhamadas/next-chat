@@ -22,3 +22,12 @@ export const channelSchema = z.object({
   }),
   image: imageProfileSchema,
 })
+
+export const joinChannelSchema = z.object({
+  code: z
+    .string({
+      required_error: ERROR.JOIN_CODE_REQUIRED,
+      invalid_type_error: ERROR.INVALID_JOIN_CODE,
+    })
+    .length(10, ERROR.INVALID_JOIN_CODE),
+})
