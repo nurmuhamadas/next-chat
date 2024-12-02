@@ -28,6 +28,9 @@ import {
 import {
   createChannelSubscriber,
   getChannelSubs,
+  setUserAsAdmin,
+  unsetUserAdmin,
+  validateChannelAdmin,
   validateChannelSubs,
 } from "../lib/channel-subscribers-queries"
 import {
@@ -235,6 +238,108 @@ const channelApp = new Hono()
 
         const response: GetChannelSubscribersResponse =
           successCollectionResponse(result.data, result.total)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/:channelId/subscribers/:userId/admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId, userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateChannelAdmin(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_ADD_MEMBER), 403)
+        }
+
+        const isSubs = await validateChannelSubs(databases, {
+          userId,
+          channelId,
+        })
+        if (!isSubs) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const isAlreadyAdmin = await validateChannelAdmin(databases, {
+          userId,
+          channelId,
+        })
+        if (isAlreadyAdmin) {
+          return c.json(createError(ERROR.USER_ALREADY_ADMIN), 400)
+        }
+
+        await setUserAsAdmin(databases, { userId, channelId })
+
+        const response: SetAdminChannelResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:channelId/subscribers/:userId/admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId, userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateChannelAdmin(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_CAN_REMOVE_ADMIN), 403)
+        }
+
+        const isSubs = await validateChannelSubs(databases, {
+          userId,
+          channelId,
+        })
+        if (!isSubs) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const isAlreadyAdmin = await validateChannelAdmin(databases, {
+          userId,
+          channelId,
+        })
+        if (!isAlreadyAdmin) {
+          return c.json(createError(ERROR.USER_IS_NOT_ADMIN), 400)
+        }
+
+        await unsetUserAdmin(databases, { userId, channelId })
+
+        const response: UnsetAdminChannelResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

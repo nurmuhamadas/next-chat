@@ -105,10 +105,13 @@ declare type GetChannelSubscribersResponse = ApiResponse<ChannelSubscriber[]>
 
 declare type SearchChannelsResponse = ApiCollectionResponse<ChannelSearch>
 
+// TODO:
 declare type DeleteChannelResponse = ApiResponse<{ id: string }>
 
+// TODO:
 declare type GetChannelMessagesResponse = ApiResponse<Message[]>
 
+// TODO:
 declare type MarkChannelMessagesAsReadResponse = ApiResponse<boolean>
 
 declare type JoinChannelResponse = ApiResponse<boolean>
@@ -116,6 +119,8 @@ declare type JoinChannelResponse = ApiResponse<boolean>
 declare type LeaveChannelResponse = ApiResponse<boolean>
 
 declare type SetAdminChannelResponse = ApiResponse<boolean>
+
+declare type UnsetAdminChannelResponse = ApiResponse<boolean>
 
 // CONVERSATION API
 /** Include groups and channels chat */

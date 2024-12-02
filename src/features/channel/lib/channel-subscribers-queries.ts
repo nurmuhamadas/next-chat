@@ -106,3 +106,68 @@ export const getChannelSubs = async (
     }
   }
 }
+
+export const validateChannelAdmin = async (
+  databases: Databases,
+  { userId, channelId }: { userId: string; channelId: string },
+) => {
+  const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+    [
+      Query.equal("userId", userId),
+      Query.equal("channelId", channelId),
+      Query.isNull("unsubscribedAt"),
+    ],
+  )
+
+  return result.documents[0]?.isAdmin ?? false
+}
+
+export const setUserAsAdmin = async (
+  databases: Databases,
+  { userId, channelId }: { userId: string; channelId: string },
+) => {
+  const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+    [
+      Query.equal("userId", userId),
+      Query.equal("channelId", channelId),
+      Query.isNull("leftAt"),
+    ],
+  )
+
+  if (result.total === 0) throw Error()
+
+  return await databases.updateDocument<ChannelSubscriberAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+    result.documents[0]?.$id,
+    { isAdmin: true },
+  )
+}
+
+export const unsetUserAdmin = async (
+  databases: Databases,
+  { userId, channelId }: { userId: string; channelId: string },
+) => {
+  const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+    [
+      Query.equal("userId", userId),
+      Query.equal("channelId", channelId),
+      Query.isNull("leftAt"),
+    ],
+  )
+
+  if (result.total === 0) throw Error()
+
+  return await databases.updateDocument<ChannelSubscriberAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+    result.documents[0]?.$id,
+    { isAdmin: false },
+  )
+}
