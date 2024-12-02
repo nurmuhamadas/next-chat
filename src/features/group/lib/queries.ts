@@ -79,13 +79,16 @@ export const createGroupOption = async (
 
 export const createGroupMember = async (
   databases: Databases,
-  data: GroupMemberModel,
+  data: Omit<GroupMemberModel, "leftAt" | "joinedAt">,
 ) => {
   return await databases.createDocument<GroupMemberAWModel>(
     DATABASE_ID,
     APPWRITE_GROUP_MEMBERS_ID,
     ID.unique(),
-    data,
+    {
+      ...data,
+      joinedAt: new Date(),
+    },
   )
 }
 
@@ -367,4 +370,21 @@ export const leftGroupMember = async (
       leftAt: new Date(),
     },
   )
+}
+
+export const validateGroupAdmin = async (
+  databases: Databases,
+  { userId, groupId }: { userId: string; groupId: string },
+) => {
+  const result = await databases.listDocuments<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    [
+      Query.equal("userId", userId),
+      Query.equal("groupId", groupId),
+      Query.isNull("leftAt"),
+    ],
+  )
+
+  return result.documents[0]?.isAdmin ?? false
 }

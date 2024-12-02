@@ -5,6 +5,7 @@ import { Hono } from "hono"
 
 import { searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
+import { getBlockedUser } from "@/features/blocked-users/lib/queries"
 import { getUserProfileById } from "@/features/user/lib/queries"
 import { constructFileUrl } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
@@ -28,6 +29,7 @@ import {
   getGroupsByUserId,
   leftGroupMember,
   searchGroup,
+  validateGroupAdmin,
   validateGroupData,
   validateGroupMember,
   validateJoinCode,
@@ -119,7 +121,6 @@ const groupApp = new Hono()
             userId: currentProfile.$id,
             groupId: createdGroup.$id,
             isAdmin: true,
-            joinedAt: new Date(),
           })
 
           await Promise.all([
@@ -128,7 +129,6 @@ const groupApp = new Hono()
                 userId: memberId,
                 groupId: createdGroup.$id,
                 isAdmin: false,
-                joinedAt: new Date(),
               }),
             ),
           ])
@@ -251,6 +251,126 @@ const groupApp = new Hono()
     },
   )
   .post(
+    "/:groupId/members/:userId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId, userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const addedUser = await getUserProfileById(databases, { userId })
+        if (!addedUser) {
+          return c.json(createError(ERROR.ADDED_USER_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateGroupAdmin(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_ADD_MEMBER), 403)
+        }
+
+        const isAlreadyMember = await validateGroupMember(databases, {
+          userId,
+          groupId,
+        })
+        if (isAlreadyMember) {
+          return c.json(createError(ERROR.ADDED_USER_ALREADY_MEMBER), 400)
+        }
+
+        const blockedUsers = await getBlockedUser(databases, {
+          userId: currentProfile.$id,
+          blockedUserId: userId,
+        })
+        if (!!blockedUsers) {
+          return c.json(createError(ERROR.ADD_BLOCKED_USERS_NOT_ALLOWED), 403)
+        }
+
+        const userBlocked = await getBlockedUser(databases, {
+          userId,
+          blockedUserId: currentProfile.$id,
+        })
+        if (!!userBlocked) {
+          return c.json(
+            createError(ERROR.ADDDED_BY_BLOCKED_USER_NOT_ALLOWED),
+            403,
+          )
+        }
+
+        await createGroupMember(databases, {
+          userId,
+          groupId,
+          isAdmin: false,
+        })
+
+        const response: AddGroupMemberResponse = successResponse(true)
+        return c.json(response)
+      } catch (error) {
+        console.log(error)
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:groupId/members/:userId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId, userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const removedUser = await getUserProfileById(databases, { userId })
+        if (!removedUser) {
+          return c.json(createError(ERROR.REMOVED_USER_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateGroupAdmin(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_REMOVE_MEMBER), 403)
+        }
+
+        const isAlreadyMember = await validateGroupMember(databases, {
+          userId,
+          groupId,
+        })
+        if (!isAlreadyMember) {
+          return c.json(createError(ERROR.REMOVED_USER_IS_NOT_MEMBER), 400)
+        }
+
+        await leftGroupMember(databases, { userId, groupId })
+
+        const response: KickGroupMemberResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
     "/:groupId/join",
     sessionMiddleware,
     validateProfileMiddleware,
@@ -290,7 +410,6 @@ const groupApp = new Hono()
           groupId,
           userId: currentProfile.$id,
           isAdmin: false,
-          joinedAt: new Date(),
         })
 
         const response: JoinGroupResponse = successResponse(true)
