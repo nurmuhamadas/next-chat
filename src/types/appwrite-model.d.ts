@@ -57,8 +57,16 @@ declare interface MessageModel {
   channelId?: string
   originalMessageId?: string
   isEmojiOnly?: boolean
-  isRead?: boolean
+  isDeleted?: boolean
   status: MessageStatus
+}
+
+declare interface MessageReadAWModel
+  extends AppwriteDocument,
+    MessageReadModel {}
+declare interface MessageReadModel {
+  userId: string
+  messageId: string
 }
 
 declare interface ReactionAWModel extends AppwriteDocument, ReactionModel {}

@@ -1,6 +1,10 @@
 declare type Gender = "MALE" | "FEMALE"
 
-declare type MessageStatus = "DEFAULT" | "DELETED_FOR_ME" | "DELETED_FOR_ALL"
+declare type MessageStatus =
+  | "DEFAULT"
+  | "DELETED_FOR_ME"
+  | "DELETED_FOR_ALL"
+  | "DELETED_BY_ADMIN"
 
 declare type AttachmentType = "IMAGE" | "VIDEO" | "AUDIO" | "PDF" | "OTHER"
 
