@@ -27,14 +27,19 @@ declare interface ConversationAWModel
 declare interface ConversationModel {
   userId1: string
   userId2: string
+  lastMessageId?: string
 }
 
 declare interface ConversationOptionAWModel
   extends AppwriteDocument,
-    ConversationOptionModel {}
+    ConversationOptionModel {
+  deletedAt?: Date
+}
 declare interface ConversationOptionModel {
   conversationId: string
+  userId: string
   notification: boolean
+  deletedAt?: string
 }
 
 declare interface BlockedUserAWModel

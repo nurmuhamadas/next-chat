@@ -126,10 +126,14 @@ declare type UnsetAdminChannelResponse = ApiResponse<boolean>
 /** Include groups and channels chat */
 declare type GetConversationListResponse = ApiResponse<Conversation[]>
 
+declare type CreateConversationResponse = ApiResponse<Conversation>
+
 declare type DeleteConversationResponse = ApiResponse<{ id: string }>
 
+// TODO:
 declare type GetPrivateMessagesResponse = ApiResponse<Message[]>
 
+// TODO:
 declare type MarkConversationMessagesAsReadResponse = ApiResponse<boolean>
 
 // MESSAGE API

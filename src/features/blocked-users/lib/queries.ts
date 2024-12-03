@@ -122,3 +122,27 @@ export const unblockUser = async (
 ) => {
   await databases.deleteDocument(DATABASE_ID, APPWRITE_BLOCKED_USERS_ID, id)
 }
+
+export const validateBlockedEach = async (
+  databases: Databases,
+  { userId1, userId2 }: { userId1: string; userId2: string },
+) => {
+  const result = await databases.listDocuments(
+    DATABASE_ID,
+    APPWRITE_BLOCKED_USERS_ID,
+    [
+      Query.or([
+        Query.and([
+          Query.equal("userId", userId1),
+          Query.equal("blockedUserId", userId2),
+        ]),
+        Query.and([
+          Query.equal("userId", userId2),
+          Query.equal("blockedUserId", userId1),
+        ]),
+      ]),
+    ],
+  )
+
+  return result.total > 0
+}
