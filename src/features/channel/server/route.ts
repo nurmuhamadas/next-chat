@@ -18,6 +18,8 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 import {
   createChannelOption,
   deleteChannelOption,
+  getChannelOption,
+  updateChannelOption,
 } from "../lib/channel-option-queries"
 import {
   checkChannelNameAvailablity,
@@ -42,9 +44,14 @@ import {
 } from "../lib/channel-subscribers-queries"
 import {
   mapChannelModelToChannel,
+  mapChannelOptModelToChannelOpt,
   mapUserModelToChannelOwner,
 } from "../lib/utils"
-import { channelSchema, joinChannelSchema } from "../schema"
+import {
+  channelSchema,
+  joinChannelSchema,
+  updateChannelOptionSchema,
+} from "../schema"
 
 const channelApp = new Hono()
   .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
@@ -501,11 +508,103 @@ const channelApp = new Hono()
 
         await createChannelSubscriber(databases, {
           channelId,
-          userId: currentMember.$id,
+          userId: currentProfile.$id,
           isAdmin: currentMember.isAdmin,
         })
 
-        const response: DeleteAllGroupChatResponse = successResponse(true)
+        const response: DeleteAllChannelChatResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:channelId/options",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const currentMember = await getCurrentChannelSubs(databases, {
+          channelId,
+          userId: currentProfile.$id,
+        })
+        if (!currentMember) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const channelOption = await getChannelOption(databases, {
+          channelId: channel.$id,
+          userId: currentProfile.$id,
+        })
+        if (!channelOption) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const response: GetChannelOptionResponse = successResponse(
+          mapChannelOptModelToChannelOpt(channelOption),
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .patch(
+    "/:channelId/options",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("json", updateChannelOptionSchema),
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+        const { notification } = c.req.valid("json")
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const currentMember = await getCurrentChannelSubs(databases, {
+          channelId,
+          userId: currentProfile.$id,
+        })
+        if (!currentMember) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const channelOption = await getChannelOption(databases, {
+          channelId: channel.$id,
+          userId: currentProfile.$id,
+        })
+        if (!channelOption) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        const result = await updateChannelOption(databases, channelOption.$id, {
+          notification,
+        })
+
+        const response: UpdateChannelNotifResponse = successResponse(
+          mapChannelOptModelToChannelOpt(result),
+        )
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

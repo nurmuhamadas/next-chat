@@ -128,6 +128,12 @@ declare type SetAdminChannelResponse = ApiResponse<boolean>
 
 declare type UnsetAdminChannelResponse = ApiResponse<boolean>
 
+declare type DeleteAllChannelChatResponse = ApiResponse<boolean>
+
+declare type GetChannelOptionResponse = ApiResponse<ChannelOption>
+
+declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
+
 // CONVERSATION API
 /** Include groups and channels chat */
 declare type GetConversationListResponse = ApiResponse<Conversation[]>

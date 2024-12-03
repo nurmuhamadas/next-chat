@@ -37,3 +37,13 @@ export const mapChannelSubModelToChannelSub = (
     lastSeenAt: user.lastSeenAt ?? null,
   }
 }
+
+export const mapChannelOptModelToChannelOpt = (
+  option: ChannelOptionAWModel,
+): ChannelOption => {
+  return {
+    id: option.$id,
+    channelId: option.channelId,
+    notification: option.notification,
+  }
+}
