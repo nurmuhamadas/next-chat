@@ -196,3 +196,51 @@ export const leaveChannel = async (
     },
   )
 }
+
+export const getCurrentChannelSubs = async (
+  databases: Databases,
+  { channelId, userId }: { channelId: string; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+      DATABASE_ID,
+      APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+      [
+        Query.equal("channelId", channelId),
+        Query.equal("userId", userId),
+        Query.isNull("unsubscribedAt"),
+      ],
+    )
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
+export const deleteAllChannelSubs = async (
+  databases: Databases,
+  { userId }: { userId: string },
+) => {
+  const result = await databases.listDocuments<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+    [Query.equal("userId", userId)],
+  )
+
+  if (result.total === 0) return null
+
+  const memberIds = result.documents.map((v) => v.$id)
+
+  return Promise.all(
+    memberIds.map((id) =>
+      databases.deleteDocument(
+        DATABASE_ID,
+        APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+        id,
+      ),
+    ),
+  )
+}

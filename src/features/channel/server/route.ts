@@ -15,7 +15,10 @@ import {
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
-import { createChannelOption } from "../lib/channel-option-queries"
+import {
+  createChannelOption,
+  deleteChannelOption,
+} from "../lib/channel-option-queries"
 import {
   checkChannelNameAvailablity,
   createChannel,
@@ -28,7 +31,9 @@ import {
 } from "../lib/channel-queries"
 import {
   createChannelSubscriber,
+  deleteAllChannelSubs,
   getChannelSubs,
+  getCurrentChannelSubs,
   leaveChannel,
   setUserAsAdmin,
   unsetUserAdmin,
@@ -115,6 +120,7 @@ const channelApp = new Hono()
           })
           await createChannelOption(databases, {
             channelId: createdChannel.$id,
+            userId: currentProfile.$id,
             notification: true,
           })
           await createChannelSubscriber(databases, {
@@ -292,8 +298,7 @@ const channelApp = new Hono()
 
         const response: SetAdminChannelResponse = successResponse(true)
         return c.json(response)
-      } catch (e) {
-        console.log(e)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -374,7 +379,7 @@ const channelApp = new Hono()
           channelId,
         })
         if (isMember) {
-          return c.json(createError(ERROR.ALREADY_SUBSRIBER), 403)
+          return c.json(createError(ERROR.ALREADY_SUBSCRIBER), 403)
         }
 
         const isJoinCodeValid = await validateJoinCode(databases, {
@@ -389,6 +394,11 @@ const channelApp = new Hono()
           channelId,
           userId: currentProfile.$id,
           isAdmin: false,
+        })
+        await createChannelOption(databases, {
+          channelId,
+          userId: currentProfile.$id,
+          notification: true,
         })
 
         const response: JoinChannelResponse = successResponse(true)
@@ -447,8 +457,55 @@ const channelApp = new Hono()
           channelId: channel.$id,
           userId: currentProfile.$id,
         })
+        await deleteChannelOption(databases, {
+          channelId,
+          userId: currentProfile.$id,
+        })
 
         const response: LeaveChannelResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:channelId/chat",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const currentMember = await getCurrentChannelSubs(databases, {
+          channelId,
+          userId: currentProfile.$id,
+        })
+        if (!currentMember) {
+          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+        }
+
+        await leaveChannel(databases, { channelId, userId: currentProfile.$id })
+
+        await deleteAllChannelSubs(databases, { userId: currentProfile.$id })
+
+        await createChannelSubscriber(databases, {
+          channelId,
+          userId: currentMember.$id,
+          isAdmin: currentMember.isAdmin,
+        })
+
+        const response: DeleteAllGroupChatResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
