@@ -1,11 +1,16 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
+import { Query } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
 import { validateBlockedEach } from "@/features/blocked-users/lib/queries"
-import { getUserProfileById } from "@/features/user/lib/queries"
+import { getUserProfileById, getUsers } from "@/features/user/lib/queries"
 import { sessionMiddleware } from "@/lib/session-middleware"
-import { createError, successResponse } from "@/lib/utils"
+import {
+  createError,
+  successCollectionResponse,
+  successResponse,
+} from "@/lib/utils"
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
@@ -15,6 +20,7 @@ import {
   deleteConversationOptById,
   getConversationById,
   getConversationByUserIds,
+  getConversations,
   getLastConversationOpt,
 } from "../lib/queries"
 import { conversationSchema } from "../schema"
@@ -22,7 +28,36 @@ import { conversationSchema } from "../schema"
 import { mapConvsModelToConversation } from "./utils"
 
 const conversationApp = new Hono()
-  .get()
+  .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
+    const databases = c.get("databases")
+    const currentProfile = c.get("userProfile")
+
+    const result = await getConversations(databases, {
+      userId: currentProfile.$id,
+    })
+    const userPairIds = result.data.map((conv) =>
+      conv.userId1 === currentProfile.$id ? conv.userId2 : conv.userId1,
+    )
+    const { documents: users } = await getUsers(databases, {
+      queries: [Query.contains("$id", userPairIds)],
+    })
+
+    // TODO: add conversation from groups and channels
+
+    const conversationList: Conversation[] = result.data.map((conv) => {
+      const user = users.find(
+        (u) => u.$id === conv.userId1 || u.$id === conv.userId2,
+      )
+      // TODO: last message and unread message
+      return mapConvsModelToConversation(conv, user!)
+    })
+
+    const response: GetConversationListResponse = successCollectionResponse(
+      conversationList,
+      result.total,
+    )
+    return c.json(response)
+  })
   .post(
     "/",
     sessionMiddleware,

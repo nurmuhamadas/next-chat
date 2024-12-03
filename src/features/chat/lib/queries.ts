@@ -61,6 +61,61 @@ export const getConversationById = async (
   }
 }
 
+export const getConversations = async (
+  databases: Databases,
+  { userId }: { userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<ConversationAWModel>(
+      DATABASE_ID,
+      APPWRITE_CONVERSATIONS_ID,
+      [
+        Query.or([
+          Query.equal("userId1", userId),
+          Query.equal("userId2", userId),
+        ]),
+      ],
+    )
+
+    if (result.total === 0) {
+      return {
+        total: 0,
+        data: [],
+      }
+    }
+
+    const conversationIds = result.documents.map((v) => v.$id)
+
+    const conversationOpt =
+      await databases.listDocuments<ConversationOptionAWModel>(
+        DATABASE_ID,
+        APPWRITE_CONVERSATION_OPTIONS_ID,
+        [
+          Query.equal("userId", userId),
+          Query.contains("conversationId", conversationIds),
+          Query.isNull("deletedAt"),
+        ],
+      )
+    const activeConversationIds = conversationOpt.documents.map(
+      (v) => v.conversationId,
+    )
+
+    const activeConversations = result.documents.filter((c) =>
+      activeConversationIds.includes(c.$id),
+    )
+
+    return {
+      total: activeConversations.length,
+      data: activeConversations,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}
+
 // ================ CONVERSATION OPTION ================
 export const createConversationOption = async (
   databases: Databases,
