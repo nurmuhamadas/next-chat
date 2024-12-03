@@ -32,6 +32,8 @@ import {
 import {
   createGroupOption,
   deleteGroupOption,
+  getGroupOption,
+  updateGroupOption,
 } from "../lib/group-option-queries"
 import {
   createGroup,
@@ -43,8 +45,16 @@ import {
   validateGroupData,
   validateJoinCode,
 } from "../lib/group-queries"
-import { mapGroupModelToGroup, mapUserModelToGroupOwner } from "../lib/utils"
-import { groupSchema, joinGroupSchema } from "../schema"
+import {
+  mapGroupModelToGroup,
+  mapGroupOptModelToGroupOpt,
+  mapUserModelToGroupOwner,
+} from "../lib/utils"
+import {
+  groupSchema,
+  joinGroupSchema,
+  updateGroupOptionSchema,
+} from "../schema"
 
 const groupApp = new Hono()
   .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
@@ -647,13 +657,106 @@ const groupApp = new Hono()
 
         await createGroupMember(databases, {
           groupId,
-          userId: currentMember.$id,
+          userId: currentProfile.$id,
           isAdmin: currentMember.isAdmin,
         })
 
         const response: DeleteAllGroupChatResponse = successResponse(true)
         return c.json(response)
       } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:groupId/options",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const currentMember = await getCurrentGroupMember(databases, {
+          groupId,
+          userId: currentProfile.$id,
+        })
+        if (!currentMember) {
+          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
+        }
+
+        const groupOption = await getGroupOption(databases, {
+          groupId: group.$id,
+          userId: currentProfile.$id,
+        })
+        if (!groupOption) {
+          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 404)
+        }
+
+        const response: GetGroupOptionResponse = successResponse(
+          mapGroupOptModelToGroupOpt(groupOption),
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .patch(
+    "/:groupId/options",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("json", updateGroupOptionSchema),
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+        const { notification } = c.req.valid("json")
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const currentMember = await getCurrentGroupMember(databases, {
+          groupId,
+          userId: currentProfile.$id,
+        })
+        if (!currentMember) {
+          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
+        }
+
+        const groupOption = await getGroupOption(databases, {
+          groupId: group.$id,
+          userId: currentProfile.$id,
+        })
+        if (!groupOption) {
+          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 404)
+        }
+
+        const result = await updateGroupOption(databases, groupOption.$id, {
+          notification,
+        })
+
+        const response: UpdateGroupNotifResponse = successResponse(
+          mapGroupOptModelToGroupOpt(result),
+        )
+        return c.json(response)
+      } catch (e) {
+        console.log(e)
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },

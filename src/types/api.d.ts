@@ -94,6 +94,10 @@ declare type UnsetAdminGroupResponse = ApiResponse<boolean>
 
 declare type DeleteAllGroupChatResponse = ApiResponse<boolean>
 
+declare type GetGroupOptionResponse = ApiResponse<GroupOption>
+
+declare type UpdateGroupNotifResponse = ApiResponse<GroupOption>
+
 // CHANNEL API
 declare type CreateChannelResponse = ApiResponse<Channel>
 

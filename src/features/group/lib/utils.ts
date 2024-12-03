@@ -37,3 +37,13 @@ export const mapGroupMemberModelToGroupMember = (
     lastSeenAt: user.lastSeenAt ?? null,
   }
 }
+
+export const mapGroupOptModelToGroupOpt = (
+  option: GroupOptionAWModel,
+): GroupOption => {
+  return {
+    id: option.$id,
+    groupId: option.groupId,
+    notification: option.notification,
+  }
+}

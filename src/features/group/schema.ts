@@ -41,3 +41,10 @@ export const joinGroupSchema = z.object({
     })
     .length(10, ERROR.INVALID_JOIN_CODE),
 })
+
+export const updateGroupOptionSchema = z.object({
+  notification: z.boolean({
+    required_error: ERROR.NOTIFICATION_REQUIRED,
+    invalid_type_error: ERROR.INVALID_NOTIFICATION_TYPE,
+  }),
+})
