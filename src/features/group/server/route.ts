@@ -20,6 +20,8 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import {
   createGroupMember,
+  deleteAllGroupMembers,
+  getCurrentGroupMember,
   getGroupMembers,
   leaveGroup,
   setUserAsAdmin,
@@ -27,7 +29,10 @@ import {
   validateGroupAdmin,
   validateGroupMember,
 } from "../lib/group-member-queries"
-import { createGroupOption } from "../lib/group-option-queries"
+import {
+  createGroupOption,
+  deleteGroupOption,
+} from "../lib/group-option-queries"
 import {
   createGroup,
   createGroupInviteCode,
@@ -119,6 +124,7 @@ const groupApp = new Hono()
           })
           await createGroupOption(databases, {
             groupId: createdGroup.$id,
+            userId: currentProfile.$id,
             notification: true,
           })
           await createGroupMember(databases, {
@@ -136,6 +142,16 @@ const groupApp = new Hono()
               }),
             ),
           ])
+          await Promise.all([
+            ...memberIds.map((memberId) =>
+              createGroupOption(databases, {
+                groupId: createdGroup.$id,
+                userId: memberId,
+                notification: true,
+              }),
+            ),
+          ])
+
           const groupResult = mapGroupModelToGroup(
             createdGroup,
             mapUserModelToGroupOwner(currentProfile),
@@ -317,6 +333,11 @@ const groupApp = new Hono()
           groupId,
           isAdmin: false,
         })
+        await createGroupOption(databases, {
+          userId,
+          groupId,
+          notification: true,
+        })
 
         const response: AddGroupMemberResponse = successResponse(true)
         return c.json(response)
@@ -365,6 +386,10 @@ const groupApp = new Hono()
         }
 
         await leaveGroup(databases, { userId, groupId })
+        await deleteGroupOption(databases, {
+          userId,
+          groupId,
+        })
 
         const response: KickGroupMemberResponse = successResponse(true)
         return c.json(response)
@@ -516,6 +541,11 @@ const groupApp = new Hono()
           userId: currentProfile.$id,
           isAdmin: false,
         })
+        await createGroupOption(databases, {
+          groupId,
+          userId: currentProfile.$id,
+          notification: true,
+        })
 
         const response: JoinGroupResponse = successResponse(true)
         return c.json(response)
@@ -573,8 +603,55 @@ const groupApp = new Hono()
           groupId: group.$id,
           userId: currentProfile.$id,
         })
+        await deleteGroupOption(databases, {
+          groupId,
+          userId: currentProfile.$id,
+        })
 
         const response: LeaveGroupResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:groupId/chat",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const currentMember = await getCurrentGroupMember(databases, {
+          groupId,
+          userId: currentProfile.$id,
+        })
+        if (!currentMember) {
+          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
+        }
+
+        await leaveGroup(databases, { groupId, userId: currentProfile.$id })
+
+        await deleteAllGroupMembers(databases, { userId: currentProfile.$id })
+
+        await createGroupMember(databases, {
+          groupId,
+          userId: currentMember.$id,
+          isAdmin: currentMember.isAdmin,
+        })
+
+        const response: DeleteAllGroupChatResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

@@ -109,6 +109,29 @@ export const getGroupMembers = async (
   }
 }
 
+export const getCurrentGroupMember = async (
+  databases: Databases,
+  { groupId, userId }: { groupId: string; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [
+        Query.equal("groupId", groupId),
+        Query.equal("userId", userId),
+        Query.isNull("leftAt"),
+      ],
+    )
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
 export const leaveGroup = async (
   databases: Databases,
   { groupId, userId }: { groupId: string; userId: string },
@@ -224,4 +247,25 @@ export const getGroupAdmins = async (
       data: [],
     }
   }
+}
+
+export const deleteAllGroupMembers = async (
+  databases: Databases,
+  { userId }: { userId: string },
+) => {
+  const result = await databases.listDocuments<GroupMemberAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUP_MEMBERS_ID,
+    [Query.equal("userId", userId)],
+  )
+
+  if (result.total === 0) return null
+
+  const memberIds = result.documents.map((v) => v.$id)
+
+  return Promise.all(
+    memberIds.map((id) =>
+      databases.deleteDocument(DATABASE_ID, APPWRITE_GROUP_MEMBERS_ID, id),
+    ),
+  )
 }

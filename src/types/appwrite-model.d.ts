@@ -106,6 +106,7 @@ declare interface GroupOptionAWModel
     GroupOptionModel {}
 declare interface GroupOptionModel {
   groupId: string
+  userId: string
   notification: boolean
 }
 
@@ -150,6 +151,7 @@ declare interface ChannelOptionAWModel
     ChannelOptionModel {}
 declare interface ChannelOptionModel {
   channelId: string
+  userId: string
   notification: boolean
 }
 
