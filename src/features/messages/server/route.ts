@@ -192,8 +192,10 @@ const messageApp = new Hono()
           const attachs = attachments
             .filter((att) => att.messageId === message.$id)
             .map((a) => mapAttachmentModelToAttachment(a, message.$id))
+          const user =
+            message.userId === currentProfile.$id ? currentProfile : userPair
 
-          return mapMessageModelToMessage(message, userPair!, attachs, true)
+          return mapMessageModelToMessage(message, user!, attachs, true)
         })
 
         const response: GetMessagesResponse = successCollectionResponse(

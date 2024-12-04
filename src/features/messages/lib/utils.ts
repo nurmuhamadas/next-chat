@@ -30,10 +30,26 @@ export const mapMessageModelToMessage = (
   attachments: Attachment[],
   isRead: boolean,
 ): Message => {
+  let fixedMessage = message.message
+  let fixedAttachments = attachments
+  if (message.status === "DELETED_BY_ADMIN") {
+    fixedMessage = "Message deleted by admin"
+    fixedAttachments = []
+  } else if (message.status === "DELETED_FOR_ALL") {
+    fixedAttachments = []
+    fixedMessage = "Message deleted"
+  } else if (
+    message.status === "DELETED_FOR_ME" &&
+    message.userId === user.$id
+  ) {
+    fixedAttachments = []
+    fixedMessage = ""
+  }
+
   return {
     id: message.$id,
     user: mapUserModelToMessageAuthor(user),
-    message: message.message ?? null,
+    message: fixedMessage ?? null,
     conversationId: message.conversationId ?? null,
     groupId: message.groupId ?? null,
     channelId: message.channelId ?? null,
@@ -44,7 +60,7 @@ export const mapMessageModelToMessage = (
     isEmojiOnly: message.isEmojiOnly,
     status: message.status,
     isRead,
-    attachments,
+    attachments: fixedAttachments,
     updatedAt: message.updatedAt ?? null,
   }
 }

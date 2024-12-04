@@ -17,6 +17,7 @@ import {
   DATABASE_ID,
 } from "@/lib/appwrite/config"
 
+import { MESSAGE_STATUS } from "../constants"
 import { createMessageSchema } from "../schema"
 
 export const validateMessage = async (
@@ -141,6 +142,13 @@ export const getMessageByConversationId = async (
         Query.equal("conversationId", conversationId),
         Query.orderDesc("$createdAt"),
         dateQueries,
+        Query.or([
+          Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
+          Query.and([
+            Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
+            Query.notEqual("userId", userId),
+          ]),
+        ]),
       ],
     )
 
@@ -185,6 +193,13 @@ export const getMessageByGroupId = async (
         Query.equal("groupId", groupId),
         Query.orderDesc("$createdAt"),
         dateQueries,
+        Query.or([
+          Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
+          Query.and([
+            Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
+            Query.notEqual("userId", userId),
+          ]),
+        ]),
       ],
     )
 
@@ -229,6 +244,13 @@ export const getMessageByChannelId = async (
         Query.equal("channelId", channelId),
         Query.orderDesc("$createdAt"),
         dateQueries,
+        Query.or([
+          Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
+          Query.and([
+            Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
+            Query.notEqual("userId", userId),
+          ]),
+        ]),
       ],
     )
 
