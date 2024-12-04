@@ -74,12 +74,6 @@ declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
 // TODO:
 declare type DeleteGroupResponse = ApiResponse<{ id: string }>
 
-// TODO:
-declare type GetGroupMessagesResponse = ApiResponse<Message[]>
-
-// TODO:
-declare type MarkGroupMessagesAsReadResponse = ApiResponse<boolean>
-
 declare type JoinGroupResponse = ApiResponse<boolean>
 
 declare type LeaveGroupResponse = ApiResponse<boolean>
@@ -114,12 +108,6 @@ declare type SearchChannelsResponse = ApiCollectionResponse<ChannelSearch>
 // TODO:
 declare type DeleteChannelResponse = ApiResponse<{ id: string }>
 
-// TODO:
-declare type GetChannelMessagesResponse = ApiResponse<Message[]>
-
-// TODO:
-declare type MarkChannelMessagesAsReadResponse = ApiResponse<boolean>
-
 declare type JoinChannelResponse = ApiResponse<boolean>
 
 declare type LeaveChannelResponse = ApiResponse<boolean>
@@ -142,14 +130,10 @@ declare type CreateConversationResponse = ApiResponse<Conversation>
 
 declare type DeleteConversationResponse = ApiResponse<{ id: string }>
 
-// TODO:
-declare type GetPrivateMessagesResponse = ApiResponse<Message[]>
-
-// TODO:
-declare type MarkConversationMessagesAsReadResponse = ApiResponse<boolean>
-
 // MESSAGE API
 declare type CreateMessageResponse = ApiResponse<Message>
+
+declare type GetMessagesResponse = ApiCollectionResponse<Message>
 
 declare type UpdateMessageResponse = ApiResponse<Message>
 

@@ -33,13 +33,13 @@ declare interface ConversationModel {
 declare interface ConversationOptionAWModel
   extends AppwriteDocument,
     ConversationOptionModel {
-  deletedAt?: Date
+  deletedAt?: string
 }
 declare interface ConversationOptionModel {
   conversationId: string
   userId: string
   notification: boolean
-  deletedAt?: string
+  deletedAt?: Date
 }
 
 declare interface BlockedUserAWModel
@@ -51,7 +51,7 @@ declare interface BlockedUserModel {
 }
 
 declare interface MessageAWModel extends AppwriteDocument, MessageModel {
-  updatedAt?: Date
+  updatedAt?: string
 }
 declare interface MessageModel {
   message?: string
@@ -65,7 +65,7 @@ declare interface MessageModel {
   originalMessageId?: string
   isEmojiOnly: boolean
   status: MessageStatus
-  updatedAt?: string
+  updatedAt?: Date
 }
 
 declare interface MessageReadAWModel

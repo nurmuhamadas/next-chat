@@ -51,7 +51,7 @@ export const getConversationById = async (
   { conversationId }: { conversationId: string },
 ) => {
   try {
-    return await databases.getDocument(
+    return await databases.getDocument<ConversationAWModel>(
       DATABASE_ID,
       APPWRITE_CONVERSATIONS_ID,
       conversationId,
@@ -151,6 +151,32 @@ export const getConversationOpt = async (
     return result.documents[0]
   } catch {
     return null
+  }
+}
+
+export const getConversationOptHistory = async (
+  databases: Databases,
+  { userId, conversationId }: { userId: string; conversationId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<ConversationOptionAWModel>(
+      DATABASE_ID,
+      APPWRITE_CONVERSATION_OPTIONS_ID,
+      [
+        Query.equal("userId", userId),
+        Query.equal("conversationId", conversationId),
+      ],
+    )
+
+    return {
+      data: result.documents,
+      total: result.total,
+    }
+  } catch {
+    return {
+      data: [],
+      total: 0,
+    }
   }
 }
 

@@ -107,6 +107,28 @@ export const getChannelSubs = async (
   }
 }
 
+export const getSubsHistory = async (
+  databases: Databases,
+  { channelId, userId }: { channelId: string; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+      DATABASE_ID,
+      APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+      [Query.equal("channelId", channelId), Query.equal("userId", userId)],
+    )
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}
+
 export const validateChannelAdmin = async (
   databases: Databases,
   { userId, channelId }: { userId: string; channelId: string },

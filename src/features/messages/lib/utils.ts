@@ -45,7 +45,7 @@ export const mapMessageModelToMessage = (
     status: message.status,
     isRead,
     attachments,
-    updatedAt: message.updatedAt?.toISOString() ?? null,
+    updatedAt: message.updatedAt ?? null,
   }
 }
 
@@ -56,5 +56,19 @@ export const mapUserModelToMessageAuthor = (
     id: user.$id,
     name: mergeName(user.firstName, user.lastName),
     imageUrl: user.imageUrl ?? null,
+  }
+}
+
+export const mapAttachmentModelToAttachment = (
+  attachment: AttachmentAWModel,
+  messageId: string,
+): Attachment => {
+  return {
+    id: attachment.$id,
+    messageId,
+    name: attachment.name,
+    size: attachment.size,
+    type: attachment.type,
+    url: attachment.url,
   }
 }

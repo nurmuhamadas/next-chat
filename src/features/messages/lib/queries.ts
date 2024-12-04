@@ -1,10 +1,15 @@
 import { StatusCode } from "hono/utils/http-status"
-import { Databases, ID } from "node-appwrite"
+import { Databases, ID, Query } from "node-appwrite"
 import { z } from "zod"
 
 import { ERROR } from "@/constants/error"
 import { getChannelById } from "@/features/channel/lib/channel-queries"
-import { getConversationById } from "@/features/chat/lib/queries"
+import { getSubsHistory } from "@/features/channel/lib/channel-subscribers-queries"
+import {
+  getConversationById,
+  getConversationOptHistory,
+} from "@/features/chat/lib/queries"
+import { getMemberHistory } from "@/features/group/lib/group-member-queries"
 import { getGroupById } from "@/features/group/lib/group-queries"
 import {
   APPWRITE_ATTACHMENTS_ID,
@@ -104,6 +109,141 @@ export const createMessage = async (
   )
 }
 
+export const getMessageByConversationId = async (
+  databases: Databases,
+  { conversationId, userId }: { conversationId: string; userId: string },
+) => {
+  try {
+    const { data: conversationHistory } = await getConversationOptHistory(
+      databases,
+      {
+        conversationId,
+        userId,
+      },
+    )
+    const dateRange = conversationHistory.map((opt) => [
+      opt.$createdAt,
+      opt.deletedAt ?? new Date().toISOString(),
+    ])
+    const dateQueries =
+      dateRange.length > 1
+        ? Query.or(
+            dateRange.map(([start, end]) =>
+              Query.between("$createdAt", start, end),
+            ),
+          )
+        : Query.between("$createdAt", dateRange[0][0], dateRange[0][1])
+
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.equal("conversationId", conversationId),
+        Query.orderDesc("$createdAt"),
+        dateQueries,
+      ],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}
+
+export const getMessageByGroupId = async (
+  databases: Databases,
+  { groupId, userId }: { groupId: string; userId: string },
+) => {
+  try {
+    const { data: groupMembers } = await getMemberHistory(databases, {
+      groupId,
+      userId,
+    })
+    const dateRange = groupMembers.map((member) => [
+      member.$createdAt,
+      member.leftAt ?? new Date().toISOString(),
+    ])
+    const dateQueries =
+      dateRange.length > 1
+        ? Query.or(
+            dateRange.map(([start, end]) =>
+              Query.between("$createdAt", start, end),
+            ),
+          )
+        : Query.between("$createdAt", dateRange[0][0], dateRange[0][1])
+
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.equal("groupId", groupId),
+        Query.orderDesc("$createdAt"),
+        dateQueries,
+      ],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}
+
+export const getMessageByChannelId = async (
+  databases: Databases,
+  { channelId, userId }: { channelId: string; userId: string },
+) => {
+  try {
+    const { data: subsHistory } = await getSubsHistory(databases, {
+      channelId,
+      userId,
+    })
+    const dateRange = subsHistory.map((sub) => [
+      sub.$createdAt,
+      sub.unsubscribedAt ?? new Date().toISOString(),
+    ])
+    const dateQueries =
+      dateRange.length > 1
+        ? Query.or(
+            dateRange.map(([start, end]) =>
+              Query.between("$createdAt", start, end),
+            ),
+          )
+        : Query.between("$createdAt", dateRange[0][0], dateRange[0][1])
+
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.equal("channelId", channelId),
+        Query.orderDesc("$createdAt"),
+        dateQueries,
+      ],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}
+
 // =============== ATTACHMENT ===============
 export const createAttachment = async (
   databases: Databases,
@@ -115,4 +255,27 @@ export const createAttachment = async (
     ID.unique(),
     data,
   )
+}
+
+export const getAttachmentsByMessageIds = async (
+  databases: Databases,
+  { messageIds }: { messageIds: string[] },
+) => {
+  try {
+    const result = await databases.listDocuments<AttachmentAWModel>(
+      DATABASE_ID,
+      APPWRITE_ATTACHMENTS_ID,
+      [Query.contains("messageId", messageIds)],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
 }

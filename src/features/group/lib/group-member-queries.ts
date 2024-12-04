@@ -109,6 +109,29 @@ export const getGroupMembers = async (
   }
 }
 
+export const getMemberHistory = async (
+  databases: Databases,
+  { groupId, userId }: { groupId: string; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [Query.equal("groupId", groupId), Query.equal("userId", userId)],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
+}
+
 export const getCurrentGroupMember = async (
   databases: Databases,
   { groupId, userId }: { groupId: string; userId: string },
