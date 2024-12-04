@@ -50,9 +50,11 @@ declare interface BlockedUserModel {
   blockedUserId: string
 }
 
-declare interface MessageAWModel extends AppwriteDocument, MessageModel {}
+declare interface MessageAWModel extends AppwriteDocument, MessageModel {
+  updatedAt?: Date
+}
 declare interface MessageModel {
-  message: string
+  message?: string
   userId: string
   conversationId?: string
   parentMessageId?: string
@@ -61,9 +63,9 @@ declare interface MessageModel {
   groupId?: string
   channelId?: string
   originalMessageId?: string
-  isEmojiOnly?: boolean
-  isDeleted?: boolean
+  isEmojiOnly: boolean
   status: MessageStatus
+  updatedAt?: string
 }
 
 declare interface MessageReadAWModel

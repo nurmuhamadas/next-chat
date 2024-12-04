@@ -5,7 +5,7 @@ import { ERROR } from "@/constants/error"
 import { createUserSetting } from "@/features/settings/lib/queries"
 import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
-import { deleteImage, uploadImage } from "@/lib/upload-image"
+import { deleteFile, uploadFile } from "@/lib/upload-file"
 import {
   createError,
   successCollectionResponse,
@@ -66,7 +66,7 @@ const userApp = new Hono()
         let imageUrl: string | undefined
         let fileId: string | undefined
         if (imageFile) {
-          const file = await uploadImage(storage, { image: imageFile })
+          const file = await uploadFile(storage, { image: imageFile })
           fileId = file.$id
           imageUrl = constructFileUrl(file.$id)
         }
@@ -86,7 +86,7 @@ const userApp = new Hono()
           return c.json(response)
         } catch {
           if (fileId) {
-            await deleteImage(storage, { id: fileId })
+            await deleteFile(storage, { id: fileId })
           }
 
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
@@ -122,7 +122,7 @@ const userApp = new Hono()
         let imageUrl = currentProfile.imageUrl
         let fileId: string | undefined
         if (imageFile) {
-          const file = await uploadImage(storage, { image: imageFile })
+          const file = await uploadFile(storage, { image: imageFile })
           fileId = file.$id
           imageUrl = constructFileUrl(file.$id)
         }
@@ -145,13 +145,13 @@ const userApp = new Hono()
           // DELETE OLD IMAGE IF NEW IMAGE UPLOADED
           if (fileId && currentProfile.imageUrl) {
             const oldFileId = destructFileId(currentProfile.imageUrl)
-            await deleteImage(storage, { id: oldFileId })
+            await deleteFile(storage, { id: oldFileId })
           }
 
           return c.json(response)
         } catch {
           if (fileId) {
-            await deleteImage(storage, { id: fileId })
+            await deleteFile(storage, { id: fileId })
           }
 
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

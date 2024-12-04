@@ -6,7 +6,7 @@ import { ERROR } from "@/constants/error"
 import { getUserProfileById } from "@/features/user/lib/queries"
 import { constructFileUrl } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
-import { deleteImage, uploadImage } from "@/lib/upload-image"
+import { deleteFile, uploadFile } from "@/lib/upload-file"
 import {
   createError,
   successCollectionResponse,
@@ -109,7 +109,7 @@ const channelApp = new Hono()
         let imageUrl: string | undefined
         let fileId: string | undefined
         if (imageFile) {
-          const file = await uploadImage(storage, { image: imageFile })
+          const file = await uploadFile(storage, { image: imageFile })
           fileId = file.$id
           imageUrl = constructFileUrl(file.$id)
         }
@@ -145,7 +145,7 @@ const channelApp = new Hono()
           return c.json(response)
         } catch {
           if (fileId) {
-            await deleteImage(storage, { id: fileId })
+            await deleteFile(storage, { id: fileId })
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }

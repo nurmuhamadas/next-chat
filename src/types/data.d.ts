@@ -73,14 +73,15 @@ declare interface BlockedUser {
   imageUrl: string | null
 }
 
+declare interface MessageAuthor {
+  id: string
+  name: string
+  imageUrl: string | null
+}
 declare interface Message {
   id: string
-  message: string
-  user: {
-    id: string
-    name: string
-    imageUrl: string | null
-  }
+  message: string | null
+  user: MessageAuthor
   conversationId: string | null
   parentMessageId: string | null
   parentMessageName: string | null
@@ -88,10 +89,10 @@ declare interface Message {
   groupId: string | null
   channelId: string | null
   originalMessageId: string | null
-  isEmojiOnly: boolean | null
-  isRead: boolean | null
+  isEmojiOnly: boolean
+  isRead: boolean
   status: MessageStatus
-  createdAt: string
+  attachments: Attachment[]
   updatedAt: string | null
 }
 

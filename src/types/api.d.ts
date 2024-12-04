@@ -153,6 +153,8 @@ declare type CreateMessageResponse = ApiResponse<Message>
 
 declare type UpdateMessageResponse = ApiResponse<Message>
 
+declare type ReactMessageResponse = ApiResponse<Reaction>
+
 declare type DeleteMessageResponse = ApiResponse<{ id: string }>
 
 // SETTINGS API
