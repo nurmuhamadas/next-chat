@@ -36,3 +36,17 @@ export const getSettings = async (
     return null
   }
 }
+
+export const updateSettings = async (
+  databases: Databases,
+  id: string,
+  data: Omit<SettingModel, "userId">,
+) => {
+  console.log(data)
+  return await databases.updateDocument<SettingAWModel>(
+    DATABASE_ID,
+    APPWRITE_SETTINGS_ID,
+    id,
+    data,
+  )
+}

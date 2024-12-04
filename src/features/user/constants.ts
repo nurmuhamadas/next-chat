@@ -35,6 +35,10 @@ export const THEME_OPT: {
   },
 ]
 
+export const TIME_FORMAT: Record<TimeFormat, TimeFormat> = {
+  "12-HOUR": "12-HOUR",
+  "24-HOUR": "24-HOUR",
+}
 export const TIME_FORMAT_OPT: {
   label: string
   value: TimeFormat
@@ -49,6 +53,10 @@ export const TIME_FORMAT_OPT: {
   },
 ]
 
+export const LANGUAGE: Record<Language, Language> = {
+  en_US: "en_US",
+  id_ID: "id_ID",
+}
 export const LANGUAGE_OPT: {
   label: string
   value: Language
@@ -63,6 +71,11 @@ export const LANGUAGE_OPT: {
   },
 ]
 
+export const NOTIFICATION: Record<NotificationType, NotificationType> = {
+  PRIVATE: "PRIVATE",
+  GROUP: "GROUP",
+  CHANNEL: "CHANNEL",
+}
 export const NOTIFICATION_OPT: {
   label: string
   value: NotificationType
