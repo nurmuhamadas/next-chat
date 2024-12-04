@@ -2,6 +2,7 @@ import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 
 import { ERROR } from "@/constants/error"
+import { createUserSetting } from "@/features/settings/lib/queries"
 import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteImage, uploadImage } from "@/lib/upload-image"
@@ -77,6 +78,7 @@ const userApp = new Hono()
             username,
             imageUrl,
           })
+          await createUserSetting(databases, { userId: result.$id })
 
           const response: CreateUserProfileResponse = successResponse(
             mapUserModelToUser(result),

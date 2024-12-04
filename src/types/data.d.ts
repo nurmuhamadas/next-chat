@@ -16,7 +16,7 @@ declare type TimeFormat = "12-HOUR" | "24-HOUR"
 
 declare type Language = "id_ID" | "en_US"
 
-declare type NotificationType = "CONVERSATION" | "GROUP" | "CHANNEL"
+declare type NotificationType = "PRIVATE" | "GROUP" | "CHANNEL"
 
 declare type Theme = "LIGHT" | "DARK" | "SYSTEM"
 

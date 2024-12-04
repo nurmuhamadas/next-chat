@@ -65,19 +65,19 @@ export const LANGUAGE_OPT: {
 
 export const NOTIFICATION_OPT: {
   label: string
-  value: RoomType
+  value: NotificationType
 }[] = [
   {
     label: "Private Chat",
-    value: "chat",
+    value: "PRIVATE",
   },
   {
     label: "Group",
-    value: "group",
+    value: "GROUP",
   },
   {
     label: "Channel",
-    value: "channel",
+    value: "CHANNEL",
   },
 ]
 

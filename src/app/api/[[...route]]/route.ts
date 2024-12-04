@@ -7,6 +7,7 @@ import channelApp from "@/features/channel/server/route"
 import conversationApp from "@/features/chat/server/route"
 import groupApp from "@/features/group/server/route"
 import userApp from "@/features/user/server/route"
+import settingApp from "@/features/settings/server/route"
 
 export const runtime = "edge"
 
@@ -20,6 +21,7 @@ const routes = app
   .route("/groups", groupApp)
   .route("/channels", channelApp)
   .route("/conversations", conversationApp)
+  .route("/settings", settingApp)
 
 export const GET = handle(app)
 export const POST = handle(app)

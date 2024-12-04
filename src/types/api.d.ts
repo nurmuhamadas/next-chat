@@ -158,4 +158,4 @@ declare type DeleteMessageResponse = ApiResponse<{ id: string }>
 // SETTINGS API
 declare type GetSettingResponse = ApiResponse<Setting>
 
-declare type MuteNotificationResponse = ApiResponse<boolean>
+declare type UpdateSettingResponse = ApiResponse<Setting>

@@ -6,11 +6,11 @@ import SettingItem from "./item"
 const NotificationSettings = () => {
   return (
     <SettingsContainer title="Notifications">
-      <SettingItem<RoomType>
+      <SettingItem<NotificationType>
         title="Allow Notification"
         type="checkbox"
         options={NOTIFICATION_OPT}
-        value={["chat"]}
+        value={["PRIVATE"]}
         onValueChange={() => {}}
       />
     </SettingsContainer>
