@@ -24,7 +24,7 @@ declare type ApiCollectionResponse<T> =
 // AUTH API
 declare type RegisterResponse = ApiResponse<boolean>
 
-declare type LoginResponse = ApiResponse<boolean>
+declare type LoginResponse = ApiResponse<{ otpId?: string }>
 
 declare type ForgotPasswordResponse = ApiResponse<boolean>
 

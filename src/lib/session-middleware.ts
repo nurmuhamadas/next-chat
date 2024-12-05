@@ -24,20 +24,24 @@ type AdditionalContext = {
 
 export const sessionMiddleware = createMiddleware<AdditionalContext>(
   async (c, next) => {
-    const { account, databases, storage } = await createSessionClient()
+    try {
+      const { account, databases, storage } = await createSessionClient()
 
-    if (!account) {
+      if (!account) {
+        return c.json(createError(ERROR.UNAUTHORIZE), 401)
+      }
+
+      const user = await account.get()
+
+      c.set("account", account)
+      c.set("account", account)
+      c.set("storage", storage)
+      c.set("databases", databases)
+      c.set("userAccount", user)
+
+      await next()
+    } catch {
       return c.json(createError(ERROR.UNAUTHORIZE), 401)
     }
-
-    const user = await account.get()
-
-    c.set("account", account)
-    c.set("account", account)
-    c.set("storage", storage)
-    c.set("databases", databases)
-    c.set("userAccount", user)
-
-    await next()
   },
 )
