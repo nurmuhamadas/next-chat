@@ -66,7 +66,7 @@ const userApp = new Hono()
         let imageUrl: string | undefined
         let fileId: string | undefined
         if (imageFile) {
-          const file = await uploadFile(storage, { image: imageFile })
+          const file = await uploadFile(storage, { file: imageFile })
           fileId = file.$id
           imageUrl = constructFileUrl(file.$id)
         }
@@ -122,7 +122,7 @@ const userApp = new Hono()
         let imageUrl = currentProfile.imageUrl
         let fileId: string | undefined
         if (imageFile) {
-          const file = await uploadFile(storage, { image: imageFile })
+          const file = await uploadFile(storage, { file: imageFile })
           fileId = file.$id
           imageUrl = constructFileUrl(file.$id)
         }

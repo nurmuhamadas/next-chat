@@ -109,7 +109,7 @@ const channelApp = new Hono()
         let imageUrl: string | undefined
         let fileId: string | undefined
         if (imageFile) {
-          const file = await uploadFile(storage, { image: imageFile })
+          const file = await uploadFile(storage, { file: imageFile })
           fileId = file.$id
           imageUrl = constructFileUrl(file.$id)
         }
