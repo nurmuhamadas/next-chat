@@ -23,16 +23,24 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import { MESSAGE_STATUS } from "../constants"
 import {
+  createLastChannelMessageRead,
   createLastConvMessageRead,
+  createLastGroupMessageRead,
+  createOrUpdateLastChannelMessageRead,
   createOrUpdateLastConvMessageRead,
+  createOrUpdateLastGroupMessageRead,
+  getLastChannelMessageRead,
   getLastConvMessageRead,
-  updateLastConvMessageRead,
+  getLastGroupMessageRead,
+  updateLastMessageRead,
 } from "../lib/message-read-queries"
 import {
   createAttachment,
   createMessage,
   getAttachmentsByMessageIds,
+  getLastMessageByChannelId,
   getLastMessageByConversationId,
+  getLastMessageByGroupId,
   getMessageByChannelId,
   getMessageByConversationId,
   getMessageByGroupId,
@@ -131,6 +139,22 @@ const messageApp = new Hono()
           if (formValue.conversationId) {
             createOrUpdateLastConvMessageRead(databases, {
               conversationId: formValue.conversationId,
+              lastMessageReadId: result.$id,
+              userId: currentProfile.$id,
+            })
+          }
+
+          if (formValue.groupId) {
+            createOrUpdateLastGroupMessageRead(databases, {
+              groupId: formValue.groupId,
+              lastMessageReadId: result.$id,
+              userId: currentProfile.$id,
+            })
+          }
+
+          if (formValue.channelId) {
+            createOrUpdateLastChannelMessageRead(databases, {
+              channelId: formValue.channelId,
               lastMessageReadId: result.$id,
               userId: currentProfile.$id,
             })
@@ -268,7 +292,7 @@ const messageApp = new Hono()
         }
 
         if (lastMessageRead) {
-          await updateLastConvMessageRead(databases, {
+          await updateLastMessageRead(databases, {
             id: lastMessageRead?.$id,
             lastMessageReadId: lastMessage.$id,
           })
@@ -354,6 +378,69 @@ const messageApp = new Hono()
       }
     },
   )
+  .post(
+    "/group/:groupId/read",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, { id: groupId })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isMember = await validateGroupMember(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isMember) {
+          return c.json(createError(ERROR.USER_IS_NOT_MEMBER), 403)
+        }
+
+        const lastMessage = await getLastMessageByGroupId(databases, {
+          groupId,
+        })
+        const lastMessageRead = await getLastGroupMessageRead(databases, {
+          groupId,
+          userId: currentProfile.$id,
+        })
+        if (!lastMessage) {
+          return c.json(createError(ERROR.NO_UNREAD_MESSAGE), 400)
+        }
+
+        if (
+          lastMessage?.$id.localeCompare(
+            lastMessageRead?.$id ?? lastMessage.$id,
+          ) < 0
+        ) {
+          return c.json(createError(ERROR.NO_UNREAD_MESSAGE), 400)
+        }
+
+        if (lastMessageRead) {
+          await updateLastMessageRead(databases, {
+            id: lastMessageRead?.$id,
+            lastMessageReadId: lastMessage.$id,
+          })
+        } else {
+          await createLastGroupMessageRead(databases, {
+            userId: currentProfile.$id,
+            groupId,
+            lastMessageReadId: lastMessage.$id,
+          })
+        }
+
+        const response: MarkMessageAsReadResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
   .get(
     "/channel/:channelId",
     sessionMiddleware,
@@ -415,6 +502,69 @@ const messageApp = new Hono()
           messages,
           result.total,
         )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/channel/:channelId/read",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, { id: channelId })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isSubs = await validateChannelSubs(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (!isSubs) {
+          return c.json(createError(ERROR.USER_IS_NOT_MEMBER), 403)
+        }
+
+        const lastMessage = await getLastMessageByChannelId(databases, {
+          channelId,
+        })
+        const lastMessageRead = await getLastChannelMessageRead(databases, {
+          channelId,
+          userId: currentProfile.$id,
+        })
+        if (!lastMessage) {
+          return c.json(createError(ERROR.NO_UNREAD_MESSAGE), 400)
+        }
+
+        if (
+          lastMessage?.$id.localeCompare(
+            lastMessageRead?.$id ?? lastMessage.$id,
+          ) < 0
+        ) {
+          return c.json(createError(ERROR.NO_UNREAD_MESSAGE), 400)
+        }
+
+        if (lastMessageRead) {
+          await updateLastMessageRead(databases, {
+            id: lastMessageRead?.$id,
+            lastMessageReadId: lastMessage.$id,
+          })
+        } else {
+          await createLastChannelMessageRead(databases, {
+            userId: currentProfile.$id,
+            channelId,
+            lastMessageReadId: lastMessage.$id,
+          })
+        }
+
+        const response: MarkMessageAsReadResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

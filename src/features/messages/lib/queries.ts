@@ -238,6 +238,52 @@ export const getMessageByGroupId = async (
   }
 }
 
+export const getLastMessageByGroupId = async (
+  databases: Databases,
+  { groupId }: { groupId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.equal("groupId", groupId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(1),
+      ],
+    )
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
+export const getLastMessageByChannelId = async (
+  databases: Databases,
+  { channelId }: { channelId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.equal("channelId", channelId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(1),
+      ],
+    )
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
 export const getMessageByChannelId = async (
   databases: Databases,
   { channelId, userId }: { channelId: string; userId: string },
