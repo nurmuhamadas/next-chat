@@ -23,9 +23,16 @@ import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import { MESSAGE_STATUS } from "../constants"
 import {
+  createLastConvMessageRead,
+  createOrUpdateLastConvMessageRead,
+  getLastConvMessageRead,
+  updateLastConvMessageRead,
+} from "../lib/message-read-queries"
+import {
   createAttachment,
   createMessage,
   getAttachmentsByMessageIds,
+  getLastMessageByConversationId,
   getMessageByChannelId,
   getMessageByConversationId,
   getMessageByGroupId,
@@ -121,6 +128,14 @@ const messageApp = new Hono()
             )
           }
 
+          if (formValue.conversationId) {
+            createOrUpdateLastConvMessageRead(databases, {
+              conversationId: formValue.conversationId,
+              lastMessageReadId: result.$id,
+              userId: currentProfile.$id,
+            })
+          }
+
           const message = mapMessageModelToMessage(
             result,
             currentProfile,
@@ -202,6 +217,70 @@ const messageApp = new Hono()
           messages,
           result.total,
         )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/private/:conversationId/read",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { conversationId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const conversation = await getConversationById(databases, {
+          conversationId,
+        })
+        if (!conversation) {
+          return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
+        }
+
+        if (
+          conversation.userId1 !== currentProfile.$id &&
+          conversation.userId2 !== currentProfile.$id
+        ) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 403)
+        }
+
+        const lastMessage = await getLastMessageByConversationId(databases, {
+          conversationId,
+        })
+        const lastMessageRead = await getLastConvMessageRead(databases, {
+          conversationId,
+          userId: currentProfile.$id,
+        })
+        if (!lastMessage) {
+          return c.json(createError(ERROR.NO_UNREAD_MESSAGE), 400)
+        }
+
+        if (
+          lastMessage?.$id.localeCompare(
+            lastMessageRead?.$id ?? lastMessage.$id,
+          ) < 0
+        ) {
+          return c.json(createError(ERROR.NO_UNREAD_MESSAGE), 400)
+        }
+
+        if (lastMessageRead) {
+          await updateLastConvMessageRead(databases, {
+            id: lastMessageRead?.$id,
+            lastMessageReadId: lastMessage.$id,
+          })
+        } else {
+          await createLastConvMessageRead(databases, {
+            userId: currentProfile.$id,
+            conversationId,
+            lastMessageReadId: lastMessage.$id,
+          })
+        }
+
+        const response: MarkMessageAsReadResponse = successResponse(true)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

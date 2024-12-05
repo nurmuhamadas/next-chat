@@ -73,7 +73,10 @@ declare interface MessageReadAWModel
     MessageReadModel {}
 declare interface MessageReadModel {
   userId: string
-  messageId: string
+  lastMessageReadId: string
+  conversationId?: string
+  groupId?: string
+  channelId?: string
 }
 
 declare interface ReactionAWModel extends AppwriteDocument, ReactionModel {}

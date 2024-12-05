@@ -164,6 +164,29 @@ export const getMessageByConversationId = async (
   }
 }
 
+export const getLastMessageByConversationId = async (
+  databases: Databases,
+  { conversationId }: { conversationId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.equal("conversationId", conversationId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(1),
+      ],
+    )
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
 export const getMessageByGroupId = async (
   databases: Databases,
   { groupId, userId }: { groupId: string; userId: string },

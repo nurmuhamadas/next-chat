@@ -141,6 +141,8 @@ declare type ReactMessageResponse = ApiResponse<Reaction>
 
 declare type DeleteMessageResponse = ApiResponse<{ id: string }>
 
+declare type MarkMessageAsReadResponse = ApiResponse<boolean>
+
 // SETTINGS API
 declare type GetSettingResponse = ApiResponse<Setting>
 
