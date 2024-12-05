@@ -7,7 +7,6 @@ export const createMessageSchema = z
   .object({
     message: z
       .string({
-        required_error: ERROR.MESSAGE_REQUIRED,
         invalid_type_error: ERROR.INVALID_TYPE,
       })
       .max(1048576, ERROR.MESSAGE_TOO_LONG)
@@ -59,3 +58,16 @@ export const createMessageSchema = z
       path: ["conversationId", "groupId", "channelId"],
     },
   )
+
+export const updateMessageSchema = z.object({
+  message: z
+    .string({
+      required_error: ERROR.MESSAGE_REQUIRED,
+      invalid_type_error: ERROR.INVALID_TYPE,
+    })
+    .max(1048576, ERROR.MESSAGE_TOO_LONG),
+  isEmojiOnly: z
+    .string({ invalid_type_error: ERROR.INVALID_TYPE })
+    .transform((text) => (text?.toLowerCase() === "true" ? true : false))
+    .optional(),
+})

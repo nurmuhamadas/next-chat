@@ -112,6 +112,19 @@ export const createMessage = async (
   )
 }
 
+export const updateMessage = async (
+  databases: Databases,
+  id: string,
+  form: Pick<MessageModel, "message" | "isEmojiOnly">,
+) => {
+  return await databases.updateDocument<MessageAWModel>(
+    DATABASE_ID,
+    APPWRITE_MESSAGES_ID,
+    id,
+    { ...form, updatedAt: new Date() },
+  )
+}
+
 export const getMessageByConversationId = async (
   databases: Databases,
   { conversationId, userId }: { conversationId: string; userId: string },
@@ -516,6 +529,41 @@ export const createAttachment = async (
     ID.unique(),
     data,
   )
+}
+export const updateAttachment = async (
+  databases: Databases,
+  id: string,
+  data: AttachmentModel,
+) => {
+  return await databases.createDocument<AttachmentAWModel>(
+    DATABASE_ID,
+    APPWRITE_ATTACHMENTS_ID,
+    id,
+    data,
+  )
+}
+
+export const getAttachmentsByMessageId = async (
+  databases: Databases,
+  { messageId }: { messageId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<AttachmentAWModel>(
+      DATABASE_ID,
+      APPWRITE_ATTACHMENTS_ID,
+      [Query.equal("messageId", messageId)],
+    )
+
+    return {
+      total: result.total,
+      data: result.documents,
+    }
+  } catch {
+    return {
+      total: 0,
+      data: [],
+    }
+  }
 }
 
 export const getAttachmentsByMessageIds = async (

@@ -37,6 +37,7 @@ import {
 import {
   createAttachment,
   createMessage,
+  getAttachmentsByMessageId,
   getAttachmentsByMessageIds,
   getLastMessageByChannelId,
   getLastMessageByConversationId,
@@ -45,6 +46,7 @@ import {
   getMessageByConversationId,
   getMessageByGroupId,
   getMessageById,
+  updateMessage,
   validateMessage,
 } from "../lib/queries"
 import {
@@ -52,7 +54,7 @@ import {
   mapAttachmentModelToAttachment,
   mapMessageModelToMessage,
 } from "../lib/utils"
-import { createMessageSchema } from "../schema"
+import { createMessageSchema, updateMessageSchema } from "../schema"
 
 const messageApp = new Hono()
   .post(
@@ -571,5 +573,63 @@ const messageApp = new Hono()
       }
     },
   )
+  .put(
+    "/:messageId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("json", updateMessageSchema, zodErrorHandler),
+    async (c) => {
+      try {
+        const { messageId } = c.req.param()
+        const { message: messageText, isEmojiOnly } = c.req.valid("json")
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const originalMessage = await getMessageById(databases, {
+          id: messageId,
+        })
+        if (!originalMessage) {
+          return c.json(createError(ERROR.MESSAGE_NOT_FOUND), 404)
+        }
+
+        if (originalMessage.userId !== currentProfile.$id) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 401)
+        }
+
+        if (originalMessage.status !== "DEFAULT") {
+          return c.json(
+            createError(ERROR.UPDATE_DELETED_MESSAGE_NOT_ALLOWED),
+            403,
+          )
+        }
+
+        const result = await updateMessage(databases, messageId, {
+          isEmojiOnly: isEmojiOnly ?? originalMessage.isEmojiOnly,
+          message: messageText ?? originalMessage.message,
+        })
+
+        const attResult = await getAttachmentsByMessageId(databases, {
+          messageId,
+        })
+        const attachments = attResult.data.map((att) =>
+          mapAttachmentModelToAttachment(att, messageId),
+        )
+
+        const message = mapMessageModelToMessage(
+          result,
+          currentProfile,
+          attachments,
+          true,
+        )
+
+        const response: CreateMessageResponse = successResponse(message)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete("/:messageId")
 
 export default messageApp
