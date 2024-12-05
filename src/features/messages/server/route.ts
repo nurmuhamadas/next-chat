@@ -4,12 +4,18 @@ import { Models, Query } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
 import { getChannelById } from "@/features/channel/lib/channel-queries"
-import { validateChannelSubs } from "@/features/channel/lib/channel-subscribers-queries"
+import {
+  validateChannelAdmin,
+  validateChannelSubs,
+} from "@/features/channel/lib/channel-subscribers-queries"
 import { getConversationById } from "@/features/chat/lib/queries"
-import { validateGroupMember } from "@/features/group/lib/group-member-queries"
+import {
+  validateGroupAdmin,
+  validateGroupMember,
+} from "@/features/group/lib/group-member-queries"
 import { getGroupById } from "@/features/group/lib/group-queries"
 import { getUserProfileById, getUsers } from "@/features/user/lib/queries"
-import { constructFileUrl } from "@/lib/appwrite"
+import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteFile, uploadFile } from "@/lib/upload-file"
 import {
@@ -37,6 +43,10 @@ import {
 import {
   createAttachment,
   createMessage,
+  deleteAttachmentsByMessageId,
+  deleteMessageByAdmin,
+  deleteMessageForAll,
+  deleteMessageForMe,
   getAttachmentsByMessageId,
   getAttachmentsByMessageIds,
   getLastMessageByChannelId,
@@ -623,13 +633,171 @@ const messageApp = new Hono()
           true,
         )
 
-        const response: CreateMessageResponse = successResponse(message)
+        const response: UpdateMessageResponse = successResponse(message)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
   )
-  .delete("/:messageId")
+  .delete(
+    "/:messageId/me",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { messageId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const originalMessage = await getMessageById(databases, {
+          id: messageId,
+        })
+        if (!originalMessage) {
+          return c.json(createError(ERROR.MESSAGE_NOT_FOUND), 404)
+        }
+
+        if (originalMessage.userId !== currentProfile.$id) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 401)
+        }
+
+        if (originalMessage.status !== "DEFAULT") {
+          return c.json(createError(ERROR.MESSAGE_ALREADY_DELETED), 403)
+        }
+
+        await deleteMessageForMe(databases, messageId)
+
+        const response: DeleteMessageResponse = successResponse({
+          id: messageId,
+        })
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:messageId/all",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { messageId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+        const storage = c.get("storage")
+
+        const originalMessage = await getMessageById(databases, {
+          id: messageId,
+        })
+        if (!originalMessage) {
+          return c.json(createError(ERROR.MESSAGE_NOT_FOUND), 404)
+        }
+
+        if (originalMessage.userId !== currentProfile.$id) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 401)
+        }
+
+        if (originalMessage.status !== "DEFAULT") {
+          return c.json(createError(ERROR.MESSAGE_ALREADY_DELETED), 403)
+        }
+
+        await deleteMessageForAll(databases, messageId)
+
+        const { data: attachments } = await getAttachmentsByMessageId(
+          databases,
+          {
+            messageId,
+          },
+        )
+        await deleteAttachmentsByMessageId(databases, { messageId })
+        await Promise.all(
+          attachments.map((attc) =>
+            deleteFile(storage, { id: destructFileId(attc.url) }),
+          ),
+        )
+
+        const response: DeleteMessageResponse = successResponse({
+          id: messageId,
+        })
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .delete(
+    "/:messageId/admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { messageId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+        const storage = c.get("storage")
+
+        const originalMessage = await getMessageById(databases, {
+          id: messageId,
+        })
+        if (!originalMessage) {
+          return c.json(createError(ERROR.MESSAGE_NOT_FOUND), 404)
+        }
+
+        if (originalMessage.conversationId) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 401)
+        }
+
+        if (originalMessage.groupId) {
+          const isAdmin = validateGroupAdmin(databases, {
+            groupId: originalMessage.groupId,
+            userId: currentProfile.$id,
+          })
+          if (!isAdmin) {
+            return c.json(createError(ERROR.NOT_ALLOWED), 401)
+          }
+        }
+
+        if (originalMessage.channelId) {
+          const isAdmin = validateChannelAdmin(databases, {
+            channelId: originalMessage.channelId,
+            userId: currentProfile.$id,
+          })
+          if (!isAdmin) {
+            return c.json(createError(ERROR.NOT_ALLOWED), 401)
+          }
+        }
+
+        if (originalMessage.status !== "DEFAULT") {
+          return c.json(createError(ERROR.MESSAGE_ALREADY_DELETED), 403)
+        }
+
+        await deleteMessageByAdmin(databases, messageId)
+
+        const { data: attachments } = await getAttachmentsByMessageId(
+          databases,
+          {
+            messageId,
+          },
+        )
+        await deleteAttachmentsByMessageId(databases, { messageId })
+        await Promise.all(
+          attachments.map((attc) =>
+            deleteFile(storage, { id: destructFileId(attc.url) }),
+          ),
+        )
+
+        const response: DeleteMessageResponse = successResponse({
+          id: messageId,
+        })
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
 
 export default messageApp

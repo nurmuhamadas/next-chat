@@ -125,6 +125,36 @@ export const updateMessage = async (
   )
 }
 
+export const deleteMessageForMe = async (databases: Databases, id: string) => {
+  return await databases.updateDocument<MessageAWModel>(
+    DATABASE_ID,
+    APPWRITE_MESSAGES_ID,
+    id,
+    { status: MESSAGE_STATUS.DELETED_FOR_ME },
+  )
+}
+
+export const deleteMessageForAll = async (databases: Databases, id: string) => {
+  return await databases.updateDocument<MessageAWModel>(
+    DATABASE_ID,
+    APPWRITE_MESSAGES_ID,
+    id,
+    { status: MESSAGE_STATUS.DELETED_FOR_ALL },
+  )
+}
+
+export const deleteMessageByAdmin = async (
+  databases: Databases,
+  id: string,
+) => {
+  return await databases.updateDocument<MessageAWModel>(
+    DATABASE_ID,
+    APPWRITE_MESSAGES_ID,
+    id,
+    { status: MESSAGE_STATUS.DELETED_BY_ADMIN },
+  )
+}
+
 export const getMessageByConversationId = async (
   databases: Databases,
   { conversationId, userId }: { conversationId: string; userId: string },
@@ -564,6 +594,23 @@ export const getAttachmentsByMessageId = async (
       data: [],
     }
   }
+}
+
+export const deleteAttachmentsByMessageId = async (
+  databases: Databases,
+  { messageId }: { messageId: string },
+) => {
+  const result = await databases.listDocuments<AttachmentAWModel>(
+    DATABASE_ID,
+    APPWRITE_ATTACHMENTS_ID,
+    [Query.equal("messageId", messageId), Query.select(["$id"])],
+  )
+
+  await Promise.all(
+    result.documents.map((v) =>
+      databases.deleteDocument(DATABASE_ID, APPWRITE_ATTACHMENTS_ID, v.$id),
+    ),
+  )
 }
 
 export const getAttachmentsByMessageIds = async (
