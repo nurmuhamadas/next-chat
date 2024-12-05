@@ -11,11 +11,13 @@ import {
 } from "@/features/chat/lib/queries"
 import { getMemberHistory } from "@/features/group/lib/group-member-queries"
 import { getGroupById } from "@/features/group/lib/group-queries"
+import { getUsers } from "@/features/user/lib/queries"
 import {
   APPWRITE_ATTACHMENTS_ID,
   APPWRITE_MESSAGES_ID,
   DATABASE_ID,
 } from "@/lib/appwrite/config"
+import { mergeName } from "@/lib/utils"
 
 import { MESSAGE_STATUS } from "../constants"
 import { createMessageSchema } from "../schema"
@@ -187,6 +189,63 @@ export const getLastMessageByConversationId = async (
   }
 }
 
+export const getLastMessageByConversationIds = async (
+  databases: Databases,
+  { conversationIds }: { conversationIds: string[] },
+) => {
+  try {
+    const data: { [key in string]: LastMessage } = {}
+    const userIds: string[] = []
+    for (let i = 0; i < conversationIds.length; i++) {
+      const message = await getLastMessageByConversationId(databases, {
+        conversationId: conversationIds[i],
+      })
+      if (message) {
+        userIds.push(message.userId)
+        data[message.conversationId!] = {
+          id: message.$id,
+          message: message.message ?? "",
+          name: message.userId,
+          time: message.$createdAt,
+        }
+      }
+    }
+
+    const { documents: users } = await getUsers(databases, {
+      queries: [Query.equal("$id", userIds)],
+    })
+
+    Object.entries(data).forEach(([key, v]) => {
+      const user = users.find((u) => u.$id === v.name)!
+      data[key] = { ...v, name: mergeName(user.firstName, user.lastName) }
+    })
+
+    return data
+  } catch {
+    return {}
+  }
+}
+
+export const getTotalConvMessageAfter = async (
+  databases: Databases,
+  { messageId, conversationId }: { messageId: string; conversationId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.greaterThan("$id", messageId),
+        Query.equal("conversationId", conversationId),
+      ],
+    )
+
+    return result.total
+  } catch {
+    return 0
+  }
+}
+
 export const getMessageByGroupId = async (
   databases: Databases,
   { groupId, userId }: { groupId: string; userId: string },
@@ -261,6 +320,60 @@ export const getLastMessageByGroupId = async (
   }
 }
 
+export const getLastMessageByGroupIds = async (
+  databases: Databases,
+  { groupIds }: { groupIds: string[] },
+) => {
+  try {
+    const data: { [key in string]: LastMessage } = {}
+    const userIds: string[] = []
+    for (let i = 0; i < groupIds.length; i++) {
+      const message = await getLastMessageByGroupId(databases, {
+        groupId: groupIds[i],
+      })
+      if (message) {
+        userIds.push(message.userId)
+        data[message.groupId!] = {
+          id: message.$id,
+          message: message.message ?? "",
+          name: message.userId,
+          time: message.$createdAt,
+        }
+      }
+    }
+
+    const { documents: users } = await getUsers(databases, {
+      queries: [Query.equal("$id", userIds)],
+    })
+
+    Object.entries(data).forEach(([key, v]) => {
+      const user = users.find((u) => u.$id === v.name)!
+      data[key] = { ...v, name: mergeName(user.firstName, user.lastName) }
+    })
+
+    return data
+  } catch {
+    return {}
+  }
+}
+
+export const getTotalGroupMessageAfter = async (
+  databases: Databases,
+  { messageId, groupId }: { messageId: string; groupId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [Query.greaterThan("$id", messageId), Query.equal("groupId", groupId)],
+    )
+
+    return result.total
+  } catch {
+    return 0
+  }
+}
+
 export const getLastMessageByChannelId = async (
   databases: Databases,
   { channelId }: { channelId: string },
@@ -281,6 +394,43 @@ export const getLastMessageByChannelId = async (
     return result.documents[0]
   } catch {
     return null
+  }
+}
+
+export const getLastMessageByChannelIds = async (
+  databases: Databases,
+  { channelIds }: { channelIds: string[] },
+) => {
+  try {
+    const data: { [key in string]: LastMessage } = {}
+    const userIds: string[] = []
+    for (let i = 0; i < channelIds.length; i++) {
+      const message = await getLastMessageByChannelId(databases, {
+        channelId: channelIds[i],
+      })
+      if (message) {
+        userIds.push(message.userId)
+        data[message.channelId!] = {
+          id: message.$id,
+          message: message.message ?? "",
+          name: message.userId,
+          time: message.$createdAt,
+        }
+      }
+    }
+
+    const { documents: users } = await getUsers(databases, {
+      queries: [Query.equal("$id", userIds)],
+    })
+
+    Object.entries(data).forEach(([key, v]) => {
+      const user = users.find((u) => u.$id === v.name)!
+      data[key] = { ...v, name: mergeName(user.firstName, user.lastName) }
+    })
+
+    return data
+  } catch {
+    return {}
   }
 }
 
@@ -335,6 +485,26 @@ export const getMessageByChannelId = async (
   }
 }
 
+export const getTotalChannelMessageAfter = async (
+  databases: Databases,
+  { messageId, channelId }: { messageId: string; channelId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGES_ID,
+      [
+        Query.greaterThan("$id", messageId),
+        Query.equal("channelId", channelId),
+      ],
+    )
+
+    return result.total
+  } catch {
+    return 0
+  }
+}
+
 // =============== ATTACHMENT ===============
 export const createAttachment = async (
   databases: Databases,
@@ -356,7 +526,7 @@ export const getAttachmentsByMessageIds = async (
     const result = await databases.listDocuments<AttachmentAWModel>(
       DATABASE_ID,
       APPWRITE_ATTACHMENTS_ID,
-      [Query.contains("messageId", messageIds)],
+      [Query.equal("messageId", messageIds)],
     )
 
     return {

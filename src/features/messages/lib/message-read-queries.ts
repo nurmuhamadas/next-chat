@@ -2,6 +2,12 @@ import { Databases, ID, Query } from "node-appwrite"
 
 import { APPWRITE_MESSAGE_READS_ID, DATABASE_ID } from "@/lib/appwrite/config"
 
+import {
+  getTotalChannelMessageAfter,
+  getTotalConvMessageAfter,
+  getTotalGroupMessageAfter,
+} from "./queries"
+
 export const getLastConvMessageRead = async (
   databases: Databases,
   { conversationId, userId }: { conversationId: string; userId: string },
@@ -79,6 +85,38 @@ export const createOrUpdateLastConvMessageRead = async (
   }
 }
 
+export const getTotalUnreadConvMessage = async (
+  databases: Databases,
+  { conversationIds, userId }: { conversationIds: string[]; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageReadAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGE_READS_ID,
+      [
+        Query.equal("conversationId", conversationIds),
+        Query.equal("userId", userId),
+        Query.limit(1),
+      ],
+    )
+
+    if (result.total === 0) return {}
+
+    const totals: { [key in string]: number } = {}
+    for (let i = 0; i < result.total; i++) {
+      const total = await getTotalConvMessageAfter(databases, {
+        messageId: result.documents[i].lastMessageReadId,
+        conversationId: result.documents[i].conversationId!,
+      })
+      totals[result.documents[i].conversationId!] = total
+    }
+
+    return totals
+  } catch {
+    return {}
+  }
+}
+
 export const getLastGroupMessageRead = async (
   databases: Databases,
   { groupId, userId }: { groupId: string; userId: string },
@@ -144,6 +182,38 @@ export const createOrUpdateLastGroupMessageRead = async (
   }
 }
 
+export const getTotalUnreadGroupMessage = async (
+  databases: Databases,
+  { groupIds, userId }: { groupIds: string[]; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageReadAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGE_READS_ID,
+      [
+        Query.equal("groupId", groupIds),
+        Query.equal("userId", userId),
+        Query.limit(1),
+      ],
+    )
+
+    if (result.total === 0) return {}
+
+    const totals: { [key in string]: number } = {}
+    for (let i = 0; i < result.total; i++) {
+      const total = await getTotalGroupMessageAfter(databases, {
+        messageId: result.documents[i].lastMessageReadId,
+        groupId: result.documents[i].groupId!,
+      })
+      totals[result.documents[i].groupId!] = total
+    }
+
+    return totals
+  } catch {
+    return {}
+  }
+}
+
 export const getLastChannelMessageRead = async (
   databases: Databases,
   { channelId, userId }: { channelId: string; userId: string },
@@ -206,5 +276,37 @@ export const createOrUpdateLastChannelMessageRead = async (
       channelId,
       lastMessageReadId,
     })
+  }
+}
+
+export const getTotalUnreadChannelMessage = async (
+  databases: Databases,
+  { channelIds, userId }: { channelIds: string[]; userId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<MessageReadAWModel>(
+      DATABASE_ID,
+      APPWRITE_MESSAGE_READS_ID,
+      [
+        Query.equal("channelId", channelIds),
+        Query.equal("userId", userId),
+        Query.limit(1),
+      ],
+    )
+
+    if (result.total === 0) return {}
+
+    const totals: { [key in string]: number } = {}
+    for (let i = 0; i < result.total; i++) {
+      const total = await getTotalChannelMessageAfter(databases, {
+        messageId: result.documents[i].lastMessageReadId,
+        channelId: result.documents[i].channelId!,
+      })
+      totals[result.documents[i].channelId!] = total
+    }
+
+    return totals
+  } catch {
+    return {}
   }
 }

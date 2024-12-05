@@ -49,7 +49,7 @@ declare interface UserSearch {
 declare interface LastMessage {
   id: string
   name: string
-  message: string
+  message?: string
   time: string
 }
 

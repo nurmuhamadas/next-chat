@@ -4,6 +4,18 @@ import { Query } from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
 import { validateBlockedEach } from "@/features/blocked-users/lib/queries"
+import { getChannelsByUserId } from "@/features/channel/lib/channel-queries"
+import { getGroupsByUserId } from "@/features/group/lib/group-queries"
+import {
+  getTotalUnreadChannelMessage,
+  getTotalUnreadConvMessage,
+  getTotalUnreadGroupMessage,
+} from "@/features/messages/lib/message-read-queries"
+import {
+  getLastMessageByChannelIds,
+  getLastMessageByConversationIds,
+  getLastMessageByGroupIds,
+} from "@/features/messages/lib/queries"
 import { getUserProfileById, getUsers } from "@/features/user/lib/queries"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import {
@@ -25,7 +37,11 @@ import {
 } from "../lib/queries"
 import { conversationSchema } from "../schema"
 
-import { mapConvsModelToConversation } from "./utils"
+import {
+  mapChannelModelToConversation,
+  mapConvsModelToConversation,
+  mapGroupModelToConversation,
+} from "./utils"
 
 const conversationApp = new Hono()
   .get("/", sessionMiddleware, validateProfileMiddleware, async (c) => {
@@ -39,21 +55,75 @@ const conversationApp = new Hono()
       conv.userId1 === currentProfile.$id ? conv.userId2 : conv.userId1,
     )
     const { documents: users } = await getUsers(databases, {
-      queries: [Query.contains("$id", userPairIds)],
+      queries: [Query.equal("$id", userPairIds)],
     })
 
-    // TODO: add conversation from groups and channels
+    const { documents: groups } = await getGroupsByUserId(databases, {
+      userId: currentProfile.$id,
+    })
+    const groupIds = groups.map((v) => v.$id)
+    const unreadGroupMessages = await getTotalUnreadGroupMessage(databases, {
+      userId: currentProfile.$id,
+      groupIds,
+    })
+    const lastGroupMessages = await getLastMessageByGroupIds(databases, {
+      groupIds,
+    })
+    const groupList: Conversation[] = groups.map((group) => {
+      const totalUnread = unreadGroupMessages[group.$id]
+      const lastMessage = lastGroupMessages[group.$id]
+      return mapGroupModelToConversation(group, lastMessage, totalUnread)
+    })
 
+    const { documents: channels } = await getChannelsByUserId(databases, {
+      userId: currentProfile.$id,
+    })
+    const channelIds = channels.map((v) => v.$id)
+    const unreadChannelMessages = await getTotalUnreadChannelMessage(
+      databases,
+      {
+        userId: currentProfile.$id,
+        channelIds,
+      },
+    )
+    const lastChannelMessages = await getLastMessageByChannelIds(databases, {
+      channelIds,
+    })
+    const channelList: Conversation[] = channels.map((channel) => {
+      const totalUnread = unreadChannelMessages[channel.$id]
+      const lastMessage = lastChannelMessages[channel.$id]
+      return mapChannelModelToConversation(channel, lastMessage, totalUnread)
+    })
+
+    const conversationIds = result.data.map((v) => v.$id)
+    const unreadConvMessages = await getTotalUnreadConvMessage(databases, {
+      userId: currentProfile.$id,
+      conversationIds,
+    })
+    const lastMessages = await getLastMessageByConversationIds(databases, {
+      conversationIds,
+    })
     const conversationList: Conversation[] = result.data.map((conv) => {
       const user = users.find(
         (u) => u.$id === conv.userId1 || u.$id === conv.userId2,
       )
-      // TODO: last message and unread message
-      return mapConvsModelToConversation(conv, user!)
+      const totalUnread = unreadConvMessages[conv.$id]
+      const lastMessage = lastMessages[conv.$id]
+      return mapConvsModelToConversation(conv, user!, lastMessage, totalUnread)
     })
 
+    const finalList = [...groupList, ...conversationList, ...channelList].sort(
+      (a, b) => {
+        if (!a.lastMessage && !b.lastMessage) return 0
+        if (!a.lastMessage) return 1
+        if (!b.lastMessage) return -1
+
+        return b.lastMessage.id.localeCompare(a.lastMessage.id)
+      },
+    )
+
     const response: GetConversationListResponse = successCollectionResponse(
-      conversationList,
+      finalList,
       result.total,
     )
     return c.json(response)
