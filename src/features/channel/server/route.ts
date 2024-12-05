@@ -3,6 +3,7 @@ import { Hono } from "hono"
 
 import { searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
+import { getLastMessageByChannelIds } from "@/features/messages/lib/queries"
 import { getUserProfileById } from "@/features/user/lib/queries"
 import { constructFileUrl } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
@@ -68,11 +69,14 @@ const channelApp = new Hono()
         userIds: ownerIds,
       })
 
+      const lastMessages = await getLastMessageByChannelIds(databases, {
+        channelIds: result.documents.map((v) => v.$id),
+      })
       const mappedChannel: Channel[] = result.documents.map((channel) =>
         mapChannelModelToChannel(
           channel,
           owners.find((user) => user.id === channel.ownerId)!,
-          // TODO: Add last message
+          lastMessages[channel.$id],
         ),
       )
 

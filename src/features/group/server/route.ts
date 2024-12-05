@@ -6,6 +6,7 @@ import { Hono } from "hono"
 import { searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
 import { getBlockedUser } from "@/features/blocked-users/lib/queries"
+import { getLastMessageByGroupIds } from "@/features/messages/lib/queries"
 import { getUserProfileById } from "@/features/user/lib/queries"
 import { constructFileUrl } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
@@ -71,11 +72,14 @@ const groupApp = new Hono()
         userIds: ownerIds,
       })
 
+      const lastMessages = await getLastMessageByGroupIds(databases, {
+        groupIds: result.documents.map((v) => v.$id),
+      })
       const mappedGroup: Group[] = result.documents.map((group) =>
         mapGroupModelToGroup(
           group,
           owners.find((user) => user.id === group.ownerId)!,
-          // TODO: Add last message
+          lastMessages[group.$id],
         ),
       )
 
