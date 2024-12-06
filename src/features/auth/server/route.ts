@@ -36,7 +36,12 @@ const authApp = new Hono()
 
         account.create(ID.unique(), email, password)
 
-        const response: RegisterResponse = { success: true, data: true }
+        const sessionToken = await account.createEmailToken(ID.unique(), email)
+
+        const response: RegisterResponse = successResponse({
+          email,
+          otpId: sessionToken.userId,
+        })
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
@@ -65,6 +70,22 @@ const authApp = new Hono()
         const user = await getUserByEmail(databases, {
           email: existingUser.email,
         })
+
+        if (!existingUser.emailVerification) {
+          const sessionToken = await account.createEmailToken(
+            ID.unique(),
+            existingUser.email,
+          )
+          const userId = sessionToken.userId
+
+          const response: LoginResponse = successResponse({
+            otpId: userId,
+            status: "unverified",
+            email,
+          })
+          return c.json(response)
+        }
+
         if (user) {
           const setting = await getSettings(databases, { userId: user?.$id })
 
@@ -75,7 +96,11 @@ const authApp = new Hono()
             )
             const userId = sessionToken.userId
 
-            const response: LoginResponse = successResponse({ otpId: userId })
+            const response: LoginResponse = successResponse({
+              otpId: userId,
+              status: "2fa",
+              email,
+            })
             return c.json(response)
           }
         }
@@ -93,12 +118,47 @@ const authApp = new Hono()
           maxAge: 60 * 60 * 24 * 30,
         })
 
-        const response: LoginResponse = successResponse({})
+        const response: LoginResponse = successResponse({ status: "success" })
         return c.json(response)
       } catch (error) {
         if (error instanceof AppwriteException) {
           if (error.type === "user_invalid_credentials") {
             const response = createError(ERROR.INVALID_CREDENTIALS)
+
+            return c.json(response, 401)
+          }
+        }
+
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/verify-otp/:userId",
+    zValidator("json", otpSchema, zodErrorHandler),
+    async (c) => {
+      try {
+        const { userId } = c.req.param()
+        const { code } = c.req.valid("json")
+
+        const { account } = await createAdminClient()
+
+        const session = await account.createSession(userId, code)
+
+        setCookie(c, AUTH_COOKIE_KEY, session.secret, {
+          path: "/",
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 30,
+        })
+
+        const response: VerifyOTPResponse = successResponse(true)
+        return c.json(response)
+      } catch (error) {
+        if (error instanceof AppwriteException) {
+          if (error.type === "user_invalid_token") {
+            const response = createError(ERROR.INVALID_CODE_OR_OTP_ID)
 
             return c.json(response, 401)
           }
@@ -149,7 +209,8 @@ const authApp = new Hono()
     deleteCookie(c, AUTH_COOKIE_KEY)
     await account.deleteSession("current")
 
-    return c.json({ success: "true" })
+    const response: LogoutResponse = successResponse(true)
+    return c.json(response)
   })
 
 export default authApp

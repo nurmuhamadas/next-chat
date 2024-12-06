@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import OTPForm from "@/features/auth/components/otp-form"
 
-interface EnterOTPPageProps {
+interface VerifyEmailPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
-const EnterOTPPage = async ({ searchParams }: EnterOTPPageProps) => {
+const VerifyEmailPage = async ({ searchParams }: VerifyEmailPageProps) => {
   const otpId = (await searchParams).otpId
   const email = (await searchParams).email
   if (!otpId && !email) {
@@ -16,7 +16,7 @@ const EnterOTPPage = async ({ searchParams }: EnterOTPPageProps) => {
 
   return (
     <Card className="w-full gap-y-9 rounded-3xl px-9 pb-[60px] pt-10 flex-col-center">
-      <h2 className="text-center font-bold h2 md:text-[36px]">Enter OTP</h2>
+      <h2 className="text-center font-bold h2 md:text-[36px]">Verify Email</h2>
       <OTPForm otpId={otpId as string} email={email as string} />
       <p className="text-center body-2">
         Didn’t get a code?
@@ -28,4 +28,4 @@ const EnterOTPPage = async ({ searchParams }: EnterOTPPageProps) => {
   )
 }
 
-export default EnterOTPPage
+export default VerifyEmailPage

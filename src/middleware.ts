@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server"
 
 import { validateAuth } from "./features/auth/lib/queries"
 import {
-  apiAuthPrefix,
+  apiPrefix,
   authRoutes,
   DEFAULT_LOGIN_REDIRECT,
   publicRoutes,
@@ -11,13 +11,14 @@ import {
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request
 
-  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
+  const isApiRoute = nextUrl.pathname.startsWith(apiPrefix)
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
+  const isCompletingProfile = nextUrl.pathname === "/complete-profile"
 
-  if (isApiAuthRoute) return
+  if (isApiRoute) return
 
-  const { isLoggedIn, isProfileComplete } = await validateAuth()
+  const { isLoggedIn, isProfileCompleted } = await validateAuth()
 
   if (isAuthRoute) {
     if (isLoggedIn) {
@@ -25,6 +26,7 @@ export async function middleware(request: NextRequest) {
         new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.toString()),
       )
     }
+
     return
   }
 
@@ -33,7 +35,13 @@ export async function middleware(request: NextRequest) {
       return Response.redirect(new URL("/sign-in", nextUrl.toString()))
     }
 
-    if (!isProfileComplete) {
+    // LOGGED IN
+    if (isProfileCompleted && isCompletingProfile) {
+      return Response.redirect(
+        new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.toString()),
+      )
+    }
+    if (!isProfileCompleted && !isCompletingProfile) {
       return Response.redirect(new URL("/complete-profile", nextUrl.toString()))
     }
   }

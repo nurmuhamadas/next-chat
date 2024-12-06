@@ -1,17 +1,21 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
 
+import useSignUp from "../hooks/use-sign-up"
 import { signUpSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
 
 const SignUpForm = () => {
+  const { mutate, isPending } = useSignUp()
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -22,7 +26,7 @@ const SignUpForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    console.log(values)
+    mutate({ json: values })
   }
 
   return (
@@ -63,7 +67,8 @@ const SignUpForm = () => {
             />
           )}
         />
-        <Button type="submit" size="xl" className="w-full">
+        <Button type="submit" size="xl" className="w-full" disabled={isPending}>
+          {isPending && <LoaderIcon className="size-6 animate-spin" />}
           Create Account
         </Button>
       </form>

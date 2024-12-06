@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import useLogout from "@/features/auth/hooks/use-logout"
 import { useBlockedUsersPanel } from "@/features/user/hooks/use-blocked-users-panel"
 import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
 import { useSettingsPanel } from "@/features/user/hooks/use-settings-panel"
@@ -21,6 +22,8 @@ import { MAIN_MENU } from "../constants"
 const MainMenu = () => {
   const { theme, setTheme } = useTheme()
   const isDarkMode = theme === "dark"
+
+  const { mutate: logout } = useLogout()
 
   const { openMyProfile } = useMyProfilePanel()
   const { openBlockedUsers } = useBlockedUsersPanel()
@@ -53,6 +56,7 @@ const MainMenu = () => {
         openComingSoonInfo()
         break
       case "logout":
+        logout()
         break
       default:
         break

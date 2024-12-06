@@ -1,7 +1,12 @@
 export const publicRoutes: string[] = []
 
-export const authRoutes = ["/sign-in", "/sign-up", "/enter-otp"]
+export const authRoutes = [
+  "/sign-in",
+  "/sign-up",
+  "/enter-otp",
+  "/verify-email",
+]
 
-export const apiAuthPrefix = "/api/auth"
+export const apiPrefix = "/api"
 
 export const DEFAULT_LOGIN_REDIRECT = "/"

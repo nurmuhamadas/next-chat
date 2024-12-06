@@ -6,25 +6,25 @@ declare interface ErrorResponse {
   }
 }
 
-declare type ApiResponse<T> =
-  | {
-      success: true
-      data: T
-    }
-  | ErrorResponse
+declare type ApiResponse<T> = {
+  success: true
+  data: T
+}
 
-declare type ApiCollectionResponse<T> =
-  | {
-      success: true
-      data: T[]
-      total: number
-    }
-  | ErrorResponse
+declare type ApiCollectionResponse<T> = {
+  success: true
+  data: T[]
+  total: number
+}
 
 // AUTH API
-declare type RegisterResponse = ApiResponse<boolean>
+declare type RegisterResponse = ApiResponse<{ otpId: string; email: string }>
 
-declare type LoginResponse = ApiResponse<{ otpId?: string }>
+declare type LoginResponse = ApiResponse<{
+  otpId?: string
+  email?: string
+  status: "unverified" | "2fa" | "success"
+}>
 
 declare type ForgotPasswordResponse = ApiResponse<boolean>
 

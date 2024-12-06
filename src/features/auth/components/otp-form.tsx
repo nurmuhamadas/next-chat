@@ -1,6 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -8,9 +9,16 @@ import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
 import { InputOTP, InputOTPSlot } from "@/components/ui/input-otp"
 
+import useVerifyOTP from "../hooks/use-verify-otp"
 import { otpSchema } from "../schema"
 
-const OTPForm = () => {
+interface OTPFormProps {
+  otpId: string
+  email: string
+}
+const OTPForm = ({ otpId, email }: OTPFormProps) => {
+  const { mutate, isPending } = useVerifyOTP()
+
   const form = useForm<z.infer<typeof otpSchema>>({
     resolver: zodResolver(otpSchema),
     defaultValues: {
@@ -19,13 +27,19 @@ const OTPForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof otpSchema>) => {
-    console.log(values)
+    mutate({
+      json: values,
+      param: { userId: otpId },
+    })
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-5">
-        <p className="text-center body-1">We&apos;ve sent a code to [EMAIL]</p>
+        <p className="text-center body-1">
+          We&apos;ve sent a code to{" "}
+          <span className="font-semibold text-primary">{email}</span>
+        </p>
 
         <FormField
           control={form.control}
@@ -44,7 +58,8 @@ const OTPForm = () => {
             </InputOTP>
           )}
         />
-        <Button type="submit" size="xl" className="w-full">
+        <Button type="submit" size="xl" className="w-full" disabled={isPending}>
+          {isPending && <LoaderIcon className="size-6 animate-spin" />}
           Submit
         </Button>
       </form>

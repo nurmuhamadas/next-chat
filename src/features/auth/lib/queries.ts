@@ -10,8 +10,8 @@ export const validateAuth = async () => {
 
     const userProfile = await getUserByEmail(databases, { email: user.email })
 
-    return { isLoggedIn: !!user, isProfileComplete: !!userProfile }
+    return { isLoggedIn: !!user, isProfileCompleted: !!userProfile }
   } catch {
-    return { isLoggedIn: false, isProfileComplete: false }
+    return { isLoggedIn: false, isProfileCompleted: false }
   }
 }

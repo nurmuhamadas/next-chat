@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google"
 import type { Metadata } from "next"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
+import QueryProvider from "@/components/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -33,9 +34,10 @@ export default function RootLayout({
             defaultTheme="light"
             disableTransitionOnChange
           >
-            <Toaster />
-
-            {children}
+            <QueryProvider>
+              <Toaster />
+              {children}
+            </QueryProvider>
           </ThemeProvider>
         </NuqsAdapter>
       </body>
