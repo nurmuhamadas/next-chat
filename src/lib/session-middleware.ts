@@ -32,6 +32,9 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
       }
 
       const user = await account.get()
+      if (!user.emailVerification) {
+        return c.json(createError(ERROR.EMAIL_UNVERIFIED), 401)
+      }
 
       c.set("account", account)
       c.set("account", account)

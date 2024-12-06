@@ -9,6 +9,7 @@ export const profileSchema = z.object({
   firstName: z
     .string({ required_error: ERROR.FIRST_NAME_REQUIRED })
     .trim()
+    .min(1, ERROR.FIRST_NAME_REQUIRED)
     .min(3, ERROR.FIRST_NAME_TOO_SHORT)
     .max(256, ERROR.FIRST_NAME_TOO_LONG),
   lastName: z
@@ -19,6 +20,7 @@ export const profileSchema = z.object({
     .optional(),
   username: z
     .string({ required_error: ERROR.USERNAME_REQUIRED })
+    .min(1, ERROR.USERNAME_REQUIRED)
     .min(3, ERROR.USERNAME_TOO_SHORT)
     .max(256, ERROR.USERNAME_TOO_LONG)
     .regex(/^[a-zA-Z0-9._-]+$/, ERROR.INVALID_USERNAME_FORMAT),

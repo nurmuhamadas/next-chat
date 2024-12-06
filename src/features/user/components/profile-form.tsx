@@ -1,9 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+import { ChangeEventHandler, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon } from "lucide-react"
+import { CameraIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -32,14 +32,18 @@ import { GENDER_OPT } from "../constants"
 
 interface ProfileFormProps {
   buttonLabel?: string
+  isLoading?: boolean
   onSubmit(values: z.infer<typeof profileSchema>): void
 }
 
 const ProfileForm = ({
   buttonLabel = "Submit",
+  isLoading = false,
   onSubmit,
 }: ProfileFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const [imagePreview, setImagePreview] = useState("")
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -47,12 +51,21 @@ const ProfileForm = ({
       firstName: "",
       lastName: "",
       username: "",
+      gender: "MALE",
       bio: "",
     },
   })
 
   const submitForm = (values: z.infer<typeof profileSchema>) => {
     onSubmit(values)
+  }
+
+  const handleImageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const image = e.target.files?.[0]
+    if (image) {
+      setImagePreview(URL.createObjectURL(image))
+      form.setValue("image", image)
+    }
   }
 
   return (
@@ -62,13 +75,19 @@ const ProfileForm = ({
         className="w-full space-y-5"
       >
         <div className="flex justify-center">
-          <input type="file" hidden ref={inputRef} className="hidden" />
+          <input
+            type="file"
+            hidden
+            ref={inputRef}
+            className="hidden"
+            onChange={handleImageChange}
+          />
 
           <Avatar
             className="relative size-[100px] cursor-pointer"
             onClick={() => inputRef.current?.click()}
           >
-            <AvatarImage src="" />
+            <AvatarImage src={imagePreview} />
             <AvatarFallback className="h1"></AvatarFallback>
             <div className="absolute size-full bg-grey-3/50 flex-center">
               <CameraIcon className="size-10 text-white" />
@@ -167,7 +186,8 @@ const ProfileForm = ({
             </FormItem>
           )}
         />
-        <Button type="submit" size="xl" className="w-full">
+        <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
+          {isLoading && <LoaderIcon className="size-6 animate-spin" />}
           {buttonLabel}
         </Button>
       </form>

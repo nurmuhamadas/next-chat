@@ -4,6 +4,7 @@ import { cookies } from "next/headers"
 
 import { Account, Client, Databases, Storage, Users } from "node-appwrite"
 
+import { ERROR } from "@/constants/error"
 import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
 
 import {
@@ -40,7 +41,7 @@ export const createSessionClient = async () => {
   const session = (await cookies()).get(AUTH_COOKIE_KEY)
 
   if (!session) {
-    throw new Error("Unauthorized")
+    throw new Error(ERROR.UNAUTHORIZE)
   }
 
   client.setSession(session.value)
