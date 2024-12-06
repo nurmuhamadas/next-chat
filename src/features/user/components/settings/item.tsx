@@ -42,7 +42,7 @@ const SettingItem = <ValueType,>({
 
       {type === "radio" && (
         <RadioGroup
-          defaultValue={selectedValue}
+          value={selectedValue}
           onValueChange={(v) => onValueChange(v as ValueType)}
           className="gap-y-4"
         >
