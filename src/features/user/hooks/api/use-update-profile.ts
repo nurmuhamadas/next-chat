@@ -4,13 +4,13 @@ import { toast } from "sonner"
 
 import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<typeof client.api.users.$post, 200>
-type RequestType = InferRequestType<typeof client.api.users.$post>
+type ResponseType = InferResponseType<typeof client.api.users.$patch, 200>
+type RequestType = InferRequestType<typeof client.api.users.$patch>
 
-const useCreateProfile = () => {
+const useUpdateProfile = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ form }) => {
-      const response = await client.api.users.$post({
+      const response = await client.api.users.$patch({
         form,
       })
 
@@ -22,7 +22,7 @@ const useCreateProfile = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("PROFILE_CREATED")
+      toast.success("PROFILE_UPDATED")
     },
     onError({ message }) {
       toast.error(message)
@@ -30,4 +30,4 @@ const useCreateProfile = () => {
   })
 }
 
-export default useCreateProfile
+export default useUpdateProfile

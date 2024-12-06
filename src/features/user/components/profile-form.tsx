@@ -1,9 +1,9 @@
 "use client"
 
-import { ChangeEventHandler, useRef, useState } from "react"
+import { ChangeEventHandler, useEffect, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon, LoaderIcon } from "lucide-react"
+import { CameraIcon, CheckCircleIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -26,38 +26,59 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { ERROR } from "@/constants/error"
 import { profileSchema } from "@/features/user/schema"
+import { debounce } from "@/lib/utils"
 
 import { GENDER_OPT } from "../constants"
+import { useValidateUsername } from "../hooks/api/use-validate-username"
 
 interface ProfileFormProps {
   buttonLabel?: string
   isLoading?: boolean
+  initialImageUrl?: string
+  initialValues?: z.infer<typeof profileSchema>
   onSubmit(values: z.infer<typeof profileSchema>): void
 }
 
 const ProfileForm = ({
   buttonLabel = "Submit",
   isLoading = false,
+  initialValues,
+  initialImageUrl = "",
   onSubmit,
 }: ProfileFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [imagePreview, setImagePreview] = useState("")
+  const [imagePreview, setImagePreview] = useState(initialImageUrl)
+  const [username, setUsername] = useState(initialValues?.username ?? "")
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      username: "",
-      gender: "MALE",
-      bio: "",
+      firstName: initialValues?.firstName ?? "",
+      lastName: initialValues?.lastName ?? "",
+      username: initialValues?.username ?? "",
+      gender: initialValues?.gender ?? "MALE",
+      bio: initialValues?.bio ?? "",
+      image: initialValues?.image,
     },
   })
 
+  const { data: isUsernameAvailable, isFetching: isCheckingUsername } =
+    useValidateUsername({
+      username,
+    })
+
+  const debouncedCheckUsername = debounce((value: string) => {
+    if (value.trim() !== "") {
+      setUsername(value)
+    }
+  }, 500)
+
   const submitForm = (values: z.infer<typeof profileSchema>) => {
-    onSubmit(values)
+    if (!values.image) delete values.image
+    onSubmit({ ...values })
   }
 
   const handleImageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -67,6 +88,14 @@ const ProfileForm = ({
       form.setValue("image", image)
     }
   }
+
+  useEffect(() => {
+    if (!isCheckingUsername && isUsernameAvailable === false) {
+      form.setError("username", { message: ERROR.USERNAME_ALREADY_EXIST })
+    } else {
+      form.clearErrors("username")
+    }
+  }, [form, isCheckingUsername, isUsernameAvailable])
 
   return (
     <Form {...form}>
@@ -79,20 +108,29 @@ const ProfileForm = ({
             type="file"
             hidden
             ref={inputRef}
+            accept="image/png,image/jpg,image/jpeg,image/webp"
             className="hidden"
             onChange={handleImageChange}
           />
-
-          <Avatar
-            className="relative size-[100px] cursor-pointer"
-            onClick={() => inputRef.current?.click()}
-          >
-            <AvatarImage src={imagePreview} />
-            <AvatarFallback className="h1"></AvatarFallback>
-            <div className="absolute size-full bg-grey-3/50 flex-center">
-              <CameraIcon className="size-10 text-white" />
-            </div>
-          </Avatar>
+          <FormField
+            control={form.control}
+            name="image"
+            render={() => (
+              <div className="gap-y-1 flex-col-center">
+                <Avatar
+                  className="relative size-[100px] cursor-pointer"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <AvatarImage src={imagePreview} />
+                  <AvatarFallback className="h1"></AvatarFallback>
+                  <div className="absolute size-full bg-grey-3/50 flex-center">
+                    <CameraIcon className="size-10 text-white" />
+                  </div>
+                </Avatar>
+                <FormMessage />
+              </div>
+            )}
+          />
         </div>
         <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
           <FormField
@@ -128,9 +166,28 @@ const ProfileForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="john_doe" {...field} />
-              </FormControl>
+              <div className="relative flex">
+                <FormControl>
+                  <Input
+                    placeholder="john_doe"
+                    {...field}
+                    onChange={(e) => {
+                      form.setValue("username", e.target.value)
+                      debouncedCheckUsername(e.target.value)
+                    }}
+                  />
+                </FormControl>
+
+                {isCheckingUsername ? (
+                  <div className="absolute right-3 top-[18px]">
+                    <LoaderIcon className="size-4 animate-spin" />
+                  </div>
+                ) : isUsernameAvailable === true ? (
+                  <div className="absolute right-3 top-[18px]">
+                    <CheckCircleIcon className="size-4 text-success" />
+                  </div>
+                ) : null}
+              </div>
               <FormMessage />
             </FormItem>
           )}

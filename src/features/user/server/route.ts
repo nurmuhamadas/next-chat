@@ -31,8 +31,10 @@ const userApp = new Hono()
       const { username } = c.req.param()
 
       const databases = c.get("databases")
+      const user = c.get("userAccount")
 
       const isUsernameAvailable = await checkUsernameIsExist(databases, {
+        email: user.email,
         username,
       })
 
@@ -57,6 +59,7 @@ const userApp = new Hono()
         const userAccount = c.get("userAccount")
 
         const isUsernameAvailable = await checkUsernameIsExist(databases, {
+          email: userAccount.email,
           username,
         })
         if (!isUsernameAvailable) {
@@ -112,6 +115,7 @@ const userApp = new Hono()
 
         if (username) {
           const isUsernameExist = await checkUsernameIsExist(databases, {
+            email: currentProfile.email,
             username,
           })
           if (username !== currentProfile.username && isUsernameExist) {
@@ -242,12 +246,16 @@ const userApp = new Hono()
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
-      const userProfile = c.get("userProfile")
+      try {
+        const userProfile = c.get("userProfile")
 
-      const response: GetMyProfileResponse = successResponse(
-        mapUserModelToUser(userProfile),
-      )
-      return c.json(response)
+        const response: GetMyProfileResponse = successResponse(
+          mapUserModelToUser(userProfile),
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
     },
   )
   .get("/:userId", sessionMiddleware, validateProfileMiddleware, async (c) => {

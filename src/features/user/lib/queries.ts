@@ -6,10 +6,11 @@ import { APPWRITE_USERS_ID, DATABASE_ID } from "@/lib/appwrite/config"
 
 export const checkUsernameIsExist = async (
   databases: Databases,
-  { username }: { username: string },
+  { username, email }: { username: string; email: string },
 ) => {
   const result = await databases.listDocuments(DATABASE_ID, APPWRITE_USERS_ID, [
     Query.equal("username", username),
+    Query.notEqual("email", email),
   ])
 
   return result.total === 0
