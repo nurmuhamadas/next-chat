@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -12,6 +14,7 @@ interface SettingItemRadioProps<ValueType> {
   type: "radio"
   value: ValueType
   options: SettingOption<ValueType>[]
+  isLoading?: boolean
   onValueChange(value: ValueType): void
 }
 
@@ -20,6 +23,7 @@ interface SettingItemCheckboxProps<ValueType> {
   type: "checkbox"
   value: ValueType[]
   options: SettingOption<ValueType>[]
+  isLoading?: boolean
   onValueChange(value: ValueType[]): void
 }
 
@@ -31,10 +35,15 @@ const SettingItem = <ValueType,>({
   title,
   type,
   options,
-  value,
+  value: defaultValue,
+  isLoading,
   onValueChange,
 }: SettingItemProps<ValueType>) => {
-  const selectedValue = String(value) as string
+  const [value, setValue] = useState<ValueType | ValueType[]>(defaultValue)
+
+  useEffect(() => {
+    setValue(defaultValue)
+  }, [defaultValue])
 
   return (
     <div className="flex flex-col gap-y-3 px-4 py-3">
@@ -42,9 +51,13 @@ const SettingItem = <ValueType,>({
 
       {type === "radio" && (
         <RadioGroup
-          value={selectedValue}
-          onValueChange={(v) => onValueChange(v as ValueType)}
+          value={value as string}
+          onValueChange={(v) => {
+            onValueChange(v as ValueType)
+            setValue(v as ValueType)
+          }}
           className="gap-y-4"
+          disabled={isLoading}
         >
           {options.map((option) => {
             const optionValue = String(option.value) as string
@@ -53,7 +66,7 @@ const SettingItem = <ValueType,>({
               <div key={optionValue} className="flex items-center gap-x-2.5">
                 <RadioGroupItem
                   id={optionValue}
-                  value={optionValue}
+                  value={option.value as string}
                   className="size-4"
                 />
                 <Label htmlFor={optionValue} className="!body-1">
@@ -76,11 +89,21 @@ const SettingItem = <ValueType,>({
                   id={optionValue}
                   value={optionValue}
                   className="size-4"
+                  checked={
+                    Array.isArray(value)
+                      ? value.includes(option.value)
+                      : undefined
+                  }
+                  disabled={isLoading}
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      onValueChange([...value, option.value])
+                      onValueChange([...defaultValue, option.value])
+                      setValue([...defaultValue, option.value])
                     } else {
-                      onValueChange(value.filter((v) => v !== option.value))
+                      setValue(defaultValue.filter((v) => v !== option.value))
+                      onValueChange(
+                        defaultValue.filter((v) => v !== option.value),
+                      )
                     }
                   }}
                 />

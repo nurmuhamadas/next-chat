@@ -16,9 +16,8 @@ import SettingItem from "./item"
 const ThemeAndAppereanceSettings = () => {
   const { setTheme, theme, systemTheme } = useTheme()
 
-  const { data, refetch } = useGetSetting()
-  console.log(data)
-  const { mutate: updateSetting } = useUpdateSetting()
+  const { data, isLoading, refetch } = useGetSetting()
+  const { mutate: updateSetting, isPending } = useUpdateSetting()
 
   const handleThemeChange = (value: Theme) => {
     if (value === "SYSTEM") {
@@ -35,6 +34,7 @@ const ThemeAndAppereanceSettings = () => {
         type="radio"
         options={THEME_OPT}
         value={theme?.toUpperCase()}
+        isLoading={isLoading || isPending}
         onValueChange={handleThemeChange}
       />
       <Separator />
@@ -43,6 +43,7 @@ const ThemeAndAppereanceSettings = () => {
         type="radio"
         options={TIME_FORMAT_OPT}
         value={data?.timeFormat}
+        isLoading={isLoading || isPending}
         onValueChange={(value) => {
           updateSetting(
             { json: { timeFormat: value as TimeFormat } },
@@ -60,6 +61,7 @@ const ThemeAndAppereanceSettings = () => {
         type="radio"
         options={LANGUAGE_OPT}
         value={data?.language}
+        isLoading={isLoading || isPending}
         onValueChange={(value) => {
           updateSetting(
             { json: { language: value as Language } },
