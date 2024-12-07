@@ -8,6 +8,8 @@ import {
 } from "@/lib/appwrite/config"
 import { generateInviteCode } from "@/lib/utils"
 
+import { CHANNEL_TYPE } from "../constants"
+
 import { getChannelSubsByUserId } from "./channel-subscribers-queries"
 import { mapUserModelToChannelOwner } from "./utils"
 
@@ -65,7 +67,7 @@ export const getChannelsByUserId = async (
     const channels = await databases.listDocuments<ChannelAWModel>(
       DATABASE_ID,
       APPWRITE_CHANNELS_ID,
-      [Query.contains("$id", channelIds)],
+      [Query.equal("$id", channelIds)],
     )
 
     return channels
@@ -83,7 +85,7 @@ export const getChannelOwnersByUserIds = async (
 ): Promise<QueryResults<ChannelOwner>> => {
   const result = await getUsers(databases, {
     queries: [
-      Query.contains("$id", userIds),
+      Query.equal("$id", userIds),
       Query.select(["$id", "firstName", "lastName", "imageUrl"]),
     ],
   })
@@ -96,6 +98,7 @@ export const getChannelOwnersByUserIds = async (
 
 export const searchChannels = async (
   databases: Databases,
+  userId: string,
   {
     query,
     limit,
@@ -106,7 +109,6 @@ export const searchChannels = async (
   },
 ): Promise<QueryResults<ChannelSearch>> => {
   const queries = [
-    Query.limit(limit),
     Query.offset(offset),
     Query.select(["$id", "name", "imageUrl"]),
   ]
@@ -115,7 +117,36 @@ export const searchChannels = async (
     queries.push(Query.search("name", query))
   }
 
+  if (limit > 0) {
+    queries.push(Query.limit(limit))
+  }
+
   try {
+    const subsOfChannels =
+      await databases.listDocuments<ChannelSubscriberAWModel>(
+        DATABASE_ID,
+        APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+        [
+          Query.equal("userId", userId),
+          Query.isNull("unsubscribedAt"),
+          Query.select(["channelId"]),
+        ],
+      )
+    const subsChannelIds = subsOfChannels.documents.map((v) => v.channelId)
+    if (subsOfChannels.total === 0) {
+      queries.push(Query.equal("type", CHANNEL_TYPE.PUBLIC))
+    } else {
+      queries.push(
+        Query.or([
+          Query.equal("type", CHANNEL_TYPE.PUBLIC),
+          Query.and([
+            Query.equal("type", CHANNEL_TYPE.PRIVATE),
+            Query.equal("$id", subsChannelIds),
+          ]),
+        ]),
+      )
+    }
+
     const result = await databases.listDocuments<ChannelAWModel>(
       DATABASE_ID,
       APPWRITE_CHANNELS_ID,
@@ -127,7 +158,7 @@ export const searchChannels = async (
       DATABASE_ID,
       APPWRITE_CHANNEL_SUBSCRIBERS_ID,
       [
-        Query.contains("channelId", channelIds),
+        Query.equal("channelId", channelIds),
         Query.isNull("unsubscribedAt"),
         Query.select(["channelId"]),
       ],

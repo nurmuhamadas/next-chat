@@ -197,8 +197,13 @@ const groupApp = new Hono()
         const { query, limit, offset } = c.req.valid("query")
 
         const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
 
-        const result = await searchGroup(databases, { query, limit, offset })
+        const result = await searchGroup(databases, currentProfile.$id, {
+          query,
+          limit,
+          offset,
+        })
 
         const response: SearchGroupsResponse = successCollectionResponse(
           result.data,

@@ -13,6 +13,8 @@ import {
 } from "@/lib/appwrite/config"
 import { generateInviteCode } from "@/lib/utils"
 
+import { GROUP_TYPE } from "../constants"
+
 import { getGroupMembersByUserId } from "./group-member-queries"
 import { mapUserModelToGroupOwner } from "./utils"
 
@@ -84,7 +86,7 @@ export const validateGroupData = async (
 
   // USER SHOULD ADD REGISTERED USER ONLY
   const validUsers = await getUsers(databases, {
-    queries: [Query.contains("$id", memberIds), Query.notEqual("$id", userId)],
+    queries: [Query.equal("$id", memberIds), Query.notEqual("$id", userId)],
   })
   if (validUsers.total < memberIds.length) {
     const validUserIds = validUsers.documents.map((v) => v.$id)
@@ -100,7 +102,7 @@ export const validateGroupData = async (
   const blockedUsers = await getBlockedUsers(databases, {
     queries: [
       Query.equal("userId", userId),
-      Query.contains("blockedUserId", memberIds),
+      Query.equal("blockedUserId", memberIds),
     ],
   })
   if (blockedUsers.total > 0) {
@@ -110,8 +112,8 @@ export const validateGroupData = async (
   // USER SHOULD NOT ADD BLOCKED USER AS MEMBER
   const blockedByUsers = await getBlockedUsers(databases, {
     queries: [
-      Query.contains("userId", memberIds),
-      Query.contains("blockedUserId", userId),
+      Query.equal("userId", memberIds),
+      Query.equal("blockedUserId", userId),
     ],
   })
   if (blockedByUsers.total > 0) {
@@ -132,7 +134,7 @@ export const getGroupsByUserId = async (
     const groups = await databases.listDocuments<GroupAWModel>(
       DATABASE_ID,
       APPWRITE_GROUPS_ID,
-      [Query.contains("$id", groupIds)],
+      [Query.equal("$id", groupIds)],
     )
 
     return groups
@@ -150,7 +152,7 @@ export const getGroupOwnersByUserIds = async (
 ): Promise<QueryResults<GroupOwner>> => {
   const result = await getUsers(databases, {
     queries: [
-      Query.contains("$id", userIds),
+      Query.equal("$id", userIds),
       Query.select(["$id", "firstName", "lastName", "imageUrl"]),
     ],
   })
@@ -178,6 +180,7 @@ export const getGroupById = async (
 
 export const searchGroup = async (
   databases: Databases,
+  userId: string,
   {
     query,
     limit,
@@ -188,7 +191,6 @@ export const searchGroup = async (
   },
 ): Promise<QueryResults<GroupSearch>> => {
   const queries = [
-    Query.limit(limit),
     Query.offset(offset),
     Query.select(["$id", "name", "imageUrl"]),
   ]
@@ -197,11 +199,42 @@ export const searchGroup = async (
     queries.push(Query.search("name", query))
   }
 
+  if (limit > 0) {
+    queries.push(Query.limit(limit))
+  }
+
   try {
+    const memberOfGroups = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [
+        Query.equal("userId", userId),
+        Query.isNull("leftAt"),
+        Query.select(["groupId"]),
+      ],
+    )
+    const memberGroupIds = memberOfGroups.documents.map((v) => v.groupId)
+    if (memberOfGroups.total === 0) {
+      queries.push(Query.equal("type", GROUP_TYPE.PUBLIC))
+    } else {
+      queries.push(
+        Query.or([
+          Query.equal("type", GROUP_TYPE.PUBLIC),
+          Query.equal("$id", memberGroupIds),
+        ]),
+      )
+    }
+
     const result = await databases.listDocuments<GroupAWModel>(
       DATABASE_ID,
       APPWRITE_GROUPS_ID,
-      queries,
+      [
+        ...queries,
+        Query.or([
+          Query.equal("type", GROUP_TYPE.PUBLIC),
+          Query.equal("$id", memberGroupIds),
+        ]),
+      ],
     )
     const groupIds = result.documents.map((v) => v.$id)
 
@@ -209,7 +242,7 @@ export const searchGroup = async (
       DATABASE_ID,
       APPWRITE_GROUP_MEMBERS_ID,
       [
-        Query.contains("groupId", groupIds),
+        Query.equal("groupId", groupIds),
         Query.isNull("leftAt"),
         Query.select(["groupId"]),
       ],

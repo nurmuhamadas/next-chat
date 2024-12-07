@@ -168,8 +168,13 @@ const channelApp = new Hono()
         const { query, limit, offset } = c.req.valid("query")
 
         const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
 
-        const result = await searchChannels(databases, { query, limit, offset })
+        const result = await searchChannels(databases, currentProfile.$id, {
+          query,
+          limit,
+          offset,
+        })
 
         const response: SearchChannelsResponse = successCollectionResponse(
           result.data,
