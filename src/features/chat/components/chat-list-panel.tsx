@@ -1,69 +1,47 @@
-import Image from "next/image"
+import { useState } from "react"
+
+import { XIcon } from "lucide-react"
 
 import SearchBar from "@/components/search-bar"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
+import { debounce } from "@/lib/utils"
 
-import ChatListItem from "./chat-list-item"
+import { useSearchQuery } from "../hooks/use-search-query"
+
+import ChatListView from "./chat-list-view"
 import FloatingButton from "./floating-button"
 import MainMenu from "./main-menu"
+import SearchResultView from "./search-result-view"
 
 const ChatListPanel = () => {
-  const data = [1]
+  const { setSearchQuery } = useSearchQuery()
+
+  const [isSearching, setIsSearching] = useState(false)
 
   return (
     <div className="group/chat-list relative flex size-full flex-col border-r border-grey-1 pt-[52px]">
       <div className="absolute left-0 top-0 flex w-full items-center gap-x-4 py-1.5 pl-4 pr-2.5">
         <MainMenu />
 
-        <SearchBar />
+        <div className="flex flex-1 items-center gap-x-2">
+          <SearchBar
+            onValueChange={debounce(setSearchQuery, 300)}
+            onClick={() => setIsSearching(true)}
+          />
+
+          {isSearching && (
+            <Button
+              variant="icon"
+              size="icon-sm"
+              onClick={() => setIsSearching(false)}
+            >
+              <XIcon />
+            </Button>
+          )}
+        </div>
       </div>
 
-      {data.length === 0 && (
-        <div className="flex-1 flex-center">
-          <div className="gap-y-6 flex-col-center">
-            <Image
-              src="/images/on-a-break.svg"
-              alt="no conversation"
-              width={160}
-              height={127}
-            />
-            <div className="gap-y-2 flex-col-center">
-              <h4 className="h4">No Conversation found</h4>
-              <p className="body-2">
-                Search and select user to start the conversation
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {data.length > 0 && (
-        <ScrollArea className="chat-list-scroll-area">
-          <ul className="flex min-w-10 flex-col px-1.5 pt-2">
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-            <ChatListItem />
-          </ul>
-        </ScrollArea>
-      )}
+      {isSearching ? <SearchResultView /> : <ChatListView />}
 
       <FloatingButton />
     </div>

@@ -52,7 +52,7 @@ declare type GetUserLastSeenResponse = ApiResponse<string | null>
 declare type UpdateUserLastSeenResponse = ApiResponse<string>
 
 // BLOCKED USERS
-declare type GetBlockedUsersResponse = ApiResponse<BlockedUser[]>
+declare type GetBlockedUsersResponse = ApiCollectionResponse<BlockedUser>
 
 declare type BlockUserResponse = ApiResponse<{ id: string }>
 
@@ -67,7 +67,7 @@ declare type GetGroupsResponse = ApiCollectionResponse<Group>
 
 declare type GetGroupResponse = ApiResponse<Group>
 
-declare type GetGroupMembersResponse = ApiResponse<GroupMember[]>
+declare type GetGroupMembersResponse = ApiCollectionResponse<GroupMember>
 
 declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
 
@@ -101,7 +101,8 @@ declare type GetChannelsResponse = ApiCollectionResponse<Channel>
 
 declare type GetChannelResponse = ApiResponse<Channel>
 
-declare type GetChannelSubscribersResponse = ApiResponse<ChannelSubscriber[]>
+declare type GetChannelSubscribersResponse =
+  ApiCollectionResponse<ChannelSubscriber>
 
 declare type SearchChannelsResponse = ApiCollectionResponse<ChannelSearch>
 
@@ -124,7 +125,7 @@ declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
 
 // CONVERSATION API
 /** Include groups and channels chat */
-declare type GetConversationListResponse = ApiResponse<Conversation[]>
+declare type GetConversationListResponse = ApiCollectionResponse<Conversation>
 
 declare type CreateConversationResponse = ApiResponse<Conversation>
 

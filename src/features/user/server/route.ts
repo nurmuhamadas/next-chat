@@ -175,8 +175,14 @@ const userApp = new Hono()
         const { query, limit, offset } = c.req.valid("query")
 
         const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
 
-        const result = await searchUser(databases, { query, limit, offset })
+        const result = await searchUser(databases, {
+          query,
+          limit,
+          offset,
+          userId: currentProfile.$id,
+        })
 
         const response: SearchUsersResponse = successCollectionResponse(
           result.documents.map(mapSearchResult),

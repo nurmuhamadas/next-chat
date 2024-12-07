@@ -64,7 +64,12 @@ export type SearchUserQueryResult = Pick<
 
 export const searchUser = async (
   databases: Databases,
-  { query, limit, offset }: { query?: string; limit: number; offset: number },
+  {
+    query,
+    limit,
+    offset,
+    userId,
+  }: { query?: string; limit: number; offset: number; userId: string },
 ) => {
   const queries = [
     Query.limit(limit),
@@ -86,7 +91,7 @@ export const searchUser = async (
     return await databases.listDocuments<SearchUserQueryResult>(
       DATABASE_ID,
       APPWRITE_USERS_ID,
-      queries,
+      [...queries, Query.notEqual("$id", userId)],
     )
   } catch {
     return {
