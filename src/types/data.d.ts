@@ -127,6 +127,7 @@ declare interface Group {
   imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage | null
+  totalMembers: number
 }
 
 declare interface GroupSearch {
@@ -165,6 +166,7 @@ declare interface Channel {
   imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage | null
+  totalSubscribers: number
 }
 
 declare interface ChannelSearch {

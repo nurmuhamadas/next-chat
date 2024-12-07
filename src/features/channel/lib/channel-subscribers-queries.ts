@@ -266,3 +266,25 @@ export const deleteAllChannelSubs = async (
     ),
   )
 }
+
+export const getTotalChannelSubscribers = async (
+  databases: Databases,
+  { channelId }: { channelId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+      DATABASE_ID,
+      APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+      [
+        Query.equal("channelId", channelId),
+        Query.isNull("unsubscribedAt"),
+        Query.select(["$id"]),
+        Query.limit(1000),
+      ],
+    )
+
+    return result.total
+  } catch {
+    return 0
+  }
+}

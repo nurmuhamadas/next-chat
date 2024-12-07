@@ -1,4 +1,12 @@
 import { type ClassValue, clsx } from "clsx"
+import {
+  format,
+  isThisWeek,
+  isThisYear,
+  isToday,
+  isYesterday,
+  parseISO,
+} from "date-fns"
 import { toast } from "sonner"
 import { twMerge } from "tailwind-merge"
 
@@ -65,5 +73,21 @@ export const debounce = <T extends (...args: any[]) => void>(
   return (...args: Parameters<T>) => {
     clearTimeout(timeout)
     timeout = setTimeout(() => func(...args), delay)
+  }
+}
+
+export const formatChatTime = (time: string, timeFormat: TimeFormat) => {
+  const date = parseISO(time)
+
+  if (isToday(date)) {
+    return format(date, timeFormat === "12-HOUR" ? "hh:mm a" : "HH:mm")
+  } else if (isYesterday(date)) {
+    return "Yesterday"
+  } else if (isThisWeek(date)) {
+    return format(date, "EEE")
+  } else if (isThisYear(date)) {
+    return format(date, "MMM d")
+  } else {
+    return format(date, "MMM d, yyyy")
   }
 }

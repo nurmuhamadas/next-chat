@@ -2,15 +2,17 @@ import Image from "next/image"
 
 import ChatSkeleton from "@/components/chat-skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 
 import useGetConversations from "../hooks/api/use-get-conversations"
 
 import ChatListItem from "./chat-list-item"
 
 const ChatListView = () => {
+  const { data: settings, isLoading: settingLoading } = useGetSetting()
   const { data, isLoading } = useGetConversations()
 
-  if (isLoading) {
+  if (isLoading || settingLoading) {
     return <ChatSkeleton rows={5} />
   }
 
@@ -38,7 +40,13 @@ const ChatListView = () => {
     <ScrollArea className="chat-list-scroll-area">
       <ul className="flex min-w-10 flex-col px-1.5 pt-2">
         {data.map((v) => {
-          return <ChatListItem key={v.id} />
+          return (
+            <ChatListItem
+              key={v.id}
+              timeFormat={settings?.timeFormat ?? "12-HOUR"}
+              data={v}
+            />
+          )
         })}
       </ul>
     </ScrollArea>

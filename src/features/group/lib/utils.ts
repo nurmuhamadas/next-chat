@@ -3,6 +3,7 @@ import { mergeName } from "@/lib/utils"
 export const mapGroupModelToGroup = (
   group: GroupAWModel,
   owner: GroupOwner,
+  totalMembers: number,
   lastMessage?: LastMessage,
 ): Group => {
   return {
@@ -14,6 +15,7 @@ export const mapGroupModelToGroup = (
     type: group.type,
     inviteCode: group.inviteCode,
     lastMessage: lastMessage ?? null,
+    totalMembers,
   }
 }
 

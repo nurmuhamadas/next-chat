@@ -37,6 +37,7 @@ import {
   deleteAllChannelSubs,
   getChannelSubs,
   getCurrentChannelSubs,
+  getTotalChannelSubscribers,
   leaveChannel,
   setUserAsAdmin,
   unsetUserAdmin,
@@ -76,6 +77,8 @@ const channelApp = new Hono()
         mapChannelModelToChannel(
           channel,
           owners.find((user) => user.id === channel.ownerId)!,
+          // TODO:
+          0,
           lastMessages[channel.$id],
         ),
       )
@@ -143,6 +146,7 @@ const channelApp = new Hono()
           const channelResult = mapChannelModelToChannel(
             createdChannel,
             mapUserModelToChannelOwner(currentProfile),
+            1,
           )
 
           const response: CreateChannelResponse = successResponse(channelResult)
@@ -219,15 +223,19 @@ const channelApp = new Hono()
           return c.json(createError(ERROR.CHANNEL_OWNER_NOT_FOUND), 404)
         }
 
+        const totalSubscribers = await getTotalChannelSubscribers(databases, {
+          channelId,
+        })
+
         const mappedChannels: Channel = mapChannelModelToChannel(
           channel,
           mapUserModelToChannelOwner(owner),
+          totalSubscribers,
         )
 
         const response: GetChannelResponse = successResponse(mappedChannels)
         return c.json(response)
-      } catch (e) {
-        console.log(e)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },

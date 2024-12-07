@@ -292,3 +292,25 @@ export const deleteAllGroupMembers = async (
     ),
   )
 }
+
+export const getTotalGroupMembers = async (
+  databases: Databases,
+  { groupId }: { groupId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [
+        Query.equal("groupId", groupId),
+        Query.isNull("leftAt"),
+        Query.limit(1000),
+        Query.select(["$id"]),
+      ],
+    )
+
+    return result.total
+  } catch {
+    return 0
+  }
+}

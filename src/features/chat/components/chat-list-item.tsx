@@ -1,33 +1,40 @@
 import Link from "next/link"
 
-import { CheckCheckIcon } from "lucide-react"
-
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, formatChatTime } from "@/lib/utils"
 
 import ChatAvatar from "../../../components/chat-avatar"
 
 interface ChatListItemProps {
   selected?: boolean
+  timeFormat?: TimeFormat
+  data: Conversation
 }
 
-const ChatListItem = ({ selected = false }: ChatListItemProps) => {
+const ChatListItem = ({
+  selected = false,
+  data,
+  timeFormat = "12-HOUR",
+}: ChatListItemProps) => {
   return (
-    <Link href="/chat/123">
+    <Link href={`/${data.type}/${data.id}`}>
       <li
         className={cn(
           "flex items-center gap-x-3 rounded-lg p-1.5 px-3 hover:bg-grey-4",
           selected && "bg-primary text-white hover:bg-primary",
         )}
       >
-        <ChatAvatar className="size-[54px]" />
+        <ChatAvatar className="size-[54px]" src={data.imageUrl ?? ""} />
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex items-center gap-x-3">
-            <h4 className="flex-1 truncate h5">User Name</h4>
+            <h4 className="flex-1 truncate h5">{data.name}</h4>
             <div className="gap-x-1.5 flex-center-end">
-              <CheckCheckIcon className="size-4 text-grey-2" />
-              <span className="caption">17:12</span>
+              {data.lastMessage?.time && (
+                <span className="caption">
+                  {formatChatTime(data.lastMessage?.time, timeFormat)}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-x-3">
@@ -37,16 +44,18 @@ const ChatListItem = ({ selected = false }: ChatListItemProps) => {
                 selected && "text-grey-4",
               )}
             >
-              Latest message will be shown here
+              {data.lastMessage?.message}
             </p>
-            <Badge
-              className={cn(
-                "rounded-full",
-                selected && "bg-white text-primary",
-              )}
-            >
-              12
-            </Badge>
+            {data.totalUnreadMessages > 0 && (
+              <Badge
+                className={cn(
+                  "rounded-full",
+                  selected && "bg-white text-primary",
+                )}
+              >
+                {data.totalUnreadMessages}
+              </Badge>
+            )}
           </div>
         </div>
       </li>

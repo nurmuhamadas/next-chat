@@ -24,6 +24,7 @@ import {
   deleteAllGroupMembers,
   getCurrentGroupMember,
   getGroupMembers,
+  getTotalGroupMembers,
   leaveGroup,
   setUserAsAdmin,
   unsetUserAdmin,
@@ -79,6 +80,8 @@ const groupApp = new Hono()
         mapGroupModelToGroup(
           group,
           owners.find((user) => user.id === group.ownerId)!,
+          // TODO:
+          0,
           lastMessages[group.$id],
         ),
       )
@@ -173,6 +176,7 @@ const groupApp = new Hono()
           const groupResult = mapGroupModelToGroup(
             createdGroup,
             mapUserModelToGroupOwner(currentProfile),
+            memberIds.length + 1,
           )
           const response: CreateGroupResponse = successResponse(groupResult)
           return c.json(response)
@@ -244,9 +248,12 @@ const groupApp = new Hono()
         return c.json(createError(ERROR.GROUP_OWNER_NOT_FOUND), 404)
       }
 
+      const totalMember = await getTotalGroupMembers(databases, { groupId })
+
       const mappedGroup: Group = mapGroupModelToGroup(
         group,
         mapUserModelToGroupOwner(owner),
+        totalMember,
       )
 
       const response: GetGroupResponse = successResponse(mappedGroup)

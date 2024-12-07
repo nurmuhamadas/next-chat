@@ -3,6 +3,7 @@ import { mergeName } from "@/lib/utils"
 export const mapChannelModelToChannel = (
   channel: ChannelAWModel,
   owner: ChannelOwner,
+  totalSubscribers: number,
   lastMessage?: LastMessage,
 ): Channel => {
   return {
@@ -14,6 +15,7 @@ export const mapChannelModelToChannel = (
     owner,
     inviteCode: channel.inviteCode,
     lastMessage: lastMessage ?? null,
+    totalSubscribers,
   }
 }
 
