@@ -121,10 +121,24 @@ export const createConversationOption = async (
   databases: Databases,
   data: Omit<ConversationOptionModel, "deletedAt">,
 ) => {
-  return await databases.createDocument<ConversationAWModel>(
+  return await databases.createDocument<ConversationOptionAWModel>(
     DATABASE_ID,
     APPWRITE_CONVERSATION_OPTIONS_ID,
     ID.unique(),
+    {
+      ...data,
+    },
+  )
+}
+export const updateConversationOption = async (
+  databases: Databases,
+  id: string,
+  data: Partial<Pick<ConversationOptionModel, "notification">>,
+) => {
+  return await databases.createDocument<ConversationOptionAWModel>(
+    DATABASE_ID,
+    APPWRITE_CONVERSATION_OPTIONS_ID,
+    id,
     {
       ...data,
     },

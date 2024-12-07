@@ -12,9 +12,10 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
+import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
-import { cn } from "@/lib/utils"
+import { cn, mergeName } from "@/lib/utils"
 
 import { useRoomProfile } from "../hooks/use-room-profile"
 
@@ -23,20 +24,40 @@ import ChatRoomMenu from "./chat-room-menu"
 const ChatRoomHeader = () => {
   const router = useRouter()
 
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+
   const { openRoomProfile } = useRoomProfile()
   const type = useRoomType()
   const roomId = useRoomId()
 
+  const { data: user, isLoading: userLoading } = useGetUserProfileById({
+    id: type === "chat" ? roomId : undefined,
+  })
   const { data: group, isLoading: groupLoading } = useGetGroupById({
     id: type === "group" ? roomId : undefined,
   })
-
   const { data: channel, isLoading: channelLoading } = useGetChannelById({
     id: type === "channel" ? roomId : undefined,
   })
-  const isLoading = groupLoading || channelLoading
+  const isLoading = userLoading || groupLoading || channelLoading
 
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const name = {
+    chat: user
+      ? mergeName(user?.firstName, user?.lastName ?? undefined)
+      : undefined,
+    group: group ? group?.name : undefined,
+    channel: channel ? channel?.name : undefined,
+  }
+  const info = {
+    chat: undefined,
+    group: group ? `${group?.totalMembers} members` : undefined,
+    channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
+  }
+  const avatar = {
+    chat: user ? (user?.imageUrl ?? "") : undefined,
+    group: group ? (group?.imageUrl ?? "") : undefined,
+    channel: channel ? (channel?.imageUrl ?? "") : undefined,
+  }
 
   return (
     <header className="w-full gap-x-4 bg-surface px-4 py-2 flex-center-between">
@@ -60,7 +81,11 @@ const ChatRoomHeader = () => {
         {isLoading ? (
           <Skeleton className="size-10 rounded-full" />
         ) : (
-          <ChatAvatar className="size-10" />
+          <ChatAvatar
+            src={avatar[type]}
+            name={name[type]}
+            className="size-10"
+          />
         )}
 
         <div className={cn("flex flex-1 flex-col")}>
@@ -71,17 +96,12 @@ const ChatRoomHeader = () => {
             </>
           ) : (
             <>
-              <h2 className="line-clamp-1 h5">
-                {type === "chat" && "User Name"}
-                {type === "group" && group?.name}
-                {type === "channel" && channel?.name}
-              </h2>
-              <p className="line-clamp-1 text-muted-foreground caption">
-                {type === "chat" && "Last seen at"}
-                {type === "group" && `${group?.totalMembers} members`}
-                {type === "channel" &&
-                  `${channel?.totalSubscribers} subscribers`}
-              </p>
+              {name[type] && <h2 className="line-clamp-1 h5">{name[type]}</h2>}
+              {info[type] && (
+                <p className="line-clamp-1 text-muted-foreground caption">
+                  {info[type]}
+                </p>
+              )}
             </>
           )}
         </div>

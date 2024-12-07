@@ -61,6 +61,8 @@ const UserResult = () => {
         return (
           <ResultItem
             key={user.id}
+            id={user.id}
+            type="chat"
             title={user.name}
             imageUrl={user.imageUrl ?? undefined}
             description={user.lastSeenAt ?? undefined}
@@ -94,6 +96,8 @@ const GroupResult = () => {
         return (
           <ResultItem
             key={user.id}
+            id={user.id}
+            type="group"
             title={user.name}
             imageUrl={user.imageUrl ?? undefined}
             description={`${user.totalMember} members`}
@@ -129,6 +133,8 @@ const ChannelResult = () => {
         return (
           <ResultItem
             key={user.id}
+            id={user.id}
+            type="channel"
             title={user.name}
             imageUrl={user.imageUrl ?? undefined}
             description={`${user.totalSubscribers} subscribers`}
@@ -140,16 +146,20 @@ const ChannelResult = () => {
 }
 
 const ResultItem = ({
+  id,
   title,
+  type,
   imageUrl,
   description,
 }: {
+  id: string
   title: string
+  type: RoomType
   imageUrl?: string
   description?: string
 }) => {
   return (
-    <Link href="/chat/123">
+    <Link href={`/${type}/${id}`}>
       <li className="flex items-center gap-x-3 rounded-lg p-1.5 px-3 hover:bg-grey-4">
         <ChatAvatar className="size-10" src={imageUrl} />
 

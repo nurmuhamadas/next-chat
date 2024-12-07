@@ -1,10 +1,9 @@
 "use client"
 
-import { ReactNode, useState } from "react"
+import { ReactNode } from "react"
 
 import {
   AtSignIcon,
-  BellIcon,
   InfoIcon,
   LogOutIcon,
   LucideIcon,
@@ -20,16 +19,21 @@ import { toast } from "sonner"
 import RightPanelWrapper from "@/components/right-panel-wrapper"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Switch } from "@/components/ui/switch"
+import { Skeleton } from "@/components/ui/skeleton"
+import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
+import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
 import { useEditChannelPanel } from "@/features/group/hooks/use-edit-channel-panel"
 import { useEditGroupPanel } from "@/features/group/hooks/use-edit-group-panel"
+import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import useWindowSize from "@/hooks/use-window-size"
-import { cn } from "@/lib/utils"
+import { cn, mergeName } from "@/lib/utils"
 
 import ChatAvatar from "../../../components/chat-avatar"
 import { useRoomProfile } from "../hooks/use-room-profile"
+
+import RoomProfileOptions from "./room-profile-options"
 
 const RoomProfilePanel = () => {
   const { isDesktop } = useWindowSize()
@@ -103,7 +107,19 @@ const RoomProfilePanel = () => {
 
 const ProfileView = () => {
   const type = useRoomType()
-  const [isNotifActive, setIsNotifActive] = useState(true)
+  const id = useRoomId()
+
+  const { data: user, isLoading: userLoading } = useGetUserProfileById({
+    id: type === "chat" ? id : undefined,
+  })
+  const { data: group, isLoading: groupLoading } = useGetGroupById({
+    id: type === "group" ? id : undefined,
+  })
+  const { data: channel, isLoading: channelLoading } = useGetChannelById({
+    id: type === "channel" ? id : undefined,
+  })
+  const isLoading = userLoading || groupLoading || channelLoading
+  const isNoData = !isLoading && !group && !channel && !user
 
   const infoList: Record<
     RoomType,
@@ -117,57 +133,76 @@ const ProfileView = () => {
     chat: [
       {
         label: "Bio",
-        value: "Lorem ipsum dolor sit amet conskadkan aksdjn ajkd sda akdmal",
-        copyText:
-          "Lorem ipsum dolor sit amet conskadkan aksdjn ajkd sda akdmal",
+        value: user?.bio,
+        copyText: user?.bio ?? "",
         icon: InfoIcon,
       },
       {
         label: "Username",
         value: (
           <div className="flex gap-x-2">
-            <span className="truncate">@nurmuhamadas</span>
-            <span className="text-grey-2">(He/Him)</span>
+            <span className="truncate">@{user?.username}</span>
+            <span className="text-grey-2">
+              {user?.gender === "MALE" ? "(He/Him)" : "(She/Her)"}
+            </span>
           </div>
         ),
-        copyText: "nurmuhamadas",
+        copyText: user?.username ?? "",
         icon: AtSignIcon,
       },
       {
         label: "Email",
-        value: `nurmuhamad@mail.com`,
-        copyText: "nurmuhamad@mail.com",
+        value: user?.email,
+        copyText: user?.email ?? "",
         icon: MailIcon,
       },
     ],
     channel: [
       {
         label: "Description",
-        value: `Lorem ipsum dolor sit amet conskadkan aksdjn ajkd sda akdmal `,
-        copyText: `Lorem ipsum dolor sit amet conskadkan aksdjn ajkd sda akdmal `,
+        value: channel?.description,
+        copyText: channel?.description ?? "",
         icon: InfoIcon,
       },
       {
         label: "Link",
-        value: `t.me/akdakd2ok33mdo`,
-        copyText: `t.me/akdakd2ok33mdo`,
+        value: `${process.env.NEXT_PUBLIC_APP_URL}/channel/${channel?.id}`,
+        copyText: `${process.env.NEXT_PUBLIC_APP_URL}/channel/${channel?.id}`,
         icon: PaperclipIcon,
       },
     ],
     group: [
       {
         label: "Description",
-        value: `Lorem ipsum dolor sit amet conskadkan aksdjn ajkd sda akdmal `,
-        copyText: `Lorem ipsum dolor sit amet conskadkan aksdjn ajkd sda akdmal `,
+        value: group?.description,
+        copyText: group?.description ?? "",
         icon: InfoIcon,
       },
       {
         label: "Link",
-        value: `t.me/akdakd2ok33mdo`,
-        copyText: `t.me/akdakd2ok33mdo`,
+        value: `${process.env.NEXT_PUBLIC_APP_URL}/group/${group?.id}`,
+        copyText: `${process.env.NEXT_PUBLIC_APP_URL}/group/${group?.id}`,
         icon: PaperclipIcon,
       },
     ],
+  }
+
+  const name = {
+    chat: user
+      ? mergeName(user?.firstName, user?.lastName ?? undefined)
+      : undefined,
+    group: group ? group?.name : undefined,
+    channel: channel ? channel?.name : undefined,
+  }
+  const info = {
+    chat: undefined,
+    group: group ? `${group?.totalMembers} members` : undefined,
+    channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
+  }
+  const avatar = {
+    chat: user ? (user?.imageUrl ?? "") : undefined,
+    group: group ? (group?.imageUrl ?? "") : undefined,
+    channel: channel ? (channel?.imageUrl ?? "") : undefined,
   }
 
   const handleCopy = (text: string) => {
@@ -175,106 +210,106 @@ const ProfileView = () => {
       toast.success("Copied to clipboard")
     })
   }
+
   return (
     <>
       <div className="relative h-[100vw] max-h-[420] w-screen max-w-[420] lg:max-h-[384px] lg:max-w-[384px]">
-        <ChatAvatar
-          className="size-full rounded-none"
-          fallbackClassName="rounded-none !text-[72px]"
-        />
+        {!isLoading ? (
+          <ChatAvatar
+            className="size-full rounded-none"
+            fallbackClassName="rounded-none !text-[72px]"
+            src={avatar[type]}
+            name={name[type]}
+          />
+        ) : (
+          <Skeleton className="size-full" />
+        )}
         <div className="absolute bottom-0 left-0 flex w-full flex-col bg-gradient-to-t from-black/25 to-black/0 p-4 text-white">
-          <p className="subtitle-2">
-            {type === "chat" && "User Name"}
-            {type === "group" && "Group Name"}
-            {type === "channel" && "Channel Name"}
-          </p>
-          <p className="opacity-75 caption">
-            {type === "chat" && "Last seen at 17:00"}
-            {type === "group" && "2 members"}
-            {type === "channel" && "2 subscribers"}
-          </p>
+          {!isLoading && (
+            <>
+              <p className="subtitle-2">{name[type]}</p>
+              <p className="opacity-75 caption">{info[type]}</p>
+            </>
+          )}
         </div>
       </div>
+      {!isNoData && (
+        <ul className="flex flex-col p-2">
+          {infoList[type].map((info) => {
+            const Icon = info.icon
 
-      <ul className="flex flex-col p-2">
-        {infoList[type].map((info) => {
-          const Icon = info.icon
-
-          return (
-            <li key={info.label} className="">
-              <button
-                className="flex w-full items-center gap-x-5 rounded px-1.5 py-3 hover:bg-grey-4 focus:outline-none"
-                onClick={() => handleCopy(info.copyText)}
-              >
-                <Icon className="size-5 shrink-0 text-grey-3" />
-                <div className="flex flex-1 flex-col overflow-hidden text-left">
-                  <div
-                    className={cn(
-                      "subtitle-2",
-                      info.label !== "Bio" &&
-                        info.label !== "Description" &&
-                        "truncate",
+            return (
+              <li key={info.label} className="">
+                <button
+                  className="flex w-full items-center gap-x-5 rounded px-1.5 py-3 hover:bg-grey-4 focus:outline-none"
+                  onClick={() => handleCopy(info.copyText)}
+                >
+                  <Icon className="size-5 shrink-0 text-grey-3" />
+                  <div className="flex flex-1 flex-col overflow-hidden text-left">
+                    {isLoading ? (
+                      <>
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="mt-1 h-4 w-1/2" />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className={cn(
+                            "subtitle-2",
+                            info.label !== "Bio" &&
+                              info.label !== "Description" &&
+                              "truncate",
+                          )}
+                        >
+                          {info.value}
+                        </div>
+                        <p className="text-grey-2 caption">{info.label}</p>
+                      </>
                     )}
-                  >
-                    {info.value}
                   </div>
-                  <p className="text-grey-2 caption">{info.label}</p>
-                </div>
-              </button>
-            </li>
-          )
-        })}
+                </button>
+              </li>
+            )
+          })}
 
-        <li>
-          <div
-            className="flex w-full items-center gap-x-5 rounded px-1.5 py-5 hover:bg-grey-4 focus:outline-none"
-            onClick={() => setIsNotifActive(!isNotifActive)}
-          >
-            <BellIcon className="size-5 text-grey-3" />
-            <div className="flex-1 flex-center-between">
-              <p className="subtitle-2">Notifications</p>
+          <RoomProfileOptions />
+        </ul>
+      )}
 
-              <Switch
-                checked={isNotifActive}
-                onCheckedChange={setIsNotifActive}
-              />
-            </div>
-          </div>
-        </li>
-      </ul>
-
-      <div className="flex-wrap gap-x-2.5 py-8 flex-center">
-        {type === "chat" && (
-          <>
-            <Button variant="outline">
-              <UserXIcon className="size-4" />
-              Block user
-            </Button>
-            <Button
-              variant="outline"
-              className="border-error text-error hover:text-error"
-            >
-              <TrashIcon className="size-4" />
-              Delete chat
-            </Button>
-          </>
-        )}
-        {type === "group" && (
-          <>
-            <Button variant="outline">
-              <LogOutIcon className="size-4" />
-              Leave group
-            </Button>
-            <Button
-              variant="outline"
-              className="border-error text-error hover:text-error"
-            >
-              <TrashIcon className="size-4" />
-              Delete and exit
-            </Button>
-          </>
-        )}
-      </div>
+      {!isLoading && !isNoData && (
+        <div className="flex-wrap gap-x-2.5 py-8 flex-center">
+          {type === "chat" && (
+            <>
+              <Button variant="outline">
+                <UserXIcon className="size-4" />
+                Block user
+              </Button>
+              <Button
+                variant="outline"
+                className="border-error text-error hover:text-error"
+              >
+                <TrashIcon className="size-4" />
+                Delete chat
+              </Button>
+            </>
+          )}
+          {type === "group" && (
+            <>
+              <Button variant="outline">
+                <LogOutIcon className="size-4" />
+                Leave group
+              </Button>
+              <Button
+                variant="outline"
+                className="border-error text-error hover:text-error"
+              >
+                <TrashIcon className="size-4" />
+                Delete and exit
+              </Button>
+            </>
+          )}
+        </div>
+      )}
     </>
   )
 }

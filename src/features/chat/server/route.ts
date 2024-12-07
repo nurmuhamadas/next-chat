@@ -34,8 +34,9 @@ import {
   getConversationByUserIds,
   getConversations,
   getLastConversationOpt,
+  updateConversationOption,
 } from "../lib/queries"
-import { conversationSchema } from "../schema"
+import { conversationSchema, updateConversationSchema } from "../schema"
 
 import {
   mapChannelModelToConversation,
@@ -253,6 +254,87 @@ const conversationApp = new Hono()
         const response: DeleteConversationResponse = successResponse({
           id: conversationId,
         })
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:conversationId/options",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { conversationId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const conversation = await getConversationById(databases, {
+          conversationId,
+        })
+        if (!conversation) {
+          return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
+        }
+
+        const lastConversationOpt = await getLastConversationOpt(databases, {
+          conversationId,
+          userId: currentProfile.$id,
+        })
+        if (!lastConversationOpt || !!lastConversationOpt.deletedAt) {
+          return c.json(createError(ERROR.CONVERSATION_ALREADY_DELETED), 400)
+        }
+
+        const response: GetConversationOptResponse =
+          successResponse(lastConversationOpt)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .patch(
+    "/:conversationId/options",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("json", updateConversationSchema, zodErrorHandler),
+    async (c) => {
+      try {
+        const { conversationId } = c.req.param()
+        const { notification } = c.req.valid("json")
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const conversation = await getConversationById(databases, {
+          conversationId,
+        })
+        if (!conversation) {
+          return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
+        }
+
+        const lastConversationOpt = await getLastConversationOpt(databases, {
+          conversationId,
+          userId: currentProfile.$id,
+        })
+        if (!lastConversationOpt || !!lastConversationOpt.deletedAt) {
+          return c.json(createError(ERROR.CONVERSATION_ALREADY_DELETED), 400)
+        }
+
+        if (lastConversationOpt.userId !== currentProfile.$id) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 403)
+        }
+
+        const result = await updateConversationOption(
+          databases,
+          lastConversationOpt.$id,
+          {
+            notification,
+          },
+        )
+
+        const response: GetConversationOptResponse = successResponse(result)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

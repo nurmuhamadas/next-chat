@@ -131,6 +131,8 @@ declare type CreateConversationResponse = ApiResponse<Conversation>
 
 declare type DeleteConversationResponse = ApiResponse<{ id: string }>
 
+declare type GetConversationOptResponse = ApiResponse<ConversationOption>
+
 // MESSAGE API
 declare type CreateMessageResponse = ApiResponse<Message>
 

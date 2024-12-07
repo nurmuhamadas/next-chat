@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 
 interface ChatAvatarProps {
   src?: string
+  name?: string
   className?: string
   fallbackClassName?: string
   onClick?(): void
@@ -10,6 +11,7 @@ interface ChatAvatarProps {
 
 const ChatAvatar = ({
   src,
+  name,
   className,
   fallbackClassName,
   onClick,
@@ -18,7 +20,7 @@ const ChatAvatar = ({
     <Avatar className={cn("", className)} onClick={onClick}>
       <AvatarImage src={src} />
       <AvatarFallback className={cn("bg-info h4", fallbackClassName)}>
-        N
+        {name?.charAt(0)?.toUpperCase()}
       </AvatarFallback>
     </Avatar>
   )
