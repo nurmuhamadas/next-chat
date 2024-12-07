@@ -33,7 +33,10 @@ const ChatListPanel = () => {
             <Button
               variant="icon"
               size="icon-sm"
-              onClick={() => setIsSearching(false)}
+              onClick={() => {
+                setIsSearching(false)
+                setSearchQuery("")
+              }}
             >
               <XIcon />
             </Button>

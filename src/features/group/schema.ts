@@ -9,6 +9,7 @@ export const groupSchema = z.object({
   name: z
     .string({ required_error: ERROR.GROUP_NAME_REQUIRED })
     .trim()
+    .min(1, ERROR.GROUP_NAME_REQUIRED)
     .min(3, ERROR.GROUP_NAME_TOO_SHORT)
     .max(256, ERROR.GROUP_NAME_TOO_LONG),
   description: z
@@ -22,14 +23,7 @@ export const groupSchema = z.object({
   }),
   memberIds: z
     .string({ description: "string of memberId separated with comma" })
-    .optional()
-    .default("")
-    .transform((str) => {
-      if (!str) return []
-
-      const memberIds = str.split(",").map((v) => v.trim())
-      return memberIds
-    }),
+    .optional(),
   image: imageProfileSchema,
 })
 

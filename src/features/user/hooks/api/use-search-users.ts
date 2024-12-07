@@ -27,7 +27,11 @@ const useSearchUsers = ({
     },
   })
 
-  return { ...query, data: query.data?.data ?? [], total: query.data?.total }
+  return {
+    ...query,
+    data: query.data?.data ?? [],
+    total: query.data?.total ?? 0,
+  }
 }
 
 export default useSearchUsers

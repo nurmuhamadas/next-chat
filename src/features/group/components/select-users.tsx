@@ -3,6 +3,7 @@ import { useState } from "react"
 import { ChevronDownIcon, XIcon } from "lucide-react"
 
 import ChatAvatar from "@/components/chat-avatar"
+import Loading from "@/components/loader"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -12,49 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-const users = [
-  {
-    id: "1",
-    name: "User 1",
-  },
-  {
-    id: "2",
-    name: "User 2",
-  },
-  {
-    id: "3",
-    name: "User 3",
-  },
-  {
-    id: "4",
-    name: "User 4",
-  },
-  {
-    id: "5",
-    name: "User 5",
-  },
-  {
-    id: "6",
-    name: "User 6",
-  },
-  {
-    id: "7",
-    name: "User 7",
-  },
-  {
-    id: "8",
-    name: "User 8",
-  },
-  {
-    id: "9",
-    name: "User 9",
-  },
-  {
-    id: "10",
-    name: "User 10",
-  },
-]
+import useSearchUsers from "@/features/user/hooks/api/use-search-users"
 
 interface SelectUsersProps {
   selectedIds: string[]
@@ -66,6 +25,12 @@ const SelectUsers = ({
   onValuesChange,
 }: SelectUsersProps) => {
   const [isOpen, setIsOpen] = useState(false)
+
+  const {
+    data: users,
+    total,
+    isLoading,
+  } = useSearchUsers({ queryKey: "", limit: "0" })
 
   const selectedUsers = users.filter((v) => selectedIds.includes(v.id))
 
@@ -94,25 +59,39 @@ const SelectUsers = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="max-h-[268px] w-screen max-w-[351px] overflow-y-auto">
-          {users.map(({ id, name }) => {
-            return (
-              <DropdownMenuItem
-                key={id}
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleChange(id)
-                }}
-                className="cursor-pointer"
-              >
-                <ChatAvatar />
-                <div className="flex flex-1 flex-col">
-                  <p className="line-clamp-1 subtitle-2">{name}</p>
-                  <p className="text-muted-foreground caption">Last seen at</p>
-                </div>
-                <Checkbox checked={selectedIds.includes(id)} />
-              </DropdownMenuItem>
-            )
-          })}
+          {isLoading && (
+            <div className="min-h-48 flex-center">
+              <Loading />
+            </div>
+          )}
+          {!isLoading && total === 0 && (
+            <div className="min-h-48 flex-center">
+              <p className="text-muted-foreground">No user found</p>
+            </div>
+          )}
+          {!isLoading &&
+            total > 0 &&
+            users.map(({ id, name, lastSeenAt, imageUrl }) => {
+              return (
+                <DropdownMenuItem
+                  key={id}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleChange(id)
+                  }}
+                  className="cursor-pointer"
+                >
+                  <ChatAvatar src={imageUrl ?? ""} />
+                  <div className="flex flex-1 flex-col">
+                    <p className="line-clamp-1 subtitle-2">{name}</p>
+                    <p className="text-muted-foreground caption">
+                      {lastSeenAt}
+                    </p>
+                  </div>
+                  <Checkbox checked={selectedIds.includes(id)} />
+                </DropdownMenuItem>
+              )
+            })}
         </DropdownMenuContent>
       </DropdownMenu>
       <div className="flex flex-wrap gap-2">

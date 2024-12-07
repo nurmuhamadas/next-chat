@@ -1,9 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+import { ChangeEventHandler, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon } from "lucide-react"
+import { CameraIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -32,21 +32,47 @@ import { groupSchema } from "../schema"
 
 import SelectUsers from "./select-users"
 
-const GroupForm = () => {
+interface GroupFormProps {
+  buttonLabel?: string
+  isLoading?: boolean
+  initialImageUrl?: string
+  initialValues?: z.infer<typeof groupSchema>
+  onSubmit(values: z.infer<typeof groupSchema>): void
+}
+
+const GroupForm = ({
+  buttonLabel = "Create Group",
+  isLoading = false,
+  initialValues,
+  initialImageUrl = "",
+  onSubmit,
+}: GroupFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const [imagePreview, setImagePreview] = useState(initialImageUrl)
 
   const form = useForm<z.infer<typeof groupSchema>>({
     resolver: zodResolver(groupSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      type: "PUBLIC",
-      memberIds: [],
+      name: initialValues?.name ?? "",
+      description: initialValues?.description ?? "",
+      type: initialValues?.type ?? "PUBLIC",
+      memberIds: undefined,
     },
   })
 
   const submitForm = (values: z.infer<typeof groupSchema>) => {
-    console.log(values)
+    if (!values.image) delete values.image
+
+    onSubmit(values)
+  }
+
+  const handleImageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const image = e.target.files?.[0]
+    if (image) {
+      setImagePreview(URL.createObjectURL(image))
+      form.setValue("image", image)
+    }
   }
 
   return (
@@ -56,18 +82,34 @@ const GroupForm = () => {
         className="w-full space-y-5"
       >
         <div className="flex justify-center">
-          <input type="file" hidden ref={inputRef} className="hidden" />
+          <input
+            type="file"
+            hidden
+            ref={inputRef}
+            accept="image/png,image/jpg,image/jpeg,image/webp"
+            className="hidden"
+            onChange={handleImageChange}
+          />
 
-          <Avatar
-            className="relative size-[100px] cursor-pointer"
-            onClick={() => inputRef.current?.click()}
-          >
-            <AvatarImage src="" />
-            <AvatarFallback className="h1"></AvatarFallback>
-            <div className="absolute size-full bg-grey-3/50 flex-center">
-              <CameraIcon className="size-10 text-white" />
-            </div>
-          </Avatar>
+          <FormField
+            control={form.control}
+            name="image"
+            render={() => (
+              <div className="gap-y-1 flex-col-center">
+                <Avatar
+                  className="relative size-[100px] cursor-pointer"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <AvatarImage src={imagePreview} />
+                  <AvatarFallback className="h1"></AvatarFallback>
+                  <div className="absolute size-full bg-grey-3/50 flex-center">
+                    <CameraIcon className="size-10 text-white" />
+                  </div>
+                </Avatar>
+                <FormMessage />
+              </div>
+            )}
+          />
         </div>
         <FormField
           control={form.control}
@@ -138,23 +180,33 @@ const GroupForm = () => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="memberIds"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Members</FormLabel>
-              <SelectUsers
-                selectedIds={field.value}
-                onValuesChange={(ids) => form.setValue("memberIds", ids)}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!initialValues && (
+          <FormField
+            control={form.control}
+            name="memberIds"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Members</FormLabel>
+                <SelectUsers
+                  selectedIds={field.value ? field.value.split(",") : []}
+                  onValuesChange={(ids) =>
+                    form.setValue("memberIds", ids.join(","))
+                  }
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <div className="pt-4">
-          <Button type="submit" size="xl" className=" w-full">
-            Create Group
+          <Button
+            type="submit"
+            size="xl"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading && <LoaderIcon className="size-6 animate-spin" />}
+            {buttonLabel}
           </Button>
         </div>
       </form>

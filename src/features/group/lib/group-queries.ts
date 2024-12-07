@@ -2,7 +2,6 @@ import "server-only"
 
 import { StatusCode } from "hono/utils/http-status"
 import { Databases, ID, Query } from "node-appwrite"
-import { z } from "zod"
 
 import { ERROR } from "@/constants/error"
 import { getBlockedUsers } from "@/features/blocked-users/lib/queries"
@@ -13,8 +12,6 @@ import {
   DATABASE_ID,
 } from "@/lib/appwrite/config"
 import { generateInviteCode } from "@/lib/utils"
-
-import { groupSchema } from "../schema"
 
 import { getGroupMembersByUserId } from "./group-member-queries"
 import { mapUserModelToGroupOwner } from "./utils"
@@ -65,7 +62,7 @@ export const createGroup = async (
 export const validateGroupData = async (
   databases: Databases,
   userId: string,
-  data: z.infer<typeof groupSchema>,
+  data: { memberIds: string[] },
 ): Promise<
   | undefined
   | {
@@ -74,16 +71,16 @@ export const validateGroupData = async (
       code: StatusCode
     }
 > => {
-  const { name, memberIds } = data
+  const { memberIds } = data
 
-  // USER SHOULD NOT CREATE TWO OR MORE GROUPS WITH SAME NAME
-  const isNameAvailable = await checkGroupNameAvailablity(databases, {
-    userId,
-    name,
-  })
-  if (!isNameAvailable) {
-    return { error: ERROR.GROUP_NAME_DUPLICATED, code: 400 }
-  }
+  // // USER SHOULD NOT CREATE TWO OR MORE GROUPS WITH SAME NAME
+  // const isNameAvailable = await checkGroupNameAvailablity(databases, {
+  //   userId,
+  //   name,
+  // })
+  // if (!isNameAvailable) {
+  //   return { error: ERROR.GROUP_NAME_DUPLICATED, code: 400 }
+  // }
 
   // USER SHOULD ADD REGISTERED USER ONLY
   const validUsers = await getUsers(databases, {

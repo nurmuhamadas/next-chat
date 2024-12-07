@@ -99,8 +99,15 @@ const groupApp = new Hono()
     zValidator("form", groupSchema, zodErrorHandler),
     async (c) => {
       try {
-        const { name, image, type, memberIds, description } =
-          c.req.valid("form")
+        const {
+          name,
+          image,
+          type,
+          memberIds: memberIdsStr,
+          description,
+        } = c.req.valid("form")
+        const memberIds = memberIdsStr ? memberIdsStr.split(",") : []
+
         const imageFile = image as unknown as File
 
         const databases = c.get("databases")
@@ -108,9 +115,6 @@ const groupApp = new Hono()
         const currentProfile = c.get("userProfile")
 
         const invalid = await validateGroupData(databases, currentProfile.$id, {
-          name,
-          description,
-          type,
           memberIds,
         })
         if (invalid) {

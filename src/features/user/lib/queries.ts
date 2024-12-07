@@ -72,10 +72,13 @@ export const searchUser = async (
   }: { query?: string; limit: number; offset: number; userId: string },
 ) => {
   const queries = [
-    Query.limit(limit),
     Query.offset(offset),
     Query.select(["$id", "firstName", "lastName", "imageUrl", "lastSeenAt"]),
   ]
+
+  if (limit > 0) {
+    queries.push(Query.limit(limit))
+  }
 
   if (query) {
     queries.push(
