@@ -127,6 +127,8 @@ declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
 /** Include groups and channels chat */
 declare type GetConversationListResponse = ApiCollectionResponse<Conversation>
 
+declare type GetConversationResponse = ApiResponse<Conversation | null>
+
 declare type CreateConversationResponse = ApiResponse<Conversation>
 
 declare type DeleteConversationResponse = ApiResponse<{ id: string }>

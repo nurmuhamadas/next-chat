@@ -24,7 +24,11 @@ const ChatListItem = ({
           selected && "bg-primary text-white hover:bg-primary",
         )}
       >
-        <ChatAvatar className="size-[54px]" src={data.imageUrl ?? ""} />
+        <ChatAvatar
+          className="size-[54px]"
+          src={data.imageUrl ?? ""}
+          name={data.name}
+        />
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex items-center gap-x-3">

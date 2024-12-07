@@ -124,7 +124,9 @@ const conversationApp = new Hono()
         ...conversationList,
         ...channelList,
       ].sort((a, b) => {
-        if (!a.lastMessage && !b.lastMessage) return 0
+        if (!a.lastMessage && !b.lastMessage) {
+          return b.id.localeCompare(a.id)
+        }
         if (!a.lastMessage) return 1
         if (!b.lastMessage) return -1
 
@@ -215,6 +217,49 @@ const conversationApp = new Hono()
 
         const response: CreateConversationResponse =
           successResponse(conversation)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/user/:userId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { userId } = c.req.param()
+
+        const databases = c.get("databases")
+        const currentProfile = c.get("userProfile")
+
+        const result = await getConversationByUserIds(databases, {
+          userId1: currentProfile.$id,
+          userId2: userId,
+        })
+        if (!result) {
+          const response: GetConversationResponse = successResponse(null)
+          return c.json(response)
+        }
+
+        const userPairId =
+          result.userId1 === currentProfile.$id
+            ? result.userId2
+            : result.userId1
+        const userPair = await getUserProfileById(databases, {
+          userId: userPairId,
+        })
+        if (!userPair) {
+          return c.json(createError(ERROR.USER_NOT_FOUND), 404)
+        }
+
+        const conversation: Conversation = mapConvsModelToConversation(
+          result,
+          userPair,
+        )
+
+        const response: GetConversationResponse = successResponse(conversation)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
