@@ -33,7 +33,7 @@ import { channelSchema } from "../schema"
 interface ChannelFormProps {
   isLoading?: boolean
   initialImageUrl?: string
-  initialValues?: z.infer<typeof channelSchema>
+  initialValues?: Partial<z.infer<typeof channelSchema>>
   onSubmit(values: z.infer<typeof channelSchema>): void
 }
 

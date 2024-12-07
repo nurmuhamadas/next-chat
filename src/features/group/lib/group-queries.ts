@@ -61,6 +61,19 @@ export const createGroup = async (
   )
 }
 
+export const updateGroup = async (
+  databases: Databases,
+  id: string,
+  formData: Partial<GroupModel>,
+) => {
+  return await databases.updateDocument<GroupAWModel>(
+    DATABASE_ID,
+    APPWRITE_GROUPS_ID,
+    id,
+    formData,
+  )
+}
+
 export const validateGroupData = async (
   databases: Databases,
   userId: string,

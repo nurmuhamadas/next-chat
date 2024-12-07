@@ -60,6 +60,29 @@ export const validateChannelSubs = async (
   return result.total > 0
 }
 
+export const getChannelSub = async (
+  databases: Databases,
+  { userId, channelId }: { userId: string; channelId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<ChannelSubscriberAWModel>(
+      DATABASE_ID,
+      APPWRITE_CHANNEL_SUBSCRIBERS_ID,
+      [
+        Query.equal("userId", userId),
+        Query.equal("channelId", channelId),
+        Query.isNull("unsubscribedAt"),
+      ],
+    )
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
 export const getChannelSubs = async (
   databases: Databases,
   { channelId }: { channelId: string },

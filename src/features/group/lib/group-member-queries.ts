@@ -62,6 +62,30 @@ export const validateGroupMember = async (
   return result.total > 0
 }
 
+export const getGroupMember = async (
+  databases: Databases,
+  { userId, groupId }: { userId: string; groupId: string },
+) => {
+  try {
+    const result = await databases.listDocuments<GroupMemberAWModel>(
+      DATABASE_ID,
+      APPWRITE_GROUP_MEMBERS_ID,
+      [
+        Query.equal("userId", userId),
+        Query.equal("groupId", groupId),
+        Query.isNull("leftAt"),
+      ],
+    )
+    console.log(result, userId, groupId)
+
+    if (result.total === 0) return null
+
+    return result.documents[0]
+  } catch {
+    return null
+  }
+}
+
 export const getGroupMembers = async (
   databases: Databases,
   { groupId }: { groupId: string },

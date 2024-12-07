@@ -21,8 +21,10 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
+import useGetIsChannelAdmin from "@/features/channel/hooks/api/use-get-is-channel-admin"
+import { useEditChannelPanel } from "@/features/channel/hooks/use-edit-channel-panel"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
-import { useEditChannelPanel } from "@/features/group/hooks/use-edit-channel-panel"
+import useGetIsGroupAdmin from "@/features/group/hooks/api/use-get-is-group-admin"
 import { useEditGroupPanel } from "@/features/group/hooks/use-edit-group-panel"
 import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
@@ -41,6 +43,14 @@ const RoomProfilePanel = () => {
   const type = useRoomType()
   const id = useRoomId()
 
+  const { data: isGroupAdmin } = useGetIsGroupAdmin({
+    id: type === "group" ? id : undefined,
+  })
+  const { data: isChannelAdmin } = useGetIsChannelAdmin({
+    id: type === "channel" ? id : undefined,
+  })
+  const isAdmin = isGroupAdmin || isChannelAdmin
+
   const { openEditGroup } = useEditGroupPanel()
   const { openEditChannel } = useEditChannelPanel()
 
@@ -49,6 +59,8 @@ const RoomProfilePanel = () => {
   const isOpen = roomProfileOpen
 
   const handleEdit = () => {
+    if (!isAdmin) return
+
     if (type === "group") {
       openEditGroup(id)
     } else if (type === "channel") {
@@ -71,7 +83,7 @@ const RoomProfilePanel = () => {
         title={title}
         isOpen={roomProfileOpen}
         onBack={closeRoomProfile}
-        action={action}
+        action={isAdmin ? action : undefined}
       >
         <ProfileView />
       </RightPanelWrapper>
@@ -94,7 +106,7 @@ const RoomProfilePanel = () => {
             <h3 className="line-clamp-1 h3">{title}</h3>
           </div>
 
-          <div className="gap-x-1 flex-center-end">{action}</div>
+          {isAdmin && <div className="gap-x-1 flex-center-end">{action}</div>}
         </div>
 
         <ScrollArea className="chat-list-scroll-area">

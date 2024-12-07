@@ -8,7 +8,7 @@ import { ERROR } from "@/constants/error"
 import { getBlockedUser } from "@/features/blocked-users/lib/queries"
 import { getLastMessageByGroupIds } from "@/features/messages/lib/queries"
 import { getUserProfileById } from "@/features/user/lib/queries"
-import { constructFileUrl } from "@/lib/appwrite"
+import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteFile, uploadFile } from "@/lib/upload-file"
 import {
@@ -23,6 +23,7 @@ import {
   createGroupMember,
   deleteAllGroupMembers,
   getCurrentGroupMember,
+  getGroupMember,
   getGroupMembers,
   getTotalGroupMembers,
   leaveGroup,
@@ -44,6 +45,7 @@ import {
   getGroupOwnersByUserIds,
   getGroupsByUserId,
   searchGroup,
+  updateGroup,
   validateGroupData,
   validateJoinCode,
 } from "../lib/group-queries"
@@ -262,6 +264,115 @@ const groupApp = new Hono()
       return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
     }
   })
+  .patch(
+    "/:groupId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("form", groupSchema.partial(), zodErrorHandler),
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const { name, image, type, description } = c.req.valid("form")
+
+        const imageFile = image as unknown as File
+
+        const databases = c.get("databases")
+        const storage = c.get("storage")
+        const currentProfile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateGroupAdmin(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.ONLY_ADMIN_ADD_MEMBER), 403)
+        }
+
+        let imageUrl: string | undefined
+        let fileId: string | undefined
+        if (imageFile) {
+          const file = await uploadFile(storage, { file: imageFile })
+          fileId = file.$id
+          imageUrl = constructFileUrl(file.$id)
+        }
+
+        try {
+          const updatedGroup = await updateGroup(databases, groupId, {
+            name,
+            description,
+            type,
+            imageUrl,
+          })
+
+          const totalMembers = await getTotalGroupMembers(databases, {
+            groupId,
+          })
+
+          const groupResult = mapGroupModelToGroup(
+            updatedGroup,
+            mapUserModelToGroupOwner(currentProfile),
+            totalMembers,
+          )
+
+          // DELETE OLD IMAGE IF NEW IMAGE UPLOADED
+          if (fileId && group.imageUrl) {
+            const oldFileId = destructFileId(group.imageUrl)
+            await deleteFile(storage, { id: oldFileId })
+          }
+
+          const response: PatchGroupResponse = successResponse(groupResult)
+          return c.json(response)
+        } catch (e) {
+          console.log(e)
+          if (fileId) {
+            await deleteFile(storage, { id: fileId })
+          }
+          return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+        }
+      } catch (e) {
+        console.log(e)
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:groupId/is-admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const profile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const member = await getGroupMember(databases, {
+          userId: profile.$id,
+          groupId,
+        })
+
+        const response = successResponse<boolean>(member?.isAdmin ?? false)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
   .get(
     "/:groupId/members",
     sessionMiddleware,

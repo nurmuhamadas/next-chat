@@ -5,7 +5,7 @@ import { searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
 import { getLastMessageByChannelIds } from "@/features/messages/lib/queries"
 import { getUserProfileById } from "@/features/user/lib/queries"
-import { constructFileUrl } from "@/lib/appwrite"
+import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteFile, uploadFile } from "@/lib/upload-file"
 import {
@@ -30,11 +30,13 @@ import {
   getChannelOwnersByUserIds,
   getChannelsByUserId,
   searchChannels,
+  updateChannel,
   validateJoinCode,
 } from "../lib/channel-queries"
 import {
   createChannelSubscriber,
   deleteAllChannelSubs,
+  getChannelSub,
   getChannelSubs,
   getCurrentChannelSubs,
   getTotalChannelSubscribers,
@@ -234,6 +236,113 @@ const channelApp = new Hono()
         )
 
         const response: GetChannelResponse = successResponse(mappedChannels)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .patch(
+    "/:channelId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("form", channelSchema.partial(), zodErrorHandler),
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const { name, image, type, description } = c.req.valid("form")
+
+        const imageFile = image as unknown as File
+
+        const databases = c.get("databases")
+        const storage = c.get("storage")
+        const currentProfile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const isAdmin = await validateChannelAdmin(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
+        if (!isAdmin) {
+          return c.json(createError(ERROR.NOT_ALLOWED), 403)
+        }
+
+        let imageUrl: string | undefined
+        let fileId: string | undefined
+        if (imageFile) {
+          const file = await uploadFile(storage, { file: imageFile })
+          fileId = file.$id
+          imageUrl = constructFileUrl(file.$id)
+        }
+
+        try {
+          const updatedChannel = await updateChannel(databases, channelId, {
+            name,
+            description,
+            type,
+            imageUrl,
+          })
+
+          const totalMembers = await getTotalChannelSubscribers(databases, {
+            channelId,
+          })
+
+          const channelResult = mapChannelModelToChannel(
+            updatedChannel,
+            mapUserModelToChannelOwner(currentProfile),
+            totalMembers,
+          )
+
+          // DELETE OLD IMAGE IF NEW IMAGE UPLOADED
+          if (fileId && channel.imageUrl) {
+            const oldFileId = destructFileId(channel.imageUrl)
+            await deleteFile(storage, { id: oldFileId })
+          }
+
+          const response: PatchChannelResponse = successResponse(channelResult)
+          return c.json(response)
+        } catch {
+          if (fileId) {
+            await deleteFile(storage, { id: fileId })
+          }
+          return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+        }
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:channelId/is-admin",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const profile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const sub = await getChannelSub(databases, {
+          userId: profile.$id,
+          channelId,
+        })
+
+        const response = successResponse<boolean>(sub?.isAdmin ?? false)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

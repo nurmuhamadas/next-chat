@@ -56,6 +56,19 @@ export const createChannel = async (
   )
 }
 
+export const updateChannel = async (
+  databases: Databases,
+  id: string,
+  formData: Partial<ChannelModel>,
+) => {
+  return await databases.updateDocument<ChannelAWModel>(
+    DATABASE_ID,
+    APPWRITE_CHANNELS_ID,
+    id,
+    formData,
+  )
+}
+
 export const getChannelsByUserId = async (
   databases: Databases,
   { userId }: { userId: string },

@@ -35,7 +35,7 @@ import SelectUsers from "./select-users"
 interface GroupFormProps {
   isLoading?: boolean
   initialImageUrl?: string
-  initialValues?: z.infer<typeof groupSchema>
+  initialValues?: Partial<z.infer<typeof groupSchema>>
   onSubmit(values: z.infer<typeof groupSchema>): void
 }
 
