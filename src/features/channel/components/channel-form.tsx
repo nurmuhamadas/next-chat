@@ -1,9 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+import { ChangeEventHandler, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon } from "lucide-react"
+import { CameraIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -31,23 +31,43 @@ import { CHANNEL_TYPE_OPT } from "../constants"
 import { channelSchema } from "../schema"
 
 interface ChannelFormProps {
-  buttonLabel?: string
+  isLoading?: boolean
+  initialImageUrl?: string
+  initialValues?: z.infer<typeof channelSchema>
+  onSubmit(values: z.infer<typeof channelSchema>): void
 }
 
-const ChannelForm = ({}: ChannelFormProps) => {
+const ChannelForm = ({
+  isLoading = false,
+  initialValues,
+  initialImageUrl = "",
+  onSubmit,
+}: ChannelFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
+
+  const [imagePreview, setImagePreview] = useState(initialImageUrl)
 
   const form = useForm<z.infer<typeof channelSchema>>({
     resolver: zodResolver(channelSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      type: "PUBLIC",
+      name: initialValues?.name ?? "",
+      description: initialValues?.description ?? "",
+      type: initialValues?.type ?? "PUBLIC",
     },
   })
 
   const submitForm = (values: z.infer<typeof channelSchema>) => {
-    console.log(values)
+    if (!values.image) delete values.image
+
+    onSubmit(values)
+  }
+
+  const handleImageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const image = e.target.files?.[0]
+    if (image) {
+      setImagePreview(URL.createObjectURL(image))
+      form.setValue("image", image)
+    }
   }
 
   return (
@@ -57,18 +77,34 @@ const ChannelForm = ({}: ChannelFormProps) => {
         className="w-full space-y-5"
       >
         <div className="flex justify-center">
-          <input type="file" hidden ref={inputRef} className="hidden" />
+          <input
+            type="file"
+            hidden
+            ref={inputRef}
+            accept="image/png,image/jpg,image/jpeg,image/webp"
+            className="hidden"
+            onChange={handleImageChange}
+          />
 
-          <Avatar
-            className="relative size-[100px] cursor-pointer"
-            onClick={() => inputRef.current?.click()}
-          >
-            <AvatarImage src="" />
-            <AvatarFallback className="h1"></AvatarFallback>
-            <div className="absolute size-full bg-grey-3/50 flex-center">
-              <CameraIcon className="size-10 text-white" />
-            </div>
-          </Avatar>
+          <FormField
+            control={form.control}
+            name="image"
+            render={() => (
+              <div className="gap-y-1 flex-col-center">
+                <Avatar
+                  className="relative size-[100px] cursor-pointer"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  <AvatarImage src={imagePreview} />
+                  <AvatarFallback className="h1"></AvatarFallback>
+                  <div className="absolute size-full bg-grey-3/50 flex-center">
+                    <CameraIcon className="size-10 text-white" />
+                  </div>
+                </Avatar>
+                <FormMessage />
+              </div>
+            )}
+          />
         </div>
         <FormField
           control={form.control}
@@ -139,8 +175,14 @@ const ChannelForm = ({}: ChannelFormProps) => {
           )}
         />
         <div className="pt-4">
-          <Button type="submit" size="xl" className=" w-full">
-            Create Channel
+          <Button
+            type="submit"
+            size="xl"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading && <LoaderIcon className="size-6 animate-spin" />}
+            {initialValues ? "Update Channel" : "Create Channel"}
           </Button>
         </div>
       </form>

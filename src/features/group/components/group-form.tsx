@@ -33,7 +33,6 @@ import { groupSchema } from "../schema"
 import SelectUsers from "./select-users"
 
 interface GroupFormProps {
-  buttonLabel?: string
   isLoading?: boolean
   initialImageUrl?: string
   initialValues?: z.infer<typeof groupSchema>
@@ -41,7 +40,6 @@ interface GroupFormProps {
 }
 
 const GroupForm = ({
-  buttonLabel = "Create Group",
   isLoading = false,
   initialValues,
   initialImageUrl = "",
@@ -206,7 +204,7 @@ const GroupForm = ({
             disabled={isLoading}
           >
             {isLoading && <LoaderIcon className="size-6 animate-spin" />}
-            {buttonLabel}
+            {initialValues ? "Update Group" : "Create Group"}
           </Button>
         </div>
       </form>
