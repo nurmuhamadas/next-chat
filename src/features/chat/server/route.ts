@@ -40,8 +40,8 @@ import { conversationSchema, updateConversationSchema } from "../schema"
 
 import {
   mapChannelModelToConversation,
-  mapConvsModelToConversation,
   mapGroupModelToConversation,
+  mapUserModelToConversation,
 } from "./utils"
 
 const conversationApp = new Hono()
@@ -111,12 +111,7 @@ const conversationApp = new Hono()
         )
         const totalUnread = unreadConvMessages[conv.$id]
         const lastMessage = lastMessages[conv.$id]
-        return mapConvsModelToConversation(
-          conv,
-          user!,
-          lastMessage,
-          totalUnread,
-        )
+        return mapUserModelToConversation(conv, user!, lastMessage, totalUnread)
       })
 
       const finalList = [
@@ -192,7 +187,7 @@ const conversationApp = new Hono()
           })
 
           const response: CreateConversationResponse = successResponse(
-            mapConvsModelToConversation(currConversation, user),
+            mapUserModelToConversation(currConversation, user),
           )
           return c.json(response)
         }
@@ -213,7 +208,7 @@ const conversationApp = new Hono()
           notification: true,
         })
 
-        const conversation = mapConvsModelToConversation(result, user)
+        const conversation = mapUserModelToConversation(result, user)
 
         const response: CreateConversationResponse =
           successResponse(conversation)
@@ -238,6 +233,7 @@ const conversationApp = new Hono()
           userId1: currentProfile.$id,
           userId2: userId,
         })
+        console.log(result, userId)
         if (!result) {
           const response: GetConversationResponse = successResponse(null)
           return c.json(response)
@@ -254,7 +250,7 @@ const conversationApp = new Hono()
           return c.json(createError(ERROR.USER_NOT_FOUND), 404)
         }
 
-        const conversation: Conversation = mapConvsModelToConversation(
+        const conversation: Conversation = mapUserModelToConversation(
           result,
           userPair,
         )

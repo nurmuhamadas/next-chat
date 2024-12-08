@@ -330,15 +330,13 @@ const groupApp = new Hono()
 
           const response: PatchGroupResponse = successResponse(groupResult)
           return c.json(response)
-        } catch (e) {
-          console.log(e)
+        } catch {
           if (fileId) {
             await deleteFile(storage, { id: fileId })
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }
-      } catch (e) {
-        console.log(e)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -367,6 +365,36 @@ const groupApp = new Hono()
         })
 
         const response = successResponse<boolean>(member?.isAdmin ?? false)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/:groupId/is-member",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+
+        const databases = c.get("databases")
+        const profile = c.get("userProfile")
+
+        const group = await getGroupById(databases, {
+          id: groupId,
+        })
+        if (!group) {
+          return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
+        }
+
+        const member = await getGroupMember(databases, {
+          userId: profile.$id,
+          groupId,
+        })
+
+        const response = successResponse<boolean>(!!member)
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

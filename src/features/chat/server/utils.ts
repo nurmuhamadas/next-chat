@@ -1,6 +1,6 @@
 import { mergeName } from "@/lib/utils"
 
-export const mapConvsModelToConversation = (
+export const mapUserModelToConversation = (
   conversation: ConversationAWModel,
   user: UserAWModel,
   lastMessage?: LastMessage,
@@ -8,6 +8,7 @@ export const mapConvsModelToConversation = (
 ): Conversation => {
   return {
     id: conversation.$id,
+    roomId: user.$id,
     name: mergeName(user.firstName, user.lastName),
     imageUrl: user.imageUrl ?? null,
     type: "chat",
@@ -23,6 +24,7 @@ export const mapGroupModelToConversation = (
 ): Conversation => {
   return {
     id: group.$id,
+    roomId: group.$id,
     name: group.name,
     imageUrl: group.imageUrl ?? null,
     type: "group",
@@ -38,6 +40,7 @@ export const mapChannelModelToConversation = (
 ): Conversation => {
   return {
     id: channel.$id,
+    roomId: channel.$id,
     name: channel.name,
     imageUrl: channel.imageUrl ?? null,
     type: "channel",

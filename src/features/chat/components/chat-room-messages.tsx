@@ -3,18 +3,30 @@ import Image from "next/image"
 import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
 
-import Loading from "@/components/loader"
 import { Button } from "@/components/ui/button"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
 
 import useCreateConversation from "../hooks/api/use-create-conversation"
-import useGetConversationByUserId from "../hooks/api/use-get-conversation-by-user-id"
 
 import MessageList from "./message-list"
 
-const ChatRoomMessages = () => {
+interface ChatRoomMessagesProps {
+  showBlank?: boolean
+  conversation?: Conversation
+  isGroupMember?: boolean
+  isPrivateGroup?: boolean
+  isChannelSubs?: boolean
+  isPrivateChannel?: boolean
+}
+const ChatRoomMessages = ({
+  conversation,
+  isGroupMember = false,
+  isPrivateGroup = true,
+  isChannelSubs,
+  isPrivateChannel,
+}: ChatRoomMessagesProps) => {
   const queryClient = useQueryClient()
 
   const type = useRoomType()
@@ -22,12 +34,6 @@ const ChatRoomMessages = () => {
 
   const { mutate: createConversation, isPending: creatingConv } =
     useCreateConversation()
-
-  const { data: conversation, isLoading: loadingConversation } =
-    useGetConversationByUserId({
-      id: type === "chat" ? id : undefined,
-    })
-  const isLoading = loadingConversation
 
   const isEmpty = true
 
@@ -47,30 +53,69 @@ const ChatRoomMessages = () => {
     )
   }
 
-  if (isLoading) {
-    return <Loading />
+  const handleJoinGroup = () => {
+    // TODO:
   }
+
+  const handleSubsChannel = () => {
+    // TODO:
+  }
+
+  const showBlank =
+    (type === "group" && isPrivateGroup && !isGroupMember) ||
+    (type === "channel" && isPrivateChannel && !isChannelSubs)
+
+  if (showBlank) {
+    return <div className="w-full flex-1"></div>
+  }
+
+  const showConvButton = type === "chat" && !conversation
+  const showJoinButton = type === "group" && !isPrivateGroup && !isGroupMember
+  const showSubsButton =
+    type === "channel" && !isPrivateChannel && !isChannelSubs
 
   return (
     <div
       className={cn(
         "w-full flex-1 overflow-hidden py-1",
-        (!conversation || isEmpty) && "flex-col-center",
+        isEmpty && "flex-col-center",
       )}
     >
-      {type == "chat" && !conversation && (
+      {showConvButton && (
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <div className="gap-y-2 flex-col-center">
-            <h4 className="mb-3 h4">No Conversation Initated</h4>
+            <h4 className="mb-3 h4">No Conversation Started</h4>
             <Button disabled={creatingConv} onClick={handleCreateConversation}>
               {creatingConv && <LoaderIcon className="size-6 animate-spin" />}
-              {creatingConv ? "Creating" : "Create"} conversation
+              {creatingConv ? "Creating" : "Create"} Conversation
+            </Button>
+          </div>
+        </div>
+      )}
+      {showJoinButton && (
+        <div className="m-auto gap-y-6 px-4 flex-col-center">
+          <div className="gap-y-2 flex-col-center">
+            <h4 className="mb-3 h4">You are not a member</h4>
+            <Button disabled={creatingConv} onClick={handleJoinGroup}>
+              {creatingConv && <LoaderIcon className="size-6 animate-spin" />}
+              {creatingConv ? "Joining" : "Join"} Group
+            </Button>
+          </div>
+        </div>
+      )}
+      {showSubsButton && (
+        <div className="m-auto gap-y-6 px-4 flex-col-center">
+          <div className="gap-y-2 flex-col-center">
+            <h4 className="mb-3 h4">You are not a subscribers</h4>
+            <Button disabled={creatingConv} onClick={handleSubsChannel}>
+              {creatingConv && <LoaderIcon className="size-6 animate-spin" />}
+              {creatingConv ? "Subscribing" : "Subcribe"} Channel
             </Button>
           </div>
         </div>
       )}
 
-      {conversation && isEmpty && (
+      {!showConvButton && !showJoinButton && !showSubsButton && isEmpty && (
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <Image
             src="/images/no-message.svg"
@@ -81,7 +126,6 @@ const ChatRoomMessages = () => {
           />
           <div className="gap-y-2 flex-col-center">
             <h4 className="h4">No Messages</h4>
-            <p className="body-2">Send message and start conversation</p>
           </div>
         </div>
       )}

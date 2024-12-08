@@ -1,6 +1,12 @@
 "use client"
 
+import Loading from "@/components/loader"
 import RightPanel from "@/components/right-panel"
+import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
+import useGetIsChannelAdmin from "@/features/channel/hooks/api/use-get-is-channel-admin"
+import useGetIsChanelSubs from "@/features/channel/hooks/api/use-get-is-channel-subs"
+import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
+import useGetIsGroupMember from "@/features/group/hooks/api/use-get-is-group-member"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 
@@ -23,9 +29,39 @@ const ChatRoom = () => {
   const { editedMessageId } = useEditedMessageId()
   const { isSelectMode } = useSelectedMessageIds()
 
-  const { data: conversation } = useGetConversationByUserId({
-    id: type === "chat" ? id : undefined,
+  const { data: conversation, isLoading: loadingConversation } =
+    useGetConversationByUserId({
+      id: type === "chat" ? id : undefined,
+    })
+
+  const { data: isGroupMember, isLoading: loadingGMember } =
+    useGetIsGroupMember({
+      id: type === "group" ? id : undefined,
+    })
+  const { data: group, isLoading: loadingGroup } = useGetGroupById({
+    id: type === "group" ? id : undefined,
   })
+  const { data: isChannelSubs, isLoading: loadingChannelSubs } =
+    useGetIsChanelSubs({
+      id: type === "channel" ? id : undefined,
+    })
+  const { data: isChannelAdmin, isLoading: loadingChannelAdmin } =
+    useGetIsChannelAdmin({
+      id: type === "channel" ? id : undefined,
+    })
+  const { data: channel, isLoading: loadingChannel } = useGetChannelById({
+    id: type === "channel" ? id : undefined,
+  })
+
+  const isLoading =
+    loadingConversation ||
+    loadingGMember ||
+    loadingGroup ||
+    loadingChannel ||
+    loadingChannelSubs ||
+    loadingChannelAdmin
+  const isPrivateGroup = group ? group?.type === "PRIVATE" : true
+  const isPrivateChannel = channel ? channel?.type === "PRIVATE" : true
 
   // TODO:
   const repliedMessage = repliedMessageId
@@ -44,24 +80,39 @@ const ChatRoom = () => {
       }
     : undefined
 
-  const inputShown = !(type == "chat" && !conversation)
+  const hideInput =
+    (type == "chat" && !conversation) ||
+    (type === "group" && !isGroupMember) ||
+    (type === "channel" && !isChannelAdmin)
 
   return (
     <div className="flex h-screen flex-1 overflow-x-hidden">
       <div className="h-full flex-1 flex-col-center">
         <ChatRoomHeader />
 
-        <ChatRoomMessages />
-
-        {inputShown && (
+        {isLoading ? (
+          <Loading />
+        ) : (
           <>
-            {isSelectMode ? (
-              <SelectedMessageMenu />
-            ) : (
-              <ChatInput
-                repliedMessage={repliedMessage}
-                editedMessage={editedMessage}
-              />
+            <ChatRoomMessages
+              conversation={conversation ?? undefined}
+              isGroupMember={isGroupMember}
+              isPrivateGroup={isPrivateGroup}
+              isChannelSubs={isChannelSubs}
+              isPrivateChannel={isPrivateChannel}
+            />
+
+            {!hideInput && (
+              <>
+                {isSelectMode ? (
+                  <SelectedMessageMenu />
+                ) : (
+                  <ChatInput
+                    repliedMessage={repliedMessage}
+                    editedMessage={editedMessage}
+                  />
+                )}
+              </>
             )}
           </>
         )}

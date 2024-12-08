@@ -350,6 +350,36 @@ const channelApp = new Hono()
     },
   )
   .get(
+    "/:channelId/is-subs",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelId } = c.req.param()
+
+        const databases = c.get("databases")
+        const profile = c.get("userProfile")
+
+        const channel = await getChannelById(databases, {
+          id: channelId,
+        })
+        if (!channel) {
+          return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
+        }
+
+        const sub = await getChannelSub(databases, {
+          userId: profile.$id,
+          channelId,
+        })
+
+        const response = successResponse<boolean>(!!sub)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
     "/:channelId/subscribers",
     sessionMiddleware,
     validateProfileMiddleware,

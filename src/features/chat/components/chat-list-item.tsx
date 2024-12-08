@@ -17,7 +17,7 @@ const ChatListItem = ({
   timeFormat = "12-HOUR",
 }: ChatListItemProps) => {
   return (
-    <Link href={`/${data.type}/${data.id}`}>
+    <Link href={`/${data.type}/${data.roomId}`}>
       <li
         className={cn(
           "flex items-center gap-x-3 rounded-lg p-1.5 px-3 hover:bg-grey-4",
