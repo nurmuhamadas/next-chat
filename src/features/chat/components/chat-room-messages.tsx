@@ -4,8 +4,6 @@ import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import useJoinChannel from "@/features/channel/hooks/api/use-join-channel"
-import useJoinGroup from "@/features/group/hooks/api/use-join-group"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
@@ -17,19 +15,15 @@ import MessageList from "./message-list"
 interface ChatRoomMessagesProps {
   showBlank?: boolean
   conversation?: Conversation
-  group?: Group
   isGroupMember?: boolean
   isPrivateGroup?: boolean
-  channel?: Channel
   isChannelSubs?: boolean
   isPrivateChannel?: boolean
 }
 const ChatRoomMessages = ({
   conversation,
-  group,
   isGroupMember = false,
   isPrivateGroup = true,
-  channel,
   isChannelSubs,
   isPrivateChannel,
 }: ChatRoomMessagesProps) => {
@@ -40,9 +34,6 @@ const ChatRoomMessages = ({
 
   const { mutate: createConversation, isPending: creatingConv } =
     useCreateConversation()
-
-  const { mutate: joinGroup, isPending: joiningGroup } = useJoinGroup()
-  const { mutate: joinChannel, isPending: joiningChannel } = useJoinChannel()
 
   const isEmpty = true
 
@@ -62,54 +53,6 @@ const ChatRoomMessages = ({
     )
   }
 
-  const handleJoinGroup = () => {
-    if (group) {
-      joinGroup(
-        { json: { code: group.inviteCode }, param: { groupId: id } },
-        {
-          onSuccess() {
-            queryClient.invalidateQueries({
-              queryKey: ["conversations"],
-            })
-            queryClient.invalidateQueries({
-              queryKey: ["conversation", id],
-            })
-            queryClient.invalidateQueries({
-              queryKey: ["get-is-group-member", id],
-            })
-            queryClient.invalidateQueries({
-              queryKey: ["get-group-option", id],
-            })
-          },
-        },
-      )
-    }
-  }
-
-  const handleSubsChannel = () => {
-    if (channel) {
-      joinChannel(
-        { json: { code: channel.inviteCode }, param: { channelId: id } },
-        {
-          onSuccess() {
-            queryClient.invalidateQueries({
-              queryKey: ["conversations"],
-            })
-            queryClient.invalidateQueries({
-              queryKey: ["conversation", id],
-            })
-            queryClient.invalidateQueries({
-              queryKey: ["get-is-channel-subs", id],
-            })
-            queryClient.invalidateQueries({
-              queryKey: ["get-channel-option", id],
-            })
-          },
-        },
-      )
-    }
-  }
-
   const showBlank =
     (type === "group" && isPrivateGroup && !isGroupMember) ||
     (type === "channel" && isPrivateChannel && !isChannelSubs)
@@ -119,9 +62,6 @@ const ChatRoomMessages = ({
   }
 
   const showConvButton = type === "chat" && !conversation
-  const showJoinButton = type === "group" && !isPrivateGroup && !isGroupMember
-  const showSubsButton =
-    type === "channel" && !isPrivateChannel && !isChannelSubs
 
   return (
     <div
@@ -141,30 +81,8 @@ const ChatRoomMessages = ({
           </div>
         </div>
       )}
-      {showJoinButton && (
-        <div className="m-auto gap-y-6 px-4 flex-col-center">
-          <div className="gap-y-2 flex-col-center">
-            <h4 className="mb-3 h4">You are not a member</h4>
-            <Button disabled={joiningGroup} onClick={handleJoinGroup}>
-              {joiningGroup && <LoaderIcon className="size-6 animate-spin" />}
-              {joiningGroup ? "Joining" : "Join"} Group
-            </Button>
-          </div>
-        </div>
-      )}
-      {showSubsButton && (
-        <div className="m-auto gap-y-6 px-4 flex-col-center">
-          <div className="gap-y-2 flex-col-center">
-            <h4 className="mb-3 h4">You are not a subscribers</h4>
-            <Button disabled={joiningChannel} onClick={handleSubsChannel}>
-              {joiningChannel && <LoaderIcon className="size-6 animate-spin" />}
-              {joiningChannel ? "Subscribing" : "Subcribe"} Channel
-            </Button>
-          </div>
-        </div>
-      )}
 
-      {!showConvButton && !showJoinButton && !showSubsButton && isEmpty && (
+      {isEmpty && (
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <Image
             src="/images/no-message.svg"

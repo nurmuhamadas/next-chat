@@ -101,10 +101,8 @@ const ChatRoom = () => {
           <>
             <ChatRoomMessages
               conversation={conversation ?? undefined}
-              group={group}
               isGroupMember={isGroupMember}
               isPrivateGroup={isPrivateGroup}
-              channel={channel}
               isChannelSubs={isChannelSubs}
               isPrivateChannel={isPrivateChannel}
             />
