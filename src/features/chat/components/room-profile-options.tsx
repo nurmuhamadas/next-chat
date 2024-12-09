@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 
 import { BellIcon } from "lucide-react"
 
-import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
 import useUpdateChannelOption from "@/features/channel/hooks/api/use-update-channel-option"
@@ -104,7 +103,7 @@ const RoomProfileOptions = () => {
     }
   }, [channelOption, groupOption, convOption])
 
-  if (isNoOption) {
+  if (isOptionLoading || isNoOption) {
     return null
   }
 
@@ -117,19 +116,15 @@ const RoomProfileOptions = () => {
         }
       >
         <BellIcon className="size-5 text-grey-3" />
-        {isOptionLoading ? (
-          <Skeleton className="h-6 w-full" />
-        ) : (
-          <div className="flex-1 flex-center-between">
-            <p className="subtitle-2">Notifications</p>
+        <div className="flex-1 flex-center-between">
+          <p className="subtitle-2">Notifications</p>
 
-            <Switch
-              disabled={isUpdating}
-              checked={isNotifActive}
-              onCheckedChange={handleNotifChange}
-            />
-          </div>
-        )}
+          <Switch
+            disabled={isUpdating}
+            checked={isNotifActive}
+            onCheckedChange={handleNotifChange}
+          />
+        </div>
       </div>
     </li>
   )

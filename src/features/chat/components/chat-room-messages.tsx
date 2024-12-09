@@ -77,6 +77,9 @@ const ChatRoomMessages = ({
             queryClient.invalidateQueries({
               queryKey: ["get-is-group-member", id],
             })
+            queryClient.invalidateQueries({
+              queryKey: ["get-group-option", id],
+            })
           },
         },
       )
@@ -97,6 +100,9 @@ const ChatRoomMessages = ({
             })
             queryClient.invalidateQueries({
               queryKey: ["get-is-channel-subs", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-channel-option", id],
             })
           },
         },

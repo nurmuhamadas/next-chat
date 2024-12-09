@@ -12,39 +12,48 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
-import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
-import { cn, mergeName } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
+import useGetConversationByUserId from "../hooks/api/use-get-conversation-by-user-id"
 import { useRoomProfile } from "../hooks/use-room-profile"
 
-import ChatRoomMenu from "./chat-room-menu"
-
-const ChatRoomHeader = () => {
+interface ChatRoomHeaderProps {
+  conversation?: Conversation
+  group?: Group
+  isGroupMember?: boolean
+  isPrivateGroup?: boolean
+  channel?: Channel
+  isChannelSubs?: boolean
+  isPrivateChannel?: boolean
+}
+const ChatRoomHeader = ({
+  isGroupMember,
+  isChannelSubs,
+}: ChatRoomHeaderProps) => {
   const router = useRouter()
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   const { openRoomProfile } = useRoomProfile()
   const type = useRoomType()
-  const roomId = useRoomId()
+  const id = useRoomId()
 
-  const { data: user, isLoading: userLoading } = useGetUserProfileById({
-    id: type === "chat" ? roomId : undefined,
-  })
+  const { data: conversation, isLoading: userLoading } =
+    useGetConversationByUserId({
+      id: type === "chat" ? id : undefined,
+    })
   const { data: group, isLoading: groupLoading } = useGetGroupById({
-    id: type === "group" ? roomId : undefined,
+    id: type === "group" ? id : undefined,
   })
   const { data: channel, isLoading: channelLoading } = useGetChannelById({
-    id: type === "channel" ? roomId : undefined,
+    id: type === "channel" ? id : undefined,
   })
   const isLoading = userLoading || groupLoading || channelLoading
 
   const name = {
-    chat: user
-      ? mergeName(user?.firstName, user?.lastName ?? undefined)
-      : undefined,
+    chat: conversation ? conversation.name : undefined,
     group: group ? group?.name : undefined,
     channel: channel ? channel?.name : undefined,
   }
@@ -54,7 +63,7 @@ const ChatRoomHeader = () => {
     channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
   }
   const avatar = {
-    chat: user ? (user?.imageUrl ?? "") : undefined,
+    chat: conversation ? (conversation?.imageUrl ?? "") : undefined,
     group: group ? (group?.imageUrl ?? "") : undefined,
     channel: channel ? (channel?.imageUrl ?? "") : undefined,
   }
@@ -107,23 +116,25 @@ const ChatRoomHeader = () => {
         </div>
       </div>
 
-      <div className="flex-center-end">
-        <div className="">
-          {isSearchOpen ? (
-            <SearchBar autoFocus onBlur={() => setIsSearchOpen(false)} />
-          ) : (
-            <Button
-              variant="icon"
-              size="icon"
-              onClick={() => setIsSearchOpen(true)}
-            >
-              <SearchIcon />
-            </Button>
-          )}
-        </div>
+      {(isGroupMember || isChannelSubs || !!conversation) && (
+        <div className="flex-center-end">
+          <div className="">
+            {isSearchOpen ? (
+              <SearchBar autoFocus onBlur={() => setIsSearchOpen(false)} />
+            ) : (
+              <Button
+                variant="icon"
+                size="icon"
+                onClick={() => setIsSearchOpen(true)}
+              >
+                <SearchIcon />
+              </Button>
+            )}
+          </div>
 
-        <ChatRoomMenu type={type} />
-      </div>
+          {/* <ChatRoomMenu type={type} /> */}
+        </div>
+      )}
     </header>
   )
 }

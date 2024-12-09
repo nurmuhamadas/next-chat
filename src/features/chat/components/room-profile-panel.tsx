@@ -5,13 +5,10 @@ import { ReactNode } from "react"
 import {
   AtSignIcon,
   InfoIcon,
-  LogOutIcon,
   LucideIcon,
   MailIcon,
   PaperclipIcon,
   PencilIcon,
-  TrashIcon,
-  UserXIcon,
   XIcon,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -35,6 +32,7 @@ import { cn, mergeName } from "@/lib/utils"
 import ChatAvatar from "../../../components/chat-avatar"
 import { useRoomProfile } from "../hooks/use-room-profile"
 
+import RoomProfilActions from "./room-profil-actions"
 import RoomProfileOptions from "./room-profile-options"
 
 const RoomProfilePanel = () => {
@@ -288,40 +286,7 @@ const ProfileView = () => {
         </ul>
       )}
 
-      {!isLoading && !isNoData && (
-        <div className="flex-wrap gap-x-2.5 py-8 flex-center">
-          {type === "chat" && (
-            <>
-              <Button variant="outline">
-                <UserXIcon className="size-4" />
-                Block user
-              </Button>
-              <Button
-                variant="outline"
-                className="border-error text-error hover:text-error"
-              >
-                <TrashIcon className="size-4" />
-                Delete chat
-              </Button>
-            </>
-          )}
-          {type === "group" && (
-            <>
-              <Button variant="outline">
-                <LogOutIcon className="size-4" />
-                Leave group
-              </Button>
-              <Button
-                variant="outline"
-                className="border-error text-error hover:text-error"
-              >
-                <TrashIcon className="size-4" />
-                Delete and exit
-              </Button>
-            </>
-          )}
-        </div>
-      )}
+      {<RoomProfilActions />}
     </>
   )
 }

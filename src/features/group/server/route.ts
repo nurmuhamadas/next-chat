@@ -850,7 +850,7 @@ const groupApp = new Hono()
           userId: currentProfile.$id,
         })
         if (!currentMember) {
-          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 403)
+          return c.json(successResponse(null))
         }
 
         const groupOption = await getGroupOption(databases, {
@@ -858,7 +858,7 @@ const groupApp = new Hono()
           userId: currentProfile.$id,
         })
         if (!groupOption) {
-          return c.json(createError(ERROR.NOT_GROUP_MEMBER), 404)
+          return c.json(successResponse(null))
         }
 
         const response: GetGroupOptionResponse = successResponse(

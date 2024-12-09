@@ -88,7 +88,7 @@ declare type UnsetAdminGroupResponse = ApiResponse<boolean>
 
 declare type DeleteAllGroupChatResponse = ApiResponse<boolean>
 
-declare type GetGroupOptionResponse = ApiResponse<GroupOption>
+declare type GetGroupOptionResponse = ApiResponse<GroupOption | null>
 
 declare type UpdateGroupNotifResponse = ApiResponse<GroupOption>
 
