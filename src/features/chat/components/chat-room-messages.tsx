@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import useJoinChannel from "@/features/channel/hooks/api/use-join-channel"
 import useJoinGroup from "@/features/group/hooks/api/use-join-group"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
@@ -19,6 +20,7 @@ interface ChatRoomMessagesProps {
   group?: Group
   isGroupMember?: boolean
   isPrivateGroup?: boolean
+  channel?: Channel
   isChannelSubs?: boolean
   isPrivateChannel?: boolean
 }
@@ -27,6 +29,7 @@ const ChatRoomMessages = ({
   group,
   isGroupMember = false,
   isPrivateGroup = true,
+  channel,
   isChannelSubs,
   isPrivateChannel,
 }: ChatRoomMessagesProps) => {
@@ -39,6 +42,7 @@ const ChatRoomMessages = ({
     useCreateConversation()
 
   const { mutate: joinGroup, isPending: joiningGroup } = useJoinGroup()
+  const { mutate: joinChannel, isPending: joiningChannel } = useJoinChannel()
 
   const isEmpty = true
 
@@ -80,7 +84,24 @@ const ChatRoomMessages = ({
   }
 
   const handleSubsChannel = () => {
-    // TODO:
+    if (channel) {
+      joinChannel(
+        { json: { code: channel.inviteCode }, param: { channelId: id } },
+        {
+          onSuccess() {
+            queryClient.invalidateQueries({
+              queryKey: ["conversations"],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["conversation", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-is-channel-subs", id],
+            })
+          },
+        },
+      )
+    }
   }
 
   const showBlank =
@@ -129,9 +150,9 @@ const ChatRoomMessages = ({
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <div className="gap-y-2 flex-col-center">
             <h4 className="mb-3 h4">You are not a subscribers</h4>
-            <Button disabled={creatingConv} onClick={handleSubsChannel}>
-              {creatingConv && <LoaderIcon className="size-6 animate-spin" />}
-              {creatingConv ? "Subscribing" : "Subcribe"} Channel
+            <Button disabled={joiningChannel} onClick={handleSubsChannel}>
+              {joiningChannel && <LoaderIcon className="size-6 animate-spin" />}
+              {joiningChannel ? "Subscribing" : "Subcribe"} Channel
             </Button>
           </div>
         </div>

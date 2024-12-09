@@ -99,6 +99,7 @@ const ChatRoom = () => {
               group={group}
               isGroupMember={isGroupMember}
               isPrivateGroup={isPrivateGroup}
+              channel={channel}
               isChannelSubs={isChannelSubs}
               isPrivateChannel={isPrivateChannel}
             />
