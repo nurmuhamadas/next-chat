@@ -1,5 +1,3 @@
-import { useRouter } from "next/navigation"
-
 import { useMutation } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
@@ -7,19 +5,17 @@ import { toast } from "sonner"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["verify-otp"][":userId"]["$post"],
+  (typeof client.api.groups)[":groupId"]["join"]["$post"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.auth)["verify-otp"][":userId"]["$post"]
+  (typeof client.api.groups)[":groupId"]["join"]["$post"]
 >
 
-const useVerifyOTP = () => {
-  const router = useRouter()
-
+const useJoinGroup = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json, param }) => {
-      const response = await client.api.auth["verify-otp"][":userId"].$post({
+      const response = await client.api.groups[":groupId"]["join"].$post({
         json,
         param,
       })
@@ -32,8 +28,7 @@ const useVerifyOTP = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("OTP_VERIFIED")
-      router.push(`/`)
+      toast.success("JOINED_GROUP")
     },
     onError({ message }) {
       toast.error(message)
@@ -41,4 +36,4 @@ const useVerifyOTP = () => {
   })
 }
 
-export default useVerifyOTP
+export default useJoinGroup

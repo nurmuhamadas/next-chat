@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import useJoinGroup from "@/features/group/hooks/api/use-join-group"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
@@ -15,6 +16,7 @@ import MessageList from "./message-list"
 interface ChatRoomMessagesProps {
   showBlank?: boolean
   conversation?: Conversation
+  group?: Group
   isGroupMember?: boolean
   isPrivateGroup?: boolean
   isChannelSubs?: boolean
@@ -22,6 +24,7 @@ interface ChatRoomMessagesProps {
 }
 const ChatRoomMessages = ({
   conversation,
+  group,
   isGroupMember = false,
   isPrivateGroup = true,
   isChannelSubs,
@@ -34,6 +37,8 @@ const ChatRoomMessages = ({
 
   const { mutate: createConversation, isPending: creatingConv } =
     useCreateConversation()
+
+  const { mutate: joinGroup, isPending: joiningGroup } = useJoinGroup()
 
   const isEmpty = true
 
@@ -54,7 +59,24 @@ const ChatRoomMessages = ({
   }
 
   const handleJoinGroup = () => {
-    // TODO:
+    if (group) {
+      joinGroup(
+        { json: { code: group.inviteCode }, param: { groupId: id } },
+        {
+          onSuccess() {
+            queryClient.invalidateQueries({
+              queryKey: ["conversations"],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["conversation", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-is-group-member", id],
+            })
+          },
+        },
+      )
+    }
   }
 
   const handleSubsChannel = () => {
@@ -96,9 +118,9 @@ const ChatRoomMessages = ({
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <div className="gap-y-2 flex-col-center">
             <h4 className="mb-3 h4">You are not a member</h4>
-            <Button disabled={creatingConv} onClick={handleJoinGroup}>
-              {creatingConv && <LoaderIcon className="size-6 animate-spin" />}
-              {creatingConv ? "Joining" : "Join"} Group
+            <Button disabled={joiningGroup} onClick={handleJoinGroup}>
+              {joiningGroup && <LoaderIcon className="size-6 animate-spin" />}
+              {joiningGroup ? "Joining" : "Join"} Group
             </Button>
           </div>
         </div>
