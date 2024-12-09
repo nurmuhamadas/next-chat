@@ -119,7 +119,7 @@ declare type UnsetAdminChannelResponse = ApiResponse<boolean>
 
 declare type DeleteAllChannelChatResponse = ApiResponse<boolean>
 
-declare type GetChannelOptionResponse = ApiResponse<ChannelOption>
+declare type GetChannelOptionResponse = ApiResponse<ChannelOption | null>
 
 declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
 

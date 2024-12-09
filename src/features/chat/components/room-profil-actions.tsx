@@ -5,6 +5,7 @@ import { LoaderIcon, LogOutIcon, TrashIcon, UserXIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
+import useLeaveChannel from "@/features/channel/hooks/api/use-leave-channel"
 import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import useLeaveGroup from "@/features/group/hooks/api/use-leave-group"
 import useConfirm from "@/hooks/use-confirm-dialog"
@@ -22,6 +23,8 @@ const RoomProfilActions = () => {
   const [Dialog, confirm] = useConfirm()
 
   const { mutate: leaveGroup, isPending: isLeavingGroup } = useLeaveGroup()
+  const { mutate: leaveChannel, isPending: isLeavingChannel } =
+    useLeaveChannel()
 
   const { data: convOption, isLoading: convLoading } = useGetConversationOption(
     {
@@ -52,6 +55,28 @@ const RoomProfilActions = () => {
           queryClient.invalidateQueries({ queryKey: ["get-group-option", id] })
           queryClient.invalidateQueries({
             queryKey: ["get-is-group-member", id],
+          })
+        },
+      },
+    )
+  }
+
+  const handleLeaveChannel = async () => {
+    const isOK = await confirm(
+      "LEAVE_CHANNEL_CONFIM_TITLE",
+      "LEAVE_CHANNEL_CONFIM_BODY",
+    )
+    if (!isOK) return
+
+    leaveChannel(
+      { param: { channelId: id } },
+      {
+        onSuccess() {
+          queryClient.invalidateQueries({
+            queryKey: ["get-channel-option", id],
+          })
+          queryClient.invalidateQueries({
+            queryKey: ["get-is-channel-subs", id],
           })
         },
       },
@@ -93,6 +118,29 @@ const RoomProfilActions = () => {
                 <LogOutIcon className="size-4" />
               )}
               {isLeavingGroup ? "Leaving" : "Leave"} group
+            </Button>
+            <Button
+              variant="outline"
+              className="border-error text-error hover:text-error"
+            >
+              <TrashIcon className="size-4" />
+              Delete and exit
+            </Button>
+          </>
+        )}
+        {type === "channel" && (
+          <>
+            <Button
+              variant="outline"
+              disabled={isLeavingChannel}
+              onClick={handleLeaveChannel}
+            >
+              {isLeavingChannel ? (
+                <LoaderIcon className="animate-spin" />
+              ) : (
+                <LogOutIcon className="size-4" />
+              )}
+              {isLeavingChannel ? "Leaving" : "Leave"} channel
             </Button>
             <Button
               variant="outline"

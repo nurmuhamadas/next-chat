@@ -698,7 +698,7 @@ const channelApp = new Hono()
           userId: currentProfile.$id,
         })
         if (!currentMember) {
-          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+          return c.json(successResponse(null))
         }
 
         const channelOption = await getChannelOption(databases, {
@@ -706,7 +706,7 @@ const channelApp = new Hono()
           userId: currentProfile.$id,
         })
         if (!channelOption) {
-          return c.json(createError(ERROR.USER_IS_NOT_SUBSCRIBER), 403)
+          return c.json(successResponse(null))
         }
 
         const response: GetChannelOptionResponse = successResponse(
