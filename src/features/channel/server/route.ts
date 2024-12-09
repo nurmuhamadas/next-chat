@@ -660,7 +660,10 @@ const channelApp = new Hono()
 
         await leaveChannel(databases, { channelId, userId: currentProfile.$id })
 
-        await deleteAllChannelSubs(databases, { userId: currentProfile.$id })
+        await deleteAllChannelSubs(databases, {
+          userId: currentProfile.$id,
+          channelId,
+        })
 
         await createChannelSubscriber(databases, {
           channelId,

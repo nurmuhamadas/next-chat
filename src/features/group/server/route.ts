@@ -812,7 +812,10 @@ const groupApp = new Hono()
 
         await leaveGroup(databases, { groupId, userId: currentProfile.$id })
 
-        await deleteAllGroupMembers(databases, { userId: currentProfile.$id })
+        await deleteAllGroupMembers(databases, {
+          userId: currentProfile.$id,
+          groupId,
+        })
 
         await createGroupMember(databases, {
           groupId,

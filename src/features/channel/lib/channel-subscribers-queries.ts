@@ -20,6 +20,7 @@ export const createChannelSubscriber = async (
   )
 }
 
+/** also include unsubscribed channels */
 export const getChannelSubsByUserId = async (
   databases: Databases,
   { userId }: { userId: string },
@@ -28,7 +29,7 @@ export const getChannelSubsByUserId = async (
     const result = await databases.listDocuments<ChannelSubscriberAWModel>(
       DATABASE_ID,
       APPWRITE_CHANNEL_SUBSCRIBERS_ID,
-      [Query.equal("userId", userId), Query.isNull("unsubscribedAt")],
+      [Query.equal("userId", userId)],
     )
 
     return {
@@ -267,12 +268,12 @@ export const getCurrentChannelSubs = async (
 
 export const deleteAllChannelSubs = async (
   databases: Databases,
-  { userId }: { userId: string },
+  { userId, channelId }: { userId: string; channelId: string },
 ) => {
   const result = await databases.listDocuments<GroupMemberAWModel>(
     DATABASE_ID,
     APPWRITE_CHANNEL_SUBSCRIBERS_ID,
-    [Query.equal("userId", userId)],
+    [Query.equal("userId", userId), Query.equal("channelId", channelId)],
   )
 
   if (result.total === 0) return null

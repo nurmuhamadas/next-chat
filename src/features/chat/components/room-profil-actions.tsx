@@ -4,8 +4,10 @@ import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon, LogOutIcon, TrashIcon, UserXIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import useDeleteChannelChat from "@/features/channel/hooks/api/use-delete-channel-chat"
 import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
 import useLeaveChannel from "@/features/channel/hooks/api/use-leave-channel"
+import useDeleteGroupChat from "@/features/group/hooks/api/use-delete-group-chat"
 import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import useLeaveGroup from "@/features/group/hooks/api/use-leave-group"
 import useConfirm from "@/hooks/use-confirm-dialog"
@@ -25,6 +27,11 @@ const RoomProfilActions = () => {
   const { mutate: leaveGroup, isPending: isLeavingGroup } = useLeaveGroup()
   const { mutate: leaveChannel, isPending: isLeavingChannel } =
     useLeaveChannel()
+
+  const { mutate: deleteGroup, isPending: isDeletingGroup } =
+    useDeleteGroupChat()
+  const { mutate: deleteChannel, isPending: isDeletingChannel } =
+    useDeleteChannelChat()
 
   const { data: convOption, isLoading: convLoading } = useGetConversationOption(
     {
@@ -83,6 +90,36 @@ const RoomProfilActions = () => {
     )
   }
 
+  const handleDeleteAndLeaveGroup = async () => {
+    const isOK = await confirm(
+      "DELETE_CHAT_GROUP_CONFIM_TITLE",
+      "DELETE_CHAT_GROUP_CONFIM_BODY",
+    )
+    if (!isOK) return
+
+    deleteGroup(
+      { param: { groupId: id } },
+      {
+        onSuccess() {},
+      },
+    )
+  }
+
+  const handleDeleteAndLeaveChannel = async () => {
+    const isOK = await confirm(
+      "DELETE_CHAT_CHANNEL_CONFIM_TITLE",
+      "DELETE_CHAT_CHANNEL_CONFIM_BODY",
+    )
+    if (!isOK) return
+
+    deleteChannel(
+      { param: { channelId: id } },
+      {
+        onSuccess() {},
+      },
+    )
+  }
+
   if (isOptionLoading || isNoOption) {
     return null
   }
@@ -122,9 +159,15 @@ const RoomProfilActions = () => {
             <Button
               variant="outline"
               className="border-error text-error hover:text-error"
+              disabled={isDeletingGroup}
+              onClick={handleDeleteAndLeaveGroup}
             >
-              <TrashIcon className="size-4" />
-              Delete and exit
+              {isDeletingGroup ? (
+                <LoaderIcon className="animate-spin" />
+              ) : (
+                <TrashIcon className="size-4" />
+              )}{" "}
+              {isDeletingGroup ? "Deleting chat" : "Delete chat"}
             </Button>
           </>
         )}
@@ -145,9 +188,15 @@ const RoomProfilActions = () => {
             <Button
               variant="outline"
               className="border-error text-error hover:text-error"
+              disabled={isDeletingChannel}
+              onClick={handleDeleteAndLeaveChannel}
             >
-              <TrashIcon className="size-4" />
-              Delete and exit
+              {isDeletingChannel ? (
+                <LoaderIcon className="animate-spin" />
+              ) : (
+                <TrashIcon className="size-4" />
+              )}{" "}
+              {isDeletingChannel ? "Deleting chat" : "Delete chat"}
             </Button>
           </>
         )}

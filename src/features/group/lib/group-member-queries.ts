@@ -22,6 +22,7 @@ export const createGroupMember = async (
   )
 }
 
+/** also include left groups */
 export const getGroupMembersByUserId = async (
   databases: Databases,
   { userId }: { userId: string },
@@ -30,7 +31,7 @@ export const getGroupMembersByUserId = async (
     const result = await databases.listDocuments<GroupMemberAWModel>(
       DATABASE_ID,
       APPWRITE_GROUP_MEMBERS_ID,
-      [Query.equal("userId", userId), Query.isNull("leftAt")],
+      [Query.equal("userId", userId)],
     )
 
     return {
@@ -298,12 +299,12 @@ export const getGroupAdmins = async (
 
 export const deleteAllGroupMembers = async (
   databases: Databases,
-  { userId }: { userId: string },
+  { userId, groupId }: { userId: string; groupId: string },
 ) => {
   const result = await databases.listDocuments<GroupMemberAWModel>(
     DATABASE_ID,
     APPWRITE_GROUP_MEMBERS_ID,
-    [Query.equal("userId", userId)],
+    [Query.equal("userId", userId), Query.equal("groupId", groupId)],
   )
 
   if (result.total === 0) return null
