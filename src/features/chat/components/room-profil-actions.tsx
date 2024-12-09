@@ -195,13 +195,15 @@ const RoomProfilActions = () => {
               <UserXIcon className="size-4" />
               Block user
             </Button>
-            <Button
-              variant="outline"
-              className="border-error text-error hover:text-error"
-            >
-              <TrashIcon className="size-4" />
-              Delete chat
-            </Button>
+            {!isNoOption && (
+              <Button
+                variant="outline"
+                className="border-error text-error hover:text-error"
+              >
+                <TrashIcon className="size-4" />
+                Delete chat
+              </Button>
+            )}
           </>
         )}
         {type === "group" && (

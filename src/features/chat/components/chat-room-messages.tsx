@@ -1,14 +1,7 @@
 import Image from "next/image"
 
-import { useQueryClient } from "@tanstack/react-query"
-import { LoaderIcon } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
-
-import useCreateConversation from "../hooks/api/use-create-conversation"
 
 import MessageList from "./message-list"
 
@@ -21,37 +14,14 @@ interface ChatRoomMessagesProps {
   isPrivateChannel?: boolean
 }
 const ChatRoomMessages = ({
-  conversation,
   isGroupMember = false,
   isPrivateGroup = true,
   isChannelSubs,
   isPrivateChannel,
 }: ChatRoomMessagesProps) => {
-  const queryClient = useQueryClient()
-
   const type = useRoomType()
-  const id = useRoomId()
-
-  const { mutate: createConversation, isPending: creatingConv } =
-    useCreateConversation()
 
   const isEmpty = true
-
-  const handleCreateConversation = () => {
-    createConversation(
-      { json: { userId: id } },
-      {
-        onSuccess() {
-          queryClient.invalidateQueries({
-            queryKey: ["conversations"],
-          })
-          queryClient.invalidateQueries({
-            queryKey: ["conversation", id],
-          })
-        },
-      },
-    )
-  }
 
   const showBlank =
     (type === "group" && isPrivateGroup && !isGroupMember) ||
@@ -61,8 +31,6 @@ const ChatRoomMessages = ({
     return <div className="w-full flex-1"></div>
   }
 
-  const showConvButton = type === "chat" && !conversation
-
   return (
     <div
       className={cn(
@@ -70,18 +38,6 @@ const ChatRoomMessages = ({
         isEmpty && "flex-col-center",
       )}
     >
-      {showConvButton && (
-        <div className="m-auto gap-y-6 px-4 flex-col-center">
-          <div className="gap-y-2 flex-col-center">
-            <h4 className="mb-3 h4">No Conversation Started</h4>
-            <Button disabled={creatingConv} onClick={handleCreateConversation}>
-              {creatingConv && <LoaderIcon className="size-6 animate-spin" />}
-              {creatingConv ? "Creating" : "Create"} Conversation
-            </Button>
-          </div>
-        </div>
-      )}
-
       {isEmpty && (
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <Image

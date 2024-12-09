@@ -5,10 +5,7 @@ import { z } from "zod"
 import { ERROR } from "@/constants/error"
 import { getChannelById } from "@/features/channel/lib/channel-queries"
 import { getSubsHistory } from "@/features/channel/lib/channel-subscribers-queries"
-import {
-  getConversationById,
-  getConversationOptHistory,
-} from "@/features/chat/lib/queries"
+import { getConversationOptHistory } from "@/features/chat/lib/queries"
 import { getMemberHistory } from "@/features/group/lib/group-member-queries"
 import { getGroupById } from "@/features/group/lib/group-queries"
 import { getUsers } from "@/features/user/lib/queries"
@@ -33,18 +30,6 @@ export const validateMessage = async (
       code: StatusCode
     }
 > => {
-  if (form.conversationId) {
-    const conversation = await getConversationById(databases, {
-      conversationId: form.conversationId,
-    })
-    if (!conversation) {
-      return {
-        error: ERROR.CONVERSATION_NOT_FOUND,
-        code: 404,
-        path: ["conversationId"],
-      }
-    }
-  }
   if (form.groupId) {
     const group = await getGroupById(databases, { id: form.groupId })
     if (!group) {

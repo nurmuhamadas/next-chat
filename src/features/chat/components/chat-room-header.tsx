@@ -12,11 +12,11 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
+import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
-import { cn } from "@/lib/utils"
+import { cn, mergeName } from "@/lib/utils"
 
-import useGetConversationByUserId from "../hooks/api/use-get-conversation-by-user-id"
 import { useRoomProfile } from "../hooks/use-room-profile"
 
 interface ChatRoomHeaderProps {
@@ -40,10 +40,9 @@ const ChatRoomHeader = ({
   const type = useRoomType()
   const id = useRoomId()
 
-  const { data: conversation, isLoading: userLoading } =
-    useGetConversationByUserId({
-      id: type === "chat" ? id : undefined,
-    })
+  const { data: user, isLoading: userLoading } = useGetUserProfileById({
+    id: type === "chat" ? id : undefined,
+  })
   const { data: group, isLoading: groupLoading } = useGetGroupById({
     id: type === "group" ? id : undefined,
   })
@@ -53,7 +52,9 @@ const ChatRoomHeader = ({
   const isLoading = userLoading || groupLoading || channelLoading
 
   const name = {
-    chat: conversation ? conversation.name : undefined,
+    chat: user
+      ? mergeName(user.firstName, user.lastName ?? undefined)
+      : undefined,
     group: group ? group?.name : undefined,
     channel: channel ? channel?.name : undefined,
   }
@@ -63,7 +64,7 @@ const ChatRoomHeader = ({
     channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
   }
   const avatar = {
-    chat: conversation ? (conversation?.imageUrl ?? "") : undefined,
+    chat: user ? (user?.imageUrl ?? "") : undefined,
     group: group ? (group?.imageUrl ?? "") : undefined,
     channel: channel ? (channel?.imageUrl ?? "") : undefined,
   }
@@ -116,7 +117,7 @@ const ChatRoomHeader = ({
         </div>
       </div>
 
-      {(isGroupMember || isChannelSubs || !!conversation) && (
+      {(isGroupMember || isChannelSubs || !!user) && (
         <div className="flex-center-end">
           <div className="">
             {isSearchOpen ? (

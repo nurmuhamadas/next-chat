@@ -8,7 +8,11 @@ import {
   validateChannelAdmin,
   validateChannelSubs,
 } from "@/features/channel/lib/channel-subscribers-queries"
-import { getConversationById } from "@/features/chat/lib/queries"
+import {
+  createConversation,
+  getConversationById,
+  getConversationByUserIds,
+} from "@/features/chat/lib/queries"
 import {
   validateGroupAdmin,
   validateGroupMember,
@@ -106,10 +110,24 @@ const messageApp = new Hono()
         }
 
         try {
+          let conversationId = ""
+          if (formValue.userId) {
+            let conversation = await getConversationByUserIds(databases, {
+              userId1: currentProfile.$id,
+              userId2: formValue.userId,
+            })
+            if (!conversation) {
+              conversation = await createConversation(databases, {
+                userId1: currentProfile.$id,
+                userId2: formValue.userId,
+              })
+            }
+            conversationId = conversation.$id
+          }
           const result = await createMessage(databases, {
             userId: currentProfile.$id,
             message: formValue.message,
-            conversationId: formValue.conversationId,
+            conversationId,
             groupId: formValue.groupId,
             channelId: formValue.channelId,
             originalMessageId: formValue.originalMessageId,
@@ -148,9 +166,9 @@ const messageApp = new Hono()
             )
           }
 
-          if (formValue.conversationId) {
+          if (conversationId) {
             createOrUpdateLastConvMessageRead(databases, {
-              conversationId: formValue.conversationId,
+              conversationId: conversationId,
               lastMessageReadId: result.$id,
               userId: currentProfile.$id,
             })

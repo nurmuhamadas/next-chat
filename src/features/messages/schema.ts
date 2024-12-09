@@ -14,9 +14,7 @@ export const createMessageSchema = z
     parentMessageId: z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
       .optional(),
-    conversationId: z
-      .string({ invalid_type_error: ERROR.INVALID_TYPE })
-      .optional(),
+    userId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }).optional(),
     groupId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }).optional(),
     channelId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }).optional(),
     originalMessageId: z
@@ -34,28 +32,25 @@ export const createMessageSchema = z
   })
   .refine(
     (value) => {
-      return value.conversationId || value.groupId || value.channelId
+      return value.userId || value.groupId || value.channelId
     },
     {
       message: ERROR.ROOM_ID_REQUIRED,
-      path: ["conversationId", "groupId", "channelId"],
+      path: ["userId", "groupId", "channelId"],
     },
   )
   .refine(
     (value) => {
-      if (value.conversationId && value.groupId && value.channelId) return false
-      if (value.conversationId && (value.groupId || value.channelId))
-        return false
-      if (value.groupId && (value.conversationId || value.channelId))
-        return false
-      if (value.channelId && (value.conversationId || value.groupId))
-        return false
+      if (value.userId && value.groupId && value.channelId) return false
+      if (value.userId && (value.groupId || value.channelId)) return false
+      if (value.groupId && (value.userId || value.channelId)) return false
+      if (value.channelId && (value.userId || value.groupId)) return false
 
       return true
     },
     {
       message: ERROR.ROOM_ID_DUPLICATED,
-      path: ["conversationId", "groupId", "channelId"],
+      path: ["userId", "groupId", "channelId"],
     },
   )
 
