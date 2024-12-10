@@ -1,17 +1,16 @@
-import { ChangeEventHandler, useRef, useState } from "react"
+import { ChangeEventHandler, useRef } from "react"
 
 interface TextEditorProps {
-  initialValue?: string
+  value?: string
   placeholder?: string
   onValueChange(value: string): void
 }
 
 const TextEditor = ({
-  initialValue = "",
+  value = "",
   placeholder = "Input message here...",
   onValueChange,
 }: TextEditorProps) => {
-  const [value, setValue] = useState(initialValue)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleInputChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
@@ -19,7 +18,6 @@ const TextEditor = ({
     if (textarea) {
       textarea.style.height = "auto"
       textarea.style.height = `${Math.min(textarea.scrollHeight, 8 * 24)}px`
-      setValue(e.target.value)
       onValueChange(e.target.value)
     }
   }

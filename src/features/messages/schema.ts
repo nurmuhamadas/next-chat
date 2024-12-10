@@ -24,9 +24,12 @@ export const createMessageSchema = z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
       .transform((text) => (text?.toLowerCase() === "true" ? true : false))
       .optional(),
-    attachments: attachmentSchema.array().optional().default([]),
+    attachments: z.union([
+      attachmentSchema,
+      z.array(attachmentSchema).optional().default([]),
+    ]),
   })
-  .refine((value) => value.message || value.attachments?.length > 0, {
+  .refine((value) => value.message || !!value.attachments, {
     message: ERROR.SHOULD_HAVE_MESSAGE_OR_ATTACHMENT,
     path: ["message", "attachment"],
   })

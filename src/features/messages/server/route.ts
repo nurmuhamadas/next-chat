@@ -102,10 +102,15 @@ const messageApp = new Hono()
           }
         }
 
+        const attachments = formValue.attachments
+          ? Array.isArray(formValue.attachments)
+            ? formValue.attachments
+            : [formValue.attachments]
+          : []
         let files: Models.File[] = []
-        if (formValue.attachments?.length > 0) {
+        if (attachments?.length > 0) {
           files = await Promise.all(
-            formValue.attachments.map((v) => uploadFile(storage, { file: v })),
+            attachments.map((v) => uploadFile(storage, { file: v })),
           )
         }
 
@@ -199,7 +204,8 @@ const messageApp = new Hono()
 
           const response: CreateMessageResponse = successResponse(message)
           return c.json(response)
-        } catch {
+        } catch (e) {
+          console.log(e)
           if (files.length > 0) {
             await Promise.all(
               files.map((file) => deleteFile(storage, { id: file.$id })),
@@ -207,7 +213,8 @@ const messageApp = new Hono()
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }
-      } catch {
+      } catch (e) {
+        console.log(e)
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },

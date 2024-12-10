@@ -1,6 +1,7 @@
 import Loading from "@/components/loader"
 import RightPanelWrapper from "@/components/right-panel-wrapper"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useRoomType } from "@/hooks/use-room-type"
 
 import useGetGroupById from "../hooks/api/use-get-group-by-id"
 import useGetIsGroupAdmin from "../hooks/api/use-get-is-group-admin"
@@ -10,7 +11,9 @@ import { useEditGroupPanel } from "../hooks/use-edit-group-panel"
 import GroupForm from "./group-form"
 
 const EditGroupPanel = () => {
+  const type = useRoomType()
   const id = useRoomId()
+
   const { isEditGroupOpen, closeEditGroup } = useEditGroupPanel()
 
   const { mutate: updateGroup, isPending } = useUpdateGroup()
@@ -18,9 +21,9 @@ const EditGroupPanel = () => {
     data: group,
     isLoading: isDataLoading,
     refetch,
-  } = useGetGroupById({ id })
+  } = useGetGroupById({ id: type === "group" ? id : undefined })
   const { data: isGroupAdmin, isLoading: isAdminLoading } = useGetIsGroupAdmin({
-    id,
+    id: type === "group" ? id : undefined,
   })
   const isLoading = isAdminLoading || isDataLoading
 

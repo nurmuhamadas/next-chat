@@ -2,8 +2,10 @@
 
 import { ChangeEventHandler, useRef, useState } from "react"
 
+import { format } from "date-fns"
 import {
   ImageIcon,
+  Loader2Icon,
   PaperclipIcon,
   PencilIcon,
   SendHorizonalIcon,
@@ -14,6 +16,8 @@ import {
 import EmojiPopover from "@/components/emoji-popover"
 import { Button } from "@/components/ui/button"
 import useSendMessage from "@/features/messages/hooks/api/use-send-message"
+import { useRoomId } from "@/hooks/use-room-id"
+import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
 
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
@@ -37,6 +41,9 @@ interface ChatInputProps {
 }
 
 const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
+  const type = useRoomType()
+  const id = useRoomId()
+
   const inputImageRef = useRef<HTMLInputElement>(null)
   const inputFileRef = useRef<HTMLInputElement>(null)
 
@@ -44,6 +51,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
   const { cancelEditMessage } = useEditedMessageId()
 
   const [message, setMessage] = useState("")
+  const [isEmojiOnly, setIsEmojiOnly] = useState(false)
   const [recordedAudio, setRecordedAudio] = useState<Blob | undefined>()
   const [attachments, setAttachments] = useState<File[]>([])
 
@@ -51,12 +59,38 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     ? URL.createObjectURL(recordedAudio)
     : undefined
 
-  const { mutate: sendMessage } = useSendMessage()
+  const { mutate: sendMessage, isPending: isSending } = useSendMessage()
 
   const handleSend = () => {
-    sendMessage({
-      form: {},
-    })
+    const att = [...attachments]
+    if (recordedAudio) {
+      const audioName = `recorded_audio-${format(new Date(), "yyyy-MM-dd_HH:mm:ss")}`
+      att.push(new File([recordedAudio], audioName, { type: "audio/webm" }))
+    }
+
+    const roomIds: Record<string, string | undefined> = {}
+    if (type === "chat") roomIds["userId"] = id
+    if (type === "channel") roomIds["groupId"] = id
+    if (type === "group") roomIds["channelId"] = id
+
+    sendMessage(
+      {
+        form: {
+          ...roomIds,
+          attachments: att,
+          message,
+          isEmojiOnly: String(isEmojiOnly),
+        },
+      },
+      {
+        onSuccess() {
+          setMessage("")
+          setAttachments([])
+          setIsEmojiOnly(false)
+          setRecordedAudio(undefined)
+        },
+      },
+    )
   }
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -83,6 +117,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   <InputFilePreview
                     key={file.size + file.name}
                     file={file}
+                    disabled={isSending}
                     onRemove={() => handleRemoveFile(i)}
                   />
                 )
@@ -143,19 +178,31 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
           <div className="flex flex-1 items-end gap-x-2">
             <EmojiPopover
               onSelectEmoji={(emoji) => {
-                console.log(emoji)
+                if (message.length === 0) {
+                  setIsEmojiOnly(true)
+                }
+                setMessage(`${message}${emoji.emoji}`)
               }}
             >
               <Button
                 variant="icon"
                 size="icon"
                 className="size-5 p-0 hover:text-primary"
+                disabled={isSending}
               >
                 <SmileIcon />
               </Button>
             </EmojiPopover>
 
-            <TextEditor onValueChange={setMessage} />
+            <TextEditor
+              value={message}
+              onValueChange={(value) => {
+                setMessage(value)
+                if (isEmojiOnly) {
+                  setIsEmojiOnly(false)
+                }
+              }}
+            />
 
             <div className="gap-x-2 flex-center-end">
               <input
@@ -171,6 +218,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                 variant="icon"
                 size="icon"
                 className="size-5 p-0 hover:text-primary"
+                disabled={isSending}
                 onClick={() => inputImageRef.current?.click()}
               >
                 <ImageIcon />
@@ -188,6 +236,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                 variant="icon"
                 size="icon"
                 className="size-5 p-0 hover:text-primary"
+                disabled={isSending}
                 onClick={() => inputFileRef.current?.click()}
               >
                 <PaperclipIcon />
@@ -195,19 +244,22 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             </div>
           </div>
         </div>
-        <div className="">
-          {message.length > 0 ? (
-            <Button
-              className="size-11 bg-surface hover:bg-primary"
-              variant="secondary"
-              onClick={handleSend}
-            >
+        {message.length > 0 || audioUrl ? (
+          <Button
+            className="size-11 bg-surface hover:bg-primary"
+            variant="secondary"
+            disabled={isSending}
+            onClick={handleSend}
+          >
+            {isSending ? (
+              <Loader2Icon className="animate-spin" />
+            ) : (
               <SendHorizonalIcon />
-            </Button>
-          ) : (
-            <AudioRecorder onStop={setRecordedAudio} />
-          )}
-        </div>
+            )}
+          </Button>
+        ) : (
+          <AudioRecorder onStop={setRecordedAudio} />
+        )}
       </div>
     </div>
   )

@@ -41,6 +41,8 @@ export const attachmentSchema = z
         "image/gif",
         "audio/mpeg",
         "audio/wav",
+        "audio/mp3",
+        "audio/webm",
         "video/mp4",
         "application/pdf",
       ].includes(file.type)

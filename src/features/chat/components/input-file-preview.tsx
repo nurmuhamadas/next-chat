@@ -6,10 +6,15 @@ import { Button } from "@/components/ui/button"
 
 interface InputFilePreviewProps {
   file: File
+  disabled?: boolean
   onRemove(): void
 }
 
-const InputFilePreview = ({ file, onRemove }: InputFilePreviewProps) => {
+const InputFilePreview = ({
+  file,
+  disabled = false,
+  onRemove,
+}: InputFilePreviewProps) => {
   let url = "/images/folder.png"
 
   if (file.type.startsWith("image/")) {
@@ -46,6 +51,7 @@ const InputFilePreview = ({ file, onRemove }: InputFilePreviewProps) => {
         variant="icon"
         size="icon-sm"
         className="absolute right-0 top-0 size-6  bg-foreground/50 hover:bg-foreground"
+        disabled={disabled}
         onClick={onRemove}
       >
         <XIcon className="!size-3.5 text-surface" />

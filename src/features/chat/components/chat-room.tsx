@@ -30,25 +30,17 @@ const ChatRoom = () => {
   const { isSelectMode } = useSelectedMessageIds()
 
   const { data: conversation, isLoading: loadingConversation } =
-    useGetConversationByUserId({
-      id: type === "chat" ? id : undefined,
-    })
+    useGetConversationByUserId({ id: type === "chat" ? id : undefined })
 
   const { data: isGroupMember, isLoading: loadingGMember } =
-    useGetIsGroupMember({
-      id: type === "group" ? id : undefined,
-    })
+    useGetIsGroupMember({ id: type === "group" ? id : undefined })
   const { data: group, isLoading: loadingGroup } = useGetGroupById({
     id: type === "group" ? id : undefined,
   })
   const { data: isChannelSubs, isLoading: loadingChannelSubs } =
-    useGetIsChanelSubs({
-      id: type === "channel" ? id : undefined,
-    })
+    useGetIsChanelSubs({ id: type === "channel" ? id : undefined })
   const { data: isChannelAdmin, isLoading: loadingChannelAdmin } =
-    useGetIsChannelAdmin({
-      id: type === "channel" ? id : undefined,
-    })
+    useGetIsChannelAdmin({ id: type === "channel" ? id : undefined })
   const { data: channel, isLoading: loadingChannel } = useGetChannelById({
     id: type === "channel" ? id : undefined,
   })
@@ -81,7 +73,6 @@ const ChatRoom = () => {
     : undefined
 
   const hideInput =
-    (type == "chat" && !conversation) ||
     (type === "group" && !isGroupMember) ||
     (type === "channel" && !isChannelAdmin)
 
