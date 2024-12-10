@@ -4,7 +4,6 @@ import Image from "next/image"
 
 import { isToday, parseISO } from "date-fns"
 
-import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelMessages from "@/features/messages/hooks/api/use-get-channel-messages"
 import useGetGroupMessages from "@/features/messages/hooks/api/use-get-group-messages"
 import useGetPrivateMessages from "@/features/messages/hooks/api/use-get-private-messages"
@@ -32,21 +31,20 @@ const ChatRoomMessages = ({
   const type = useRoomType()
   const id = useRoomId()
 
-  const [messages, setMessages] = useState<GroupedMessage[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
+  const [canLoadMore, setCanLoadMore] = useState(true)
+  const [page, setPage] = useState(1)
 
   const { data: setting } = useGetSetting()
 
   const { data: privateMessages, isLoading: privateLoading } =
-    useGetPrivateMessages({
-      id: type === "chat" ? id : undefined,
-    })
+    useGetPrivateMessages({ id: type === "chat" ? id : undefined, page })
   const { data: groupMessages, isLoading: groupLoading } = useGetGroupMessages({
     id: type === "group" ? id : undefined,
+    page,
   })
   const { data: channelMessages, isLoading: channelLoading } =
-    useGetChannelMessages({
-      id: type === "channel" ? id : undefined,
-    })
+    useGetChannelMessages({ id: type === "channel" ? id : undefined, page })
 
   const isLoading = privateLoading || groupLoading || channelLoading
   const isEmpty = messages.length === 0
@@ -84,6 +82,8 @@ const ChatRoomMessages = ({
     [setting?.timeFormat],
   )
 
+  const groupedMessages = groupingMessage(messages)
+
   useEffect(() => {
     const rawMessage = {
       chat: privateMessages,
@@ -92,7 +92,11 @@ const ChatRoomMessages = ({
     }
 
     if (!isLoading) {
-      setMessages(groupingMessage(rawMessage[type]))
+      setMessages((prev) => [...prev, ...rawMessage[type]])
+
+      if (rawMessage[type].length < 20) {
+        setCanLoadMore(false)
+      }
     }
   }, [groupingMessage, type, isLoading])
 
@@ -111,7 +115,6 @@ const ChatRoomMessages = ({
         isEmpty && "flex-col-center",
       )}
     >
-      {isLoading && <MessageLoading />}
       {!isLoading && isEmpty && (
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <Image
@@ -126,27 +129,17 @@ const ChatRoomMessages = ({
           </div>
         </div>
       )}
-      {!isLoading && !isEmpty && (
+      {!isEmpty && (
         <MessageList
-          messages={messages}
+          messages={groupedMessages}
           timeFormat={setting?.timeFormat ?? "12-HOUR"}
+          canLoadMore={canLoadMore}
+          isLoading={isLoading}
+          loadMore={() => {
+            setPage(page + 1)
+          }}
         />
       )}
-    </div>
-  )
-}
-
-const MessageLoading = () => {
-  return (
-    <div className="mx-auto flex size-full max-w-[700px] flex-1 flex-col justify-end gap-y-2">
-      <Skeleton className="ml-auto h-10 w-[300px]" />
-      <Skeleton className="ml-auto h-8 w-[160px]" />
-      <Skeleton className="h-10 w-[300px]" />
-      <Skeleton className="h-8 w-[160px]" />
-      <Skeleton className="ml-auto h-10 w-[300px]" />
-      <Skeleton className="ml-auto h-8 w-[160px]" />
-      <Skeleton className="h-10 w-[300px]" />
-      <Skeleton className="h-8 w-[160px]" />
     </div>
   )
 }

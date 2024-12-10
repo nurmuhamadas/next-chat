@@ -69,3 +69,17 @@ export const updateMessageSchema = z.object({
     .transform((text) => (text?.toLowerCase() === "true" ? true : false))
     .optional(),
 })
+
+export const getMessageSchema = z.object({
+  page: z
+    .string()
+    .optional()
+    .transform((v) => {
+      const num = Number(v)
+      if (isNaN(num)) {
+        return 1
+      }
+
+      return num
+    }),
+})

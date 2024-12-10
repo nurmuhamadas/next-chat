@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useGetMyProfile } from "@/features/user/hooks/api/use-get-my-profile"
 
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
@@ -14,10 +15,16 @@ export type GroupedMessage = { time: string; messages: Message[] }
 interface MessageListProps {
   messages: GroupedMessage[]
   timeFormat?: TimeFormat
+  canLoadMore: boolean
+  isLoading: boolean
+  loadMore(): void
 }
 const MessageList = ({
   messages: groupedMessages,
   timeFormat,
+  canLoadMore,
+  isLoading,
+  loadMore,
 }: MessageListProps) => {
   const chatRef = useRef<HTMLDivElement>(null)
 
@@ -34,6 +41,26 @@ const MessageList = ({
 
   return (
     <ScrollArea ref={chatRef} className="chat-list-scroll-area size-full">
+      <div
+        className="h-1"
+        ref={(el) => {
+          if (el) {
+            const observer = new IntersectionObserver(
+              ([entry]) => {
+                if (entry.isIntersecting && canLoadMore && !isLoading) {
+                  loadMore()
+                }
+              },
+              { threshold: 1 },
+            )
+
+            observer.observe(el)
+
+            return () => observer.disconnect()
+          }
+        }}
+      />
+
       <div className="mx-auto flex w-full max-w-[700px] flex-col-reverse gap-y-2 px-4 pt-4">
         {groupedMessages.map(({ time, messages }) => {
           return (
@@ -63,8 +90,25 @@ const MessageList = ({
             </div>
           )
         })}
+
+        {isLoading && <MessageLoading />}
       </div>
     </ScrollArea>
+  )
+}
+
+const MessageLoading = () => {
+  return (
+    <div className="mx-auto flex size-full max-w-[700px] flex-1 flex-col justify-end gap-y-2">
+      <Skeleton className="ml-auto h-10 w-[300px]" />
+      <Skeleton className="ml-auto h-8 w-[160px]" />
+      <Skeleton className="h-10 w-[300px]" />
+      <Skeleton className="h-8 w-[160px]" />
+      <Skeleton className="ml-auto h-10 w-[300px]" />
+      <Skeleton className="ml-auto h-8 w-[160px]" />
+      <Skeleton className="h-10 w-[300px]" />
+      <Skeleton className="h-8 w-[160px]" />
+    </div>
   )
 }
 

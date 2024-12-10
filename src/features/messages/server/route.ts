@@ -69,7 +69,11 @@ import {
   mapAttachmentModelToAttachment,
   mapMessageModelToMessage,
 } from "../lib/utils"
-import { createMessageSchema, updateMessageSchema } from "../schema"
+import {
+  createMessageSchema,
+  getMessageSchema,
+  updateMessageSchema,
+} from "../schema"
 
 const messageApp = new Hono()
   .post(
@@ -230,11 +234,13 @@ const messageApp = new Hono()
   )
   .get(
     "/private/:userId",
+    zValidator("query", getMessageSchema),
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
       try {
         const { userId } = c.req.param()
+        const { page } = c.req.valid("query")
 
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
@@ -257,6 +263,7 @@ const messageApp = new Hono()
         const result = await getMessageByConversationId(databases, {
           conversationId: conversation.$id,
           userId: currentProfile.$id,
+          page,
         })
         const userPair = await getUserProfileById(databases, {
           userId,
@@ -356,11 +363,13 @@ const messageApp = new Hono()
   )
   .get(
     "/group/:groupId",
+    zValidator("query", getMessageSchema),
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
       try {
         const { groupId } = c.req.param()
+        const { page } = c.req.valid("query")
 
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
@@ -381,6 +390,7 @@ const messageApp = new Hono()
         const result = await getMessageByGroupId(databases, {
           groupId,
           userId: currentProfile.$id,
+          page,
         })
 
         const userIds: string[] = []
@@ -486,11 +496,13 @@ const messageApp = new Hono()
   )
   .get(
     "/channel/:channelId",
+    zValidator("query", getMessageSchema),
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
       try {
         const { channelId } = c.req.param()
+        const { page } = c.req.valid("query")
 
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
@@ -511,6 +523,7 @@ const messageApp = new Hono()
         const result = await getMessageByChannelId(databases, {
           channelId,
           userId: currentProfile.$id,
+          page,
         })
 
         const userIds: string[] = []

@@ -142,8 +142,13 @@ export const deleteMessageByAdmin = async (
 
 export const getMessageByConversationId = async (
   databases: Databases,
-  { conversationId, userId }: { conversationId: string; userId: string },
+  {
+    conversationId,
+    userId,
+    page,
+  }: { conversationId: string; userId: string; page: number },
 ) => {
+  const offset = (page - 1) * 20
   try {
     const { data: conversationHistory } = await getConversationOptHistory(
       databases,
@@ -156,7 +161,6 @@ export const getMessageByConversationId = async (
       opt.$createdAt,
       opt.deletedAt ?? new Date().toISOString(),
     ])
-    console.log(dateRange)
     const dateQueries =
       dateRange.length > 1
         ? Query.or(
@@ -173,13 +177,15 @@ export const getMessageByConversationId = async (
         Query.equal("conversationId", conversationId),
         Query.orderDesc("$createdAt"),
         dateQueries,
-        // Query.or([
-        //   Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
-        //   Query.and([
-        //     Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
-        //     Query.notEqual("userId", userId),
-        //   ]),
-        // ]),
+        Query.or([
+          Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
+          Query.and([
+            Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
+            Query.notEqual("userId", userId),
+          ]),
+        ]),
+        Query.limit(20),
+        Query.offset(offset),
       ],
     )
 
@@ -277,8 +283,9 @@ export const getTotalConvMessageAfter = async (
 
 export const getMessageByGroupId = async (
   databases: Databases,
-  { groupId, userId }: { groupId: string; userId: string },
+  { groupId, userId, page }: { groupId: string; userId: string; page: number },
 ) => {
+  const offset = (page - 1) * 20
   try {
     const { data: groupMembers } = await getMemberHistory(databases, {
       groupId,
@@ -311,6 +318,8 @@ export const getMessageByGroupId = async (
             Query.notEqual("userId", userId),
           ]),
         ]),
+        Query.limit(20),
+        Query.offset(offset),
       ],
     )
 
@@ -465,8 +474,13 @@ export const getLastMessageByChannelIds = async (
 
 export const getMessageByChannelId = async (
   databases: Databases,
-  { channelId, userId }: { channelId: string; userId: string },
+  {
+    channelId,
+    userId,
+    page,
+  }: { channelId: string; userId: string; page: number },
 ) => {
+  const offset = (page - 1) * 20
   try {
     const { data: subsHistory } = await getSubsHistory(databases, {
       channelId,
@@ -499,6 +513,8 @@ export const getMessageByChannelId = async (
             Query.notEqual("userId", userId),
           ]),
         ]),
+        Query.limit(20),
+        Query.offset(offset),
       ],
     )
 

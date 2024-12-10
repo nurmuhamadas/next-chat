@@ -2,12 +2,13 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useGetChannelMessages = ({ id }: { id?: string }) => {
+const useGetChannelMessages = ({ id, page }: { id?: string; page: number }) => {
   const query = useQuery({
-    queryKey: ["channel-messages", id],
+    queryKey: ["channel-messages", id, page],
     queryFn: async () => {
       const response = await client.api.messages.channel[":channelId"].$get({
         param: { channelId: id ?? "" },
+        query: { page: String(page) },
       })
 
       const result = await response.json()
