@@ -9,34 +9,22 @@ import MessageMenu from "./message-menu"
 interface MessageItemProps {
   classNames?: string
   message: Message
-  time: string
   type?: "private" | "group" | "channel"
   isSender?: boolean
-  isForwarded?: boolean
-  parentMessage?: {
-    id: string
-    name: string
-    message: string
-  }
-  attachments?: []
   isSelected?: boolean
 }
 
 const MessageItem = ({
   classNames,
   message,
-  time,
   type = "private",
   isSender = false,
-  isForwarded,
-  parentMessage,
-  attachments,
   isSelected = false,
 }: MessageItemProps) => {
   const { isSelectMode, toggleSelectMessage } = useSelectedMessageIds()
 
-  // TODO: check if emoji and 1 character
-  const isOnlyEmoji = message.message.length === 2
+  const isEmojiOnly = message.isEmojiOnly
+  const isForwarded = !!message.originalMessageId
 
   return (
     <div
@@ -70,7 +58,7 @@ const MessageItem = ({
             <div className="flex items-center gap-x-1">
               {!isSender && type !== "private" && (
                 <span className="line-clamp-1 !font-medium text-primary caption">
-                  {message.name}
+                  {message.user.name}
                 </span>
               )}
 
@@ -86,7 +74,7 @@ const MessageItem = ({
             </div>
           </div>
 
-          {parentMessage && (
+          {message.parentMessageName && message.parentMessageText && (
             <div
               className={cn(
                 "flex flex-col rounded-sm border-l-4 px-2 py-1 mt-1",
@@ -94,25 +82,25 @@ const MessageItem = ({
               )}
             >
               <p className="line-clamp-1 font-semibold caption">
-                {parentMessage.name}
+                {message.parentMessageName}
               </p>
               <p className={cn("line-clamp-1 text-foreground/50 caption")}>
-                {parentMessage.message}
+                {message.parentMessageText}
               </p>
             </div>
           )}
 
-          {attachments && attachments.length > 0 && <></>}
+          {message.attachments.length > 0 && <></>}
 
           {/* <Image src="" /> */}
 
-          <p className={cn("mt-1", isOnlyEmoji ? "text-[72px]" : "body-2")}>
+          <p className={cn("mt-1", isEmojiOnly ? "text-[72px]" : "body-2")}>
             {message.message}
           </p>
 
           <div className="mt-1.5 flex-center-between">
             <div className="">{/* Reaction here */}</div>
-            <span className="ml-auto text-foreground/50 caption">{time}</span>
+            <span className="ml-auto text-foreground/50 caption">{"time"}</span>
           </div>
         </div>
       </div>

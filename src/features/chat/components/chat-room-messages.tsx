@@ -1,5 +1,9 @@
 import Image from "next/image"
 
+import useGetChannelMessages from "@/features/messages/hooks/api/use-get-channel-messages"
+import useGetGroupMessages from "@/features/messages/hooks/api/use-get-group-messages"
+import useGetPrivateMessages from "@/features/messages/hooks/api/use-get-private-messages"
+import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
 
@@ -20,8 +24,26 @@ const ChatRoomMessages = ({
   isPrivateChannel,
 }: ChatRoomMessagesProps) => {
   const type = useRoomType()
+  const id = useRoomId()
 
-  const isEmpty = true
+  const { data: privateMessages, total: totalPrivateMessage } =
+    useGetPrivateMessages({ id: type === "chat" ? id : undefined })
+  const { data: groupMessages, total: totalGroupMessage } = useGetGroupMessages(
+    { id: type === "group" ? id : undefined },
+  )
+  const { data: channelMessages, total: totalChannelMessage } =
+    useGetChannelMessages({ id: type === "channel" ? id : undefined })
+
+  const messages = {
+    chat: privateMessages,
+    group: groupMessages,
+    channel: channelMessages,
+  }
+
+  const isEmpty =
+    totalPrivateMessage === 0 &&
+    totalGroupMessage === 0 &&
+    totalChannelMessage === 0
 
   const showBlank =
     (type === "group" && isPrivateGroup && !isGroupMember) ||
@@ -53,7 +75,7 @@ const ChatRoomMessages = ({
         </div>
       )}
 
-      {!isEmpty && <MessageList />}
+      {!isEmpty && <MessageList messages={messages[type]} />}
     </div>
   )
 }
