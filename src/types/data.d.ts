@@ -108,6 +108,7 @@ declare interface Reaction {
 declare interface Attachment {
   id: string
   url: string
+  downloadUrl: string
   name: string
   type: AttachmentType
   size: number

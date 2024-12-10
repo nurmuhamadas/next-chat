@@ -1,10 +1,18 @@
+import Image from "next/image"
+
+import { DownloadIcon, EyeIcon } from "lucide-react"
+import { PhotoProvider, PhotoView } from "react-photo-view"
+
 import ChatAvatar from "@/components/chat-avatar"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { cn, formatChatTime, formatMessageTime } from "@/lib/utils"
+import { cn, formatMessageTime } from "@/lib/utils"
 
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
 import MessageMenu from "./message-menu"
+
+import "react-photo-view/dist/react-photo-view.css"
 
 interface MessageItemProps {
   classNames?: string
@@ -92,7 +100,99 @@ const MessageItem = ({
             </div>
           )}
 
-          {message.attachments.length > 0 && <></>}
+          {message.attachments.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-3">
+              <PhotoProvider speed={() => 250}>
+                {message.attachments.map((att) => {
+                  return (
+                    <div key={att.id} className="h-auto">
+                      {att.type === "IMAGE" && (
+                        <PhotoView src={att.url}>
+                          <Image
+                            src={att.url}
+                            alt={att.name}
+                            width={200}
+                            height={150}
+                            className="object-cover"
+                          />
+                        </PhotoView>
+                      )}
+                      {att.type === "AUDIO" && (
+                        <audio controls src={att.url} className="w-[300px]" />
+                      )}
+                      {att.type === "VIDEO" && (
+                        <video controls src={att.url} className="w-[300px]" />
+                      )}
+                      {att.type === "PDF" && (
+                        <div className="group relative flex cursor-pointer flex-col gap-y-1">
+                          <Image
+                            src={"/images/pdf.png"}
+                            alt={att.name}
+                            width={75}
+                            height={75}
+                            className="size-full"
+                          />
+                          <p className="line-clamp-1 caption">{att.name}</p>
+                          <div className="absolute inset-0 hidden items-center gap-x-2 bg-black/20 group-hover:flex-center">
+                            <Button
+                              className=""
+                              variant="secondary"
+                              size="icon"
+                              asChild
+                            >
+                              <a href={att.url} target="_blank">
+                                <EyeIcon />
+                              </a>
+                            </Button>
+                            <Button
+                              className=""
+                              variant="secondary"
+                              size="icon"
+                            >
+                              <a
+                                href={att.downloadUrl}
+                                target="_blank"
+                                download
+                              >
+                                <DownloadIcon />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      {att.type === "OTHER" && (
+                        <div className="group relative flex cursor-pointer flex-col gap-y-1">
+                          <Image
+                            src={"/images/folder.png"}
+                            alt={att.name}
+                            width={75}
+                            height={75}
+                            className="size-full"
+                          />
+                          <p className="line-clamp-1 caption">{att.name}</p>
+                          <div className="absolute inset-0 hidden items-center gap-x-2 bg-black/20 group-hover:flex-center">
+                            <Button
+                              className=""
+                              variant="secondary"
+                              size="icon"
+                            >
+                              <a
+                                href={att.downloadUrl}
+                                target="_blank"
+                                download
+                              >
+                                <DownloadIcon />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </PhotoProvider>
+            </div>
+          )}
 
           {/* <Image src="" /> */}
 

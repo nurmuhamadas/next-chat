@@ -29,26 +29,26 @@ export const imageProfileSchema = z
 export const attachmentSchema = z
   .any()
   .optional()
-  .refine(
-    (file) => {
-      if (!file) return true
+  // .refine(
+  //   (file) => {
+  //     if (!file) return true
 
-      return [
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-        "image/webp",
-        "image/gif",
-        "audio/mpeg",
-        "audio/wav",
-        "audio/mp3",
-        "audio/webm",
-        "video/mp4",
-        "application/pdf",
-      ].includes(file.type)
-    },
-    { message: ERROR.INVALID_TYPE },
-  )
+  //     return [
+  //       "image/jpeg",
+  //       "image/png",
+  //       "image/jpg",
+  //       "image/webp",
+  //       "image/gif",
+  //       "audio/mpeg",
+  //       "audio/wav",
+  //       "audio/mp3",
+  //       "audio/webm",
+  //       "video/mp4",
+  //       "application/pdf",
+  //     ].includes(file.type)
+  //   },
+  //   { message: ERROR.INVALID_TYPE },
+  // )
   .refine(
     (file) => {
       if (!file) return true

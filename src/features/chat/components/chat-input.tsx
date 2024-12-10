@@ -245,7 +245,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             </div>
           </div>
         </div>
-        {message.length > 0 || audioUrl ? (
+        {message.length > 0 || audioUrl || attachments.length > 0 ? (
           <Button
             className="size-11 bg-surface hover:bg-primary"
             variant="secondary"

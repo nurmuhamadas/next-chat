@@ -20,7 +20,11 @@ import {
 } from "@/features/group/lib/group-member-queries"
 import { getGroupById } from "@/features/group/lib/group-queries"
 import { getUserProfileById, getUsers } from "@/features/user/lib/queries"
-import { constructFileUrl, destructFileId } from "@/lib/appwrite"
+import {
+  constructDownloadUrl,
+  constructFileUrl,
+  destructFileId,
+} from "@/lib/appwrite"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteFile, uploadFile } from "@/lib/upload-file"
 import {
@@ -172,6 +176,7 @@ const messageApp = new Hono()
               size: file.sizeOriginal,
               type: getFileType(file.mimeType),
               url: constructFileUrl(file.$id),
+              downloadUrl: constructDownloadUrl(file.$id),
             }))
             await Promise.all(
               files.map((file) =>
@@ -181,6 +186,7 @@ const messageApp = new Hono()
                   size: file.sizeOriginal,
                   type: getFileType(file.mimeType),
                   url: constructFileUrl(file.$id),
+                  downloadUrl: constructDownloadUrl(file.$id),
                 }),
               ),
             )

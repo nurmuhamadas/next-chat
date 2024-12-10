@@ -10,7 +10,9 @@ export const getFileType = (mimeType: string): AttachmentType => {
       return "IMAGE"
 
     case "audio/mpeg":
+    case "audio/mp3":
     case "audio/wav":
+    case "audio/webm":
       return "AUDIO"
 
     case "video/mp4":
@@ -87,5 +89,6 @@ export const mapAttachmentModelToAttachment = (
     size: attachment.size,
     type: attachment.type,
     url: attachment.url,
+    downloadUrl: attachment.downloadUrl,
   }
 }

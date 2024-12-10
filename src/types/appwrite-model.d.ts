@@ -89,6 +89,7 @@ declare interface ReactionModel {
 declare interface AttachmentAWModel extends AppwriteDocument, AttachmentModel {}
 declare interface AttachmentModel {
   url: string
+  downloadUrl: string
   name: string
   type: AttachmentType
   size: number
