@@ -302,25 +302,26 @@ const conversationApp = new Hono()
     },
   )
   .get(
-    "/:conversationId/options",
+    "/:userId/options",
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
       try {
-        const { conversationId } = c.req.param()
+        const { userId } = c.req.param()
 
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
 
-        const conversation = await getConversationById(databases, {
-          conversationId,
+        const conversation = await getConversationByUserIds(databases, {
+          userId1: currentProfile.$id,
+          userId2: userId,
         })
         if (!conversation) {
           return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
         }
 
         const lastConversationOpt = await getLastConversationOpt(databases, {
-          conversationId,
+          conversationId: conversation.$id,
           userId: currentProfile.$id,
         })
         if (!lastConversationOpt || !!lastConversationOpt.deletedAt) {

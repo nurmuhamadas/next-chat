@@ -156,6 +156,7 @@ export const getMessageByConversationId = async (
       opt.$createdAt,
       opt.deletedAt ?? new Date().toISOString(),
     ])
+    console.log(dateRange)
     const dateQueries =
       dateRange.length > 1
         ? Query.or(
@@ -172,13 +173,13 @@ export const getMessageByConversationId = async (
         Query.equal("conversationId", conversationId),
         Query.orderDesc("$createdAt"),
         dateQueries,
-        Query.or([
-          Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
-          Query.and([
-            Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
-            Query.notEqual("userId", userId),
-          ]),
-        ]),
+        // Query.or([
+        //   Query.notEqual("status", MESSAGE_STATUS.DELETED_FOR_ME),
+        //   Query.and([
+        //     Query.equal("status", MESSAGE_STATUS.DELETED_FOR_ME),
+        //     Query.notEqual("userId", userId),
+        //   ]),
+        // ]),
       ],
     )
 

@@ -206,6 +206,7 @@ export const getLastConversationOpt = async (
         Query.equal("userId", userId),
         Query.equal("conversationId", conversationId),
         Query.orderDesc("$id"),
+        Query.limit(1),
       ],
     )
 

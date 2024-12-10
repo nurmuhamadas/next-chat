@@ -10,6 +10,7 @@ import {
 } from "@/features/channel/lib/channel-subscribers-queries"
 import {
   createConversation,
+  createConversationOption,
   getConversationById,
   getConversationByUserIds,
 } from "@/features/chat/lib/queries"
@@ -126,6 +127,16 @@ const messageApp = new Hono()
                 userId1: currentProfile.$id,
                 userId2: formValue.userId,
               })
+              await createConversationOption(databases, {
+                conversationId: conversation.$id,
+                userId: currentProfile.$id,
+                notification: true,
+              })
+              await createConversationOption(databases, {
+                conversationId: conversation.$id,
+                userId: formValue.userId,
+                notification: true,
+              })
             }
             conversationId = conversation.$id
           }
@@ -204,8 +215,7 @@ const messageApp = new Hono()
 
           const response: CreateMessageResponse = successResponse(message)
           return c.json(response)
-        } catch (e) {
-          console.log(e)
+        } catch {
           if (files.length > 0) {
             await Promise.all(
               files.map((file) => deleteFile(storage, { id: file.$id })),
@@ -213,25 +223,25 @@ const messageApp = new Hono()
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }
-      } catch (e) {
-        console.log(e)
+      } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
   )
   .get(
-    "/private/:conversationId",
+    "/private/:userId",
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
       try {
-        const { conversationId } = c.req.param()
+        const { userId } = c.req.param()
 
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
 
-        const conversation = await getConversationById(databases, {
-          conversationId,
+        const conversation = await getConversationByUserIds(databases, {
+          userId1: currentProfile.$id,
+          userId2: userId,
         })
         if (!conversation) {
           return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
@@ -245,15 +255,11 @@ const messageApp = new Hono()
         }
 
         const result = await getMessageByConversationId(databases, {
-          conversationId,
+          conversationId: conversation.$id,
           userId: currentProfile.$id,
         })
-        const userPairId =
-          conversation.userId1 === currentProfile.$id
-            ? conversation.userId2
-            : conversation.userId1
         const userPair = await getUserProfileById(databases, {
-          userId: userPairId,
+          userId,
         })
 
         const messageIds = result.data.map((v) => v.$id)

@@ -3,12 +3,14 @@ import { ChangeEventHandler, useRef } from "react"
 interface TextEditorProps {
   value?: string
   placeholder?: string
+  disabled?: boolean
   onValueChange(value: string): void
 }
 
 const TextEditor = ({
   value = "",
   placeholder = "Input message here...",
+  disabled,
   onValueChange,
 }: TextEditorProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -28,6 +30,7 @@ const TextEditor = ({
       value={value}
       onChange={handleInputChange}
       placeholder={placeholder}
+      disabled={disabled}
       className="max-h-40 w-full resize-none overflow-y-auto bg-transparent body-2 focus:outline-none"
       rows={1}
     />
