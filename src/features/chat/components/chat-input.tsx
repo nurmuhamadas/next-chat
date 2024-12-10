@@ -4,7 +4,6 @@ import { ChangeEventHandler, useRef, useState } from "react"
 
 import {
   ImageIcon,
-  MicIcon,
   PaperclipIcon,
   PencilIcon,
   SendHorizonalIcon,
@@ -20,6 +19,7 @@ import { cn } from "@/lib/utils"
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
 import { useRepliedMessageId } from "../hooks/use-replied-message-id"
 
+import AudioRecorder from "./audio-recorder"
 import InputFilePreview from "./input-file-preview"
 import TextEditor from "./text-editor"
 
@@ -44,7 +44,12 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
   const { cancelEditMessage } = useEditedMessageId()
 
   const [message, setMessage] = useState("")
+  const [recordedAudio, setRecordedAudio] = useState<Blob | undefined>()
   const [attachments, setAttachments] = useState<File[]>([])
+
+  const audioUrl = recordedAudio
+    ? URL.createObjectURL(recordedAudio)
+    : undefined
 
   const { mutate: sendMessage } = useSendMessage()
 
@@ -82,6 +87,19 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   />
                 )
               })}
+            </div>
+          )}
+          {audioUrl && (
+            <div className="relative mb-3 flex h-max w-full flex-col overflow-hidden rounded-md bg-grey-4 p-1.5">
+              <audio controls src={audioUrl} className="w-full" />
+              <Button
+                variant="icon"
+                size="icon-sm"
+                className="absolute right-0 top-0 size-6  bg-foreground/50 hover:bg-foreground"
+                onClick={() => setRecordedAudio(undefined)}
+              >
+                <XIcon className="!size-3.5 text-surface" />
+              </Button>
             </div>
           )}
           {editedMessage && (
@@ -187,12 +205,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
               <SendHorizonalIcon />
             </Button>
           ) : (
-            <Button
-              className="size-11 bg-surface hover:bg-primary"
-              variant="secondary"
-            >
-              <MicIcon />
-            </Button>
+            <AudioRecorder onStop={setRecordedAudio} />
           )}
         </div>
       </div>
