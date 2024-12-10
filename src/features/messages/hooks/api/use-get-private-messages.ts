@@ -6,9 +6,9 @@ const useGetPrivateMessages = ({ id }: { id?: string }) => {
   const query = useQuery({
     queryKey: ["private-messages", id],
     queryFn: async () => {
-      const response = await client.api.messages.private[
-        ":conversationId"
-      ].$get({ param: { conversationId: id ?? "" } })
+      const response = await client.api.messages.private[":userId"].$get({
+        param: { userId: id ?? "" },
+      })
 
       const result = await response.json()
       if (!result.success) {

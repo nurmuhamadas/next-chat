@@ -76,6 +76,12 @@ export const debounce = <T extends (...args: any[]) => void>(
   }
 }
 
+export const formatMessageTime = (time: string, timeFormat: TimeFormat) => {
+  const date = parseISO(time)
+
+  return format(date, timeFormat === "12-HOUR" ? "hh:mm a" : "HH:mm")
+}
+
 export const formatChatTime = (time: string, timeFormat: TimeFormat) => {
   const date = parseISO(time)
 

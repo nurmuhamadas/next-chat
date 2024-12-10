@@ -1,6 +1,6 @@
 import ChatAvatar from "@/components/chat-avatar"
 import { Checkbox } from "@/components/ui/checkbox"
-import { cn } from "@/lib/utils"
+import { cn, formatChatTime, formatMessageTime } from "@/lib/utils"
 
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
@@ -12,6 +12,7 @@ interface MessageItemProps {
   type?: "private" | "group" | "channel"
   isSender?: boolean
   isSelected?: boolean
+  timeFormat?: TimeFormat
 }
 
 const MessageItem = ({
@@ -20,6 +21,7 @@ const MessageItem = ({
   type = "private",
   isSender = false,
   isSelected = false,
+  timeFormat = "12-HOUR",
 }: MessageItemProps) => {
   const { isSelectMode, toggleSelectMessage } = useSelectedMessageIds()
 
@@ -100,7 +102,9 @@ const MessageItem = ({
 
           <div className="mt-1.5 flex-center-between">
             <div className="">{/* Reaction here */}</div>
-            <span className="ml-auto text-foreground/50 caption">{"time"}</span>
+            <span className="ml-auto text-foreground/50 caption">
+              {formatMessageTime(message.createdAt, timeFormat)}
+            </span>
           </div>
         </div>
       </div>

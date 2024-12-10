@@ -95,6 +95,7 @@ declare interface Message {
   status: MessageStatus
   attachments: Attachment[]
   updatedAt: string | null
+  createdAt: string
 }
 
 declare interface Reaction {

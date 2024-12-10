@@ -62,6 +62,7 @@ export const mapMessageModelToMessage = (
     isRead,
     attachments: fixedAttachments,
     updatedAt: message.updatedAt ?? null,
+    createdAt: message.$createdAt,
   }
 }
 
