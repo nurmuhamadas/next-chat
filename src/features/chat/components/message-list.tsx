@@ -61,7 +61,7 @@ const MessageList = ({
         }}
       />
 
-      <div className="mx-auto flex w-full max-w-[700px] flex-col-reverse gap-y-2 px-4 pt-4">
+      <div className="mx-auto flex min-h-full w-full max-w-[700px] flex-col-reverse gap-y-2 px-4 pt-4">
         {groupedMessages.map(({ time, messages }) => {
           return (
             <div className="" key={time}>
@@ -83,6 +83,14 @@ const MessageList = ({
                       isSelected={selectedMessageIds.includes(message.id)}
                       isSender={myProfile?.id === message.user.id}
                       timeFormat={timeFormat}
+                      onClickParentMessage={(id) => {
+                        const container = chatRef.current
+                        const element = document.getElementById(id)
+
+                        if (container && element) {
+                          container.scrollTop = element.offsetTop
+                        }
+                      }}
                     />
                   )
                 })}
@@ -90,16 +98,15 @@ const MessageList = ({
             </div>
           )
         })}
-
         {isLoading && <MessageLoading />}
       </div>
     </ScrollArea>
   )
 }
 
-const MessageLoading = () => {
+export const MessageLoading = () => {
   return (
-    <div className="mx-auto flex size-full max-w-[700px] flex-1 flex-col justify-end gap-y-2">
+    <div className="mx-auto flex size-full flex-1 flex-col justify-end gap-y-2">
       <Skeleton className="ml-auto h-10 w-[300px]" />
       <Skeleton className="ml-auto h-8 w-[160px]" />
       <Skeleton className="h-10 w-[300px]" />

@@ -43,7 +43,9 @@ const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
         editMessage(message.id)
         break
       case "copy-text":
-        copyMessage(message.message)
+        if (message.message) {
+          copyMessage(message.message)
+        }
         break
       case "pin":
         break
@@ -62,8 +64,8 @@ const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
   }
 
   const fixedMenu = messageItemMenu.filter((menu) => {
-    if (!isSender) {
-      return menu.action !== "edit"
+    if (!isSender || !message.message) {
+      return menu.action !== "edit" && menu.action !== "copy-text"
     }
 
     return true

@@ -12,7 +12,10 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn, formatChatTime } from "@/lib/utils"
 
-import MessageList, { GroupedMessage } from "./message-list"
+import { useEditedMessageId } from "../hooks/use-edited-message-id"
+import { useRepliedMessageId } from "../hooks/use-replied-message-id"
+
+import MessageList, { GroupedMessage, MessageLoading } from "./message-list"
 
 interface ChatRoomMessagesProps {
   showBlank?: boolean
@@ -21,15 +24,22 @@ interface ChatRoomMessagesProps {
   isPrivateGroup?: boolean
   isChannelSubs?: boolean
   isPrivateChannel?: boolean
+  onRepliedMessageChange(message: Message | undefined): void
+  onEditMessageChange(message: Message | undefined): void
 }
 const ChatRoomMessages = ({
   isGroupMember = false,
   isPrivateGroup = true,
   isChannelSubs,
   isPrivateChannel,
+  onRepliedMessageChange,
+  onEditMessageChange,
 }: ChatRoomMessagesProps) => {
   const type = useRoomType()
   const id = useRoomId()
+
+  const { repliedMessageId } = useRepliedMessageId()
+  const { editedMessageId } = useEditedMessageId()
 
   const [messages, setMessages] = useState<Message[]>([])
   const [canLoadMore, setCanLoadMore] = useState(true)
@@ -100,6 +110,18 @@ const ChatRoomMessages = ({
     }
   }, [groupingMessage, type, isLoading])
 
+  useEffect(() => {
+    if (!isLoading) {
+      onRepliedMessageChange(messages?.find((m) => m.id === repliedMessageId))
+    }
+  }, [repliedMessageId, onRepliedMessageChange, isLoading])
+
+  useEffect(() => {
+    if (!isLoading) {
+      onEditMessageChange(messages?.find((m) => m.id === editedMessageId))
+    }
+  }, [editedMessageId, onEditMessageChange, isLoading])
+
   const showBlank =
     (type === "group" && isPrivateGroup && !isGroupMember) ||
     (type === "channel" && isPrivateChannel && !isChannelSubs)
@@ -127,6 +149,11 @@ const ChatRoomMessages = ({
           <div className="gap-y-2 flex-col-center">
             <h4 className="h4">No Messages</h4>
           </div>
+        </div>
+      )}
+      {isLoading && isEmpty && (
+        <div className="mx-auto size-full max-w-[700px]">
+          <MessageLoading />
         </div>
       )}
       {!isEmpty && (

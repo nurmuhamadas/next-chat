@@ -89,6 +89,7 @@
 
   .chat-list-scroll-area > div > div {
     display: block !important;
+    height: 100%;
   }
 
   ::-webkit-scrollbar {

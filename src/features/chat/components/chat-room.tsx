@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import Loading from "@/components/loader"
 import RightPanel from "@/components/right-panel"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
@@ -11,8 +13,6 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 
 import useGetConversationByUserId from "../hooks/api/use-get-conversation-by-user-id"
-import { useEditedMessageId } from "../hooks/use-edited-message-id"
-import { useRepliedMessageId } from "../hooks/use-replied-message-id"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
 import ChatInput from "./chat-input"
@@ -25,8 +25,9 @@ const ChatRoom = () => {
   const type = useRoomType()
   const id = useRoomId()
 
-  const { repliedMessageId } = useRepliedMessageId()
-  const { editedMessageId } = useEditedMessageId()
+  const [repliedMessage, setRepliedMessage] = useState<Message | undefined>()
+  const [editedMessage, setEditedMessage] = useState<Message | undefined>()
+
   const { isSelectMode } = useSelectedMessageIds()
 
   const { data: conversation, isLoading: loadingConversation } =
@@ -55,23 +56,6 @@ const ChatRoom = () => {
   const isPrivateGroup = group ? group?.type === "PRIVATE" : true
   const isPrivateChannel = channel ? channel?.type === "PRIVATE" : true
 
-  // TODO:
-  const repliedMessage = repliedMessageId
-    ? {
-        id: repliedMessageId,
-        name: "User Replied",
-        message: "Dolor sit amet",
-      }
-    : undefined
-  // TODO:
-  const editedMessage = editedMessageId
-    ? {
-        id: repliedMessageId,
-        name: "User Replied",
-        message: "Dolor sit amet",
-      }
-    : undefined
-
   const hideInput =
     (type === "group" && !isGroupMember) ||
     (type === "channel" && !isChannelAdmin)
@@ -96,6 +80,8 @@ const ChatRoom = () => {
               isPrivateGroup={isPrivateGroup}
               isChannelSubs={isChannelSubs}
               isPrivateChannel={isPrivateChannel}
+              onRepliedMessageChange={setRepliedMessage}
+              onEditMessageChange={setEditedMessage}
             />
 
             {!hideInput && (

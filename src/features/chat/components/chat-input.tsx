@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEventHandler, useRef, useState } from "react"
+import { ChangeEventHandler, useEffect, useRef, useState } from "react"
 
 import { format } from "date-fns"
 import {
@@ -8,6 +8,7 @@ import {
   Loader2Icon,
   PaperclipIcon,
   PencilIcon,
+  ReplyIcon,
   SendHorizonalIcon,
   SmileIcon,
   XIcon,
@@ -16,6 +17,7 @@ import {
 import EmojiPopover from "@/components/emoji-popover"
 import { Button } from "@/components/ui/button"
 import useSendMessage from "@/features/messages/hooks/api/use-send-message"
+import useUpdateMessage from "@/features/messages/hooks/api/use-update-message"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn } from "@/lib/utils"
@@ -28,16 +30,8 @@ import InputFilePreview from "./input-file-preview"
 import TextEditor from "./text-editor"
 
 interface ChatInputProps {
-  editedMessage?: {
-    id: string
-    name: string
-    message: string
-  }
-  repliedMessage?: {
-    id: string
-    name: string
-    message: string
-  }
+  editedMessage?: Message
+  repliedMessage?: Message
 }
 
 const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
@@ -60,6 +54,8 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     : undefined
 
   const { mutate: sendMessage, isPending: isSending } = useSendMessage()
+  const { mutate: updateMessage, isPending: isUpdating } = useUpdateMessage()
+  const isLoading = isUpdating || isSending
 
   const handleSend = () => {
     const att = [...attachments]
@@ -73,24 +69,43 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     if (type === "channel") roomIds["groupId"] = id
     if (type === "group") roomIds["channelId"] = id
 
-    sendMessage(
-      {
-        form: {
-          ...roomIds,
-          attachments: att,
-          message,
-          isEmojiOnly: String(isEmojiOnly),
+    if (editedMessage) {
+      updateMessage(
+        {
+          json: { message, isEmojiOnly: String(isEmojiOnly) },
+          param: { messageId: editedMessage.id },
         },
-      },
-      {
-        onSuccess() {
-          setMessage("")
-          setAttachments([])
-          setIsEmojiOnly(false)
-          setRecordedAudio(undefined)
+        {
+          onSuccess() {
+            setMessage("")
+            setAttachments([])
+            setIsEmojiOnly(false)
+            setRecordedAudio(undefined)
+            cancelEditMessage()
+          },
         },
-      },
-    )
+      )
+    } else {
+      sendMessage(
+        {
+          form: {
+            ...roomIds,
+            attachments: att,
+            message,
+            isEmojiOnly: String(isEmojiOnly),
+            parentMessageId: repliedMessage?.id,
+          },
+        },
+        {
+          onSuccess() {
+            setMessage("")
+            setAttachments([])
+            setIsEmojiOnly(false)
+            setRecordedAudio(undefined)
+          },
+        },
+      )
+    }
   }
 
   const handleFileChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -106,6 +121,12 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     )
   }
 
+  useEffect(() => {
+    if (editedMessage) {
+      setMessage(editedMessage.message ?? "")
+    }
+  }, [editedMessage])
+
   return (
     <div className="flex w-full justify-center p-4 pt-3">
       <div className="flex w-full max-w-[700px] items-end gap-x-2">
@@ -117,7 +138,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   <InputFilePreview
                     key={file.size + file.name}
                     file={file}
-                    disabled={isSending}
+                    disabled={isLoading}
                     onRemove={() => handleRemoveFile(i)}
                   />
                 )
@@ -156,12 +177,16 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
           )}
           {!editedMessage && repliedMessage && (
             <div className={cn("mb-3 flex items-center gap-x-1")}>
+              <ReplyIcon className="mr-2 size-6 text-muted-foreground" />
               <div className="flex flex-1 flex-col rounded-sm border-l-4 bg-bubble-reply-1 py-1 pl-2 pr-1">
                 <p className="line-clamp-1 font-semibold caption">
-                  {repliedMessage.name}
+                  {repliedMessage.user.name}
                 </p>
                 <p className={cn("line-clamp-1 text-foreground/50 caption")}>
                   {repliedMessage.message}
+                  {!repliedMessage.message && attachments && (
+                    <span className="text-muted-foreground">Attachments</span>
+                  )}
                 </p>
               </div>
 
@@ -188,7 +213,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                 variant="icon"
                 size="icon"
                 className="size-5 p-0 hover:text-primary"
-                disabled={isSending}
+                disabled={isLoading}
               >
                 <SmileIcon />
               </Button>
@@ -196,7 +221,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
 
             <TextEditor
               value={message}
-              disabled={isSending}
+              disabled={isLoading}
               onValueChange={(value) => {
                 setMessage(value)
                 if (isEmojiOnly) {
@@ -205,54 +230,56 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
               }}
             />
 
-            <div className="gap-x-2 flex-center-end">
-              <input
-                type="file"
-                hidden
-                ref={inputImageRef}
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-                multiple
-              />
-              <Button
-                variant="icon"
-                size="icon"
-                className="size-5 p-0 hover:text-primary"
-                disabled={isSending}
-                onClick={() => inputImageRef.current?.click()}
-              >
-                <ImageIcon />
-              </Button>
-              <input
-                type="file"
-                hidden
-                ref={inputFileRef}
-                accept="*"
-                className="hidden"
-                multiple
-                onChange={handleFileChange}
-              />
-              <Button
-                variant="icon"
-                size="icon"
-                className="size-5 p-0 hover:text-primary"
-                disabled={isSending}
-                onClick={() => inputFileRef.current?.click()}
-              >
-                <PaperclipIcon />
-              </Button>
-            </div>
+            {!editedMessage && (
+              <div className="gap-x-2 flex-center-end">
+                <input
+                  type="file"
+                  hidden
+                  ref={inputImageRef}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  multiple
+                />
+                <Button
+                  variant="icon"
+                  size="icon"
+                  className="size-5 p-0 hover:text-primary"
+                  disabled={isLoading}
+                  onClick={() => inputImageRef.current?.click()}
+                >
+                  <ImageIcon />
+                </Button>
+                <input
+                  type="file"
+                  hidden
+                  ref={inputFileRef}
+                  accept="*"
+                  className="hidden"
+                  multiple
+                  onChange={handleFileChange}
+                />
+                <Button
+                  variant="icon"
+                  size="icon"
+                  className="size-5 p-0 hover:text-primary"
+                  disabled={isLoading}
+                  onClick={() => inputFileRef.current?.click()}
+                >
+                  <PaperclipIcon />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
         {message.length > 0 || audioUrl || attachments.length > 0 ? (
           <Button
             className="size-11 bg-surface hover:bg-primary"
             variant="secondary"
-            disabled={isSending}
+            disabled={isLoading}
             onClick={handleSend}
           >
-            {isSending ? (
+            {isLoading ? (
               <Loader2Icon className="animate-spin" />
             ) : (
               <SendHorizonalIcon />

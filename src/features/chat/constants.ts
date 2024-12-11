@@ -10,7 +10,6 @@ import {
   LucideIcon,
   MoonStarIcon,
   PencilIcon,
-  PinIcon,
   ReplyIcon,
   SettingsIcon,
   SunIcon,
@@ -157,11 +156,11 @@ export const messageItemMenu: {
     icon: CopyIcon,
     action: "copy-text",
   },
-  {
-    label: "Pin",
-    icon: PinIcon,
-    action: "pin",
-  },
+  // {
+  //   label: "Pin",
+  //   icon: PinIcon,
+  //   action: "pin",
+  // },
   {
     label: "Forward",
     icon: ForwardIcon,

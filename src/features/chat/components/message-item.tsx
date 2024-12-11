@@ -21,6 +21,7 @@ interface MessageItemProps {
   isSender?: boolean
   isSelected?: boolean
   timeFormat?: TimeFormat
+  onClickParentMessage?(id: string): void
 }
 
 const MessageItem = ({
@@ -30,6 +31,7 @@ const MessageItem = ({
   isSender = false,
   isSelected = false,
   timeFormat = "12-HOUR",
+  onClickParentMessage,
 }: MessageItemProps) => {
   const { isSelectMode, toggleSelectMessage } = useSelectedMessageIds()
 
@@ -38,6 +40,7 @@ const MessageItem = ({
 
   return (
     <div
+      id={message.id}
       className={cn(
         "flex w-full  rounded-md",
         isSender ? "justify-end" : "justify-start",
@@ -87,9 +90,14 @@ const MessageItem = ({
           {message.parentMessageName && message.parentMessageText && (
             <div
               className={cn(
-                "flex flex-col rounded-sm border-l-4 px-2 py-1 mt-1",
+                "flex flex-col rounded-sm border-l-4 px-2 py-1 mt-1 cursor-pointer",
                 isSender ? "bg-bubble-reply-2" : "bg-bubble-reply-1",
               )}
+              onClick={() => {
+                if (message.parentMessageId) {
+                  onClickParentMessage?.(message.parentMessageId)
+                }
+              }}
             >
               <p className="line-clamp-1 font-semibold caption">
                 {message.parentMessageName}
@@ -200,9 +208,15 @@ const MessageItem = ({
             {message.message}
           </p>
 
-          <div className="mt-1.5 flex-center-between">
+          <div className="mt-1.5 flex items-center justify-end gap-x-2">
             <div className="">{/* Reaction here */}</div>
-            <span className="ml-auto text-foreground/50 caption">
+
+            {message.updatedAt && (
+              <span className="italic text-muted-foreground caption">
+                Edited
+              </span>
+            )}
+            <span className="text-foreground/50 caption">
               {formatMessageTime(message.createdAt, timeFormat)}
             </span>
           </div>
