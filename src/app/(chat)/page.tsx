@@ -5,6 +5,7 @@ export default function Home() {
     <div className="hidden h-screen flex-1 md:flex-center">
       <div className="gap-y-6 flex-col-center">
         <Image
+          priority
           src="/images/no-message.svg"
           alt="no conversation"
           width={200}

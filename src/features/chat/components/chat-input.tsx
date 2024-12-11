@@ -64,11 +64,6 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
       att.push(new File([recordedAudio], audioName, { type: "audio/webm" }))
     }
 
-    const roomIds: Record<string, string | undefined> = {}
-    if (type === "chat") roomIds["userId"] = id
-    if (type === "channel") roomIds["groupId"] = id
-    if (type === "group") roomIds["channelId"] = id
-
     if (editedMessage) {
       updateMessage(
         {
@@ -89,7 +84,9 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
       sendMessage(
         {
           form: {
-            ...roomIds,
+            userId: type === "chat" ? id : undefined,
+            groupId: type === "group" ? id : undefined,
+            channelId: type === "channel" ? id : undefined,
             attachments: att,
             message,
             isEmojiOnly: String(isEmojiOnly),

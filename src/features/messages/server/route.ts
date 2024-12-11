@@ -11,7 +11,6 @@ import {
 import {
   createConversation,
   createConversationOption,
-  getConversationById,
   getConversationByUserIds,
 } from "@/features/chat/lib/queries"
 import {
@@ -194,7 +193,7 @@ const messageApp = new Hono()
 
           if (conversationId) {
             createOrUpdateLastConvMessageRead(databases, {
-              conversationId: conversationId,
+              conversationId,
               lastMessageReadId: result.$id,
               userId: currentProfile.$id,
             })
@@ -304,29 +303,24 @@ const messageApp = new Hono()
     },
   )
   .post(
-    "/private/:conversationId/read",
+    "/private/:userId/read",
     sessionMiddleware,
     validateProfileMiddleware,
     async (c) => {
       try {
-        const { conversationId } = c.req.param()
+        const { userId } = c.req.param()
 
         const databases = c.get("databases")
         const currentProfile = c.get("userProfile")
 
-        const conversation = await getConversationById(databases, {
-          conversationId,
+        const conversation = await getConversationByUserIds(databases, {
+          userId1: currentProfile.$id,
+          userId2: userId,
         })
         if (!conversation) {
           return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
         }
-
-        if (
-          conversation.userId1 !== currentProfile.$id &&
-          conversation.userId2 !== currentProfile.$id
-        ) {
-          return c.json(createError(ERROR.NOT_ALLOWED), 403)
-        }
+        const conversationId = conversation.$id
 
         const lastMessage = await getLastMessageByConversationId(databases, {
           conversationId,

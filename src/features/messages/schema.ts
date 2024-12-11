@@ -10,16 +10,28 @@ export const createMessageSchema = z
         invalid_type_error: ERROR.INVALID_TYPE,
       })
       .max(1048576, ERROR.MESSAGE_TOO_LONG)
-      .optional(),
+      .optional()
+      .transform((v) => (v === "undefined" ? undefined : v)),
     parentMessageId: z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
-      .optional(),
-    userId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }).optional(),
-    groupId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }).optional(),
-    channelId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }).optional(),
+      .optional()
+      .transform((v) => (v === "undefined" ? undefined : v)),
+    userId: z
+      .string({ invalid_type_error: ERROR.INVALID_TYPE })
+      .optional()
+      .transform((v) => (v === "undefined" ? undefined : v)),
+    groupId: z
+      .string({ invalid_type_error: ERROR.INVALID_TYPE })
+      .optional()
+      .transform((v) => (v === "undefined" ? undefined : v)),
+    channelId: z
+      .string({ invalid_type_error: ERROR.INVALID_TYPE })
+      .optional()
+      .transform((v) => (v === "undefined" ? undefined : v)),
     originalMessageId: z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
-      .optional(),
+      .optional()
+      .transform((v) => (v === "undefined" ? undefined : v)),
     isEmojiOnly: z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
       .transform((text) => (text?.toLowerCase() === "true" ? true : false))

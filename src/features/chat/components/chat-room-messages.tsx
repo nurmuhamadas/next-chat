@@ -140,6 +140,7 @@ const ChatRoomMessages = ({
       {!isLoading && isEmpty && (
         <div className="m-auto gap-y-6 px-4 flex-col-center">
           <Image
+            priority
             src="/images/no-message.svg"
             alt="no conversation"
             width={200}
@@ -152,7 +153,7 @@ const ChatRoomMessages = ({
         </div>
       )}
       {isLoading && isEmpty && (
-        <div className="mx-auto size-full max-w-[700px]">
+        <div className="mx-auto size-full max-w-[700px] px-4">
           <MessageLoading />
         </div>
       )}

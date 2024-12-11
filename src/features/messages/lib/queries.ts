@@ -54,6 +54,7 @@ export const validateMessage = async (
       }
     }
   }
+
   if (form.parentMessageId) {
     const originMessage = await getMessageById(databases, {
       id: form.parentMessageId,
