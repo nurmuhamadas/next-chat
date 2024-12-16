@@ -1,25 +1,17 @@
 import "server-only"
 
+import { Profile } from "@prisma/client"
 import { createMiddleware } from "hono/factory"
-import {
-  type Account as AccountType,
-  type Databases as DatabasesType,
-  Models,
-  type Storage as StorageType,
-} from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
-import { getUserByEmail } from "@/features/user/lib/queries"
+import { getProfileByUserId } from "@/features/user/lib/queries"
 
 import { createError } from "./utils"
 
 type AdditionalContext = {
   Variables: {
-    userProfile: UserAWModel
-    account: AccountType
-    databases: DatabasesType
-    storage: StorageType
-    userAccount: Models.User<Models.Preferences>
+    userSession: UserSession
+    userProfile: Profile
   }
 }
 
@@ -28,10 +20,9 @@ type AdditionalContext = {
  */
 export const validateProfileMiddleware = createMiddleware<AdditionalContext>(
   async (c, next) => {
-    const databases = c.get("databases")
-    const user = c.get("userAccount")
+    const session = c.get("userSession")
 
-    const profile = await getUserByEmail(databases, { email: user.email })
+    const profile = await getProfileByUserId(session.userId)
 
     if (!profile) {
       return c.json(createError(ERROR.COMPLETE_PROFILE_FIRST), 403)

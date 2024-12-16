@@ -1,46 +1,55 @@
 import "server-only"
 
+import { isBefore } from "date-fns"
+import { deleteCookie, getCookie } from "hono/cookie"
 import { createMiddleware } from "hono/factory"
-import {
-  type Account as AccountType,
-  type Databases as DatabasesType,
-  Models,
-  type Storage as StorageType,
-} from "node-appwrite"
 
 import { ERROR } from "@/constants/error"
+import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
+import { deleteSession } from "@/features/auth/lib/queries"
+import { decodeJWT } from "@/features/auth/lib/utils"
 
-import { createSessionClient } from "./appwrite"
+import { prisma } from "./prisma"
 import { createError } from "./utils"
 
 type AdditionalContext = {
   Variables: {
-    account: AccountType
-    databases: DatabasesType
-    storage: StorageType
-    userAccount: Models.User<Models.Preferences>
+    userSession: UserSession
   }
 }
 
 export const sessionMiddleware = createMiddleware<AdditionalContext>(
   async (c, next) => {
     try {
-      const { account, databases, storage } = await createSessionClient()
+      const token = getCookie(c, AUTH_COOKIE_KEY)
 
-      if (!account) {
+      if (!token) {
         return c.json(createError(ERROR.UNAUTHORIZE), 401)
       }
 
-      const user = await account.get()
-      if (!user.emailVerification) {
-        return c.json(createError(ERROR.EMAIL_UNVERIFIED), 401)
+      const session = await prisma.session.findUnique({ where: { token } })
+      if (!session) {
+        deleteCookie(c, AUTH_COOKIE_KEY)
+
+        return c.json(createError(ERROR.UNAUTHORIZE), 401)
+      }
+      if (isBefore(session.expiresAt, new Date())) {
+        deleteCookie(c, AUTH_COOKIE_KEY)
+        await deleteSession(token)
+
+        return c.json(createError(ERROR.UNAUTHORIZE), 401)
       }
 
-      c.set("account", account)
-      c.set("account", account)
-      c.set("storage", storage)
-      c.set("databases", databases)
-      c.set("userAccount", user)
+      const { payload } = decodeJWT(token)
+      const userSession = {
+        id: session.id,
+        userId: session.userId,
+        email: payload.email,
+        username: payload.username,
+        token,
+      }
+
+      c.set("userSession", userSession)
 
       await next()
     } catch {

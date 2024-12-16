@@ -1,3 +1,11 @@
+declare interface UserSession {
+  id: string
+  token: string
+  userId: string
+  username: string
+  email: string
+}
+
 declare interface ErrorResponse {
   success: false
   error: {
@@ -18,24 +26,26 @@ declare type ApiCollectionResponse<T> = {
 }
 
 // AUTH API
-declare type RegisterResponse = ApiResponse<{ otpId: string; email: string }>
+declare type SignUpResponse = ApiResponse<{ username: string; email: string }>
 
-declare type LoginResponse = ApiResponse<{
-  otpId?: string
-  email?: string
+declare type SignInResponse = ApiResponse<{
   status: "unverified" | "2fa" | "success"
 }>
 
-declare type ForgotPasswordResponse = ApiResponse<boolean>
+declare type EmailVerificationResponse = ApiResponse<{ email: string }>
+
+declare type EmailLoginResponse = ApiResponse<{ email: string }>
+
+declare type EmailPasswordResetResponse = ApiResponse<{ email: string }>
 
 declare type ResetPasswordResponse = ApiResponse<boolean>
 
-declare type VerifyOTPResponse = ApiResponse<boolean>
+declare type VerifyEmailResponse = ApiResponse<boolean>
 
 declare type LogoutResponse = ApiResponse<boolean>
 
 // USER API
-declare type CheckUsernameResponse = ApiResponse<boolean>
+declare type UsernameAvailabilityResponse = ApiResponse<boolean>
 
 declare type CreateUserProfileResponse = ApiResponse<User>
 

@@ -10,7 +10,7 @@ import messageApp from "@/features/messages/server/route"
 import settingApp from "@/features/settings/server/route"
 import userApp from "@/features/user/server/route"
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 const app = new Hono().basePath("/api")
 

@@ -1,4 +1,8 @@
-import "server-only"
+import { LogActivity } from "@prisma/client"
+
+import { prisma } from "@/lib/prisma"
+
+import { getSessionExpired, getTokenExpired } from "./utils"
 
 export const validateAuth = async () => {
   try {
@@ -6,4 +10,137 @@ export const validateAuth = async () => {
   } catch {
     return { isLoggedIn: false, isProfileCompleted: false }
   }
+}
+
+// =============== USER ===============
+export const verifyUserEmail = (id: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: { emailVerifiedAt: new Date() },
+  })
+}
+
+export const updateUserPassword = ({
+  id,
+  password,
+  sessionId,
+}: {
+  id: string
+  password: string
+  sessionId?: string
+}) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      password,
+      logs: sessionId
+        ? {
+            create: {
+              activity: "RESET_PASSWORD",
+              description: "Password reset",
+              sessionId,
+            },
+          }
+        : undefined,
+    },
+  })
+}
+
+// =============== USER LOG ===============
+export const createUserLog = ({
+  activity,
+  userId,
+  sessionId,
+  description,
+}: {
+  activity: LogActivity
+  userId: string
+  sessionId: string
+  description?: string
+}) => {
+  return prisma.userLog.create({
+    data: { activity, description, sessionId, userId },
+  })
+}
+
+// =============== SESSION ===============
+export const createOrUpdateSession = ({
+  token,
+  userAgent,
+  userId,
+  description,
+}: {
+  token: string
+  userAgent: string
+  userId: string
+  description: string
+}) => {
+  const userLogs = {
+    userId,
+    description,
+  }
+  return prisma.session.upsert({
+    where: { token },
+    create: {
+      token,
+      userAgent,
+      userId,
+      expiresAt: getSessionExpired(),
+      userLogs: {
+        create: { ...userLogs, activity: LogActivity.LOGIN_NEW_DEVICE },
+      },
+    },
+    update: {
+      expiresAt: getSessionExpired(),
+      userLogs: {
+        create: { ...userLogs, activity: LogActivity.LOGIN },
+      },
+    },
+  })
+}
+
+export const deleteSession = (token: string) => {
+  return prisma.session.delete({
+    where: { token },
+  })
+}
+
+// =============== PASSWORD TOKEN ===============
+export const createPasswordResetToken = ({
+  email,
+  token,
+}: {
+  email: string
+  token: string
+}) => {
+  return prisma.passwordResetToken.create({
+    data: { email, token, expiresAt: getTokenExpired() },
+  })
+}
+
+export const deletePasswordResetToken = ({ email }: { email: string }) => {
+  return prisma.passwordResetToken.delete({
+    where: { email },
+  })
+}
+
+// =============== VERIFICATION TOKEN ===============
+export const createOrUpdateVerificationToken = ({
+  email,
+  token,
+}: {
+  email: string
+  token: string
+}) => {
+  return prisma.verificationToken.upsert({
+    where: { email },
+    create: { email, token, expiresAt: getTokenExpired() },
+    update: { token, expiresAt: getTokenExpired() },
+  })
+}
+
+export const deleteVerificationToken = ({ email }: { email: string }) => {
+  return prisma.verificationToken.delete({
+    where: { email },
+  })
 }
