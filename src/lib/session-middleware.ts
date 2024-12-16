@@ -6,7 +6,7 @@ import { createMiddleware } from "hono/factory"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
-import { deleteSession } from "@/features/auth/lib/queries"
+import { softDeleteSession } from "@/features/auth/lib/queries"
 import { decodeJWT } from "@/features/auth/lib/utils"
 
 import { prisma } from "./prisma"
@@ -35,7 +35,7 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
       }
       if (isBefore(session.expiresAt, new Date())) {
         deleteCookie(c, AUTH_COOKIE_KEY)
-        await deleteSession(token)
+        await softDeleteSession(session)
 
         return c.json(createError(ERROR.UNAUTHORIZE), 401)
       }

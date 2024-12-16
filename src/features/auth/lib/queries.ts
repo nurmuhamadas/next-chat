@@ -1,4 +1,5 @@
 import { LogActivity } from "@prisma/client"
+import { addDays } from "date-fns"
 
 import { prisma } from "@/lib/prisma"
 
@@ -65,11 +66,13 @@ export const createUserLog = ({
 
 // =============== SESSION ===============
 export const createOrUpdateSession = ({
+  id = "",
   token,
   userAgent,
   userId,
   description,
 }: {
+  id?: string
   token: string
   userAgent: string
   userId: string
@@ -80,7 +83,7 @@ export const createOrUpdateSession = ({
     description,
   }
   return prisma.session.upsert({
-    where: { token },
+    where: { id },
     create: {
       token,
       userAgent,
@@ -91,6 +94,7 @@ export const createOrUpdateSession = ({
       },
     },
     update: {
+      token,
       expiresAt: getSessionExpired(),
       userLogs: {
         create: { ...userLogs, activity: LogActivity.LOGIN },
@@ -99,9 +103,24 @@ export const createOrUpdateSession = ({
   })
 }
 
-export const deleteSession = (token: string) => {
-  return prisma.session.delete({
-    where: { token },
+export const softDeleteSession = ({
+  id,
+  userId,
+}: {
+  id: string
+  userId: string
+}) => {
+  return prisma.session.update({
+    where: { id },
+    data: {
+      expiresAt: addDays(new Date(), -10),
+      userLogs: {
+        create: {
+          activity: "LOGOUT",
+          userId,
+        },
+      },
+    },
   })
 }
 

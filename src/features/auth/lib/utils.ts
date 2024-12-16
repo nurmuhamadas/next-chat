@@ -1,10 +1,14 @@
-import { PasswordResetToken, VerificationToken } from "@prisma/client"
+import { PasswordResetToken, Session, VerificationToken } from "@prisma/client"
 import { addDays, addMinutes, isBefore } from "date-fns"
+import { Context } from "hono"
+import { getCookie, setCookie } from "hono/cookie"
 import * as jwt from "hono/jwt"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_SECRET } from "@/lib/config"
 import { prisma } from "@/lib/prisma"
+
+import { AUTH_COOKIE_KEY, DEVICE_ID_COOKIE_KEY } from "../constants"
 
 const SALT_ROUND = 10
 
@@ -24,7 +28,7 @@ export const generateSessionToken = (data: {
   username: string
   email: string
 }) => {
-  return jwt.sign(data, AUTH_SECRET)
+  return jwt.sign({ ...data, createdAt: new Date() }, AUTH_SECRET)
 }
 
 export const generateVerificationToken = (data: {
@@ -71,4 +75,28 @@ export const validateToken = ({
   if (isBefore(originToken.expiresAt, new Date())) {
     return ERROR.TOKEN_EXPIRED
   }
+}
+
+export const setAuthCookies = (c: Context, session: Session) => {
+  const deviceId = getDeviceId(c)
+  if (!deviceId) {
+    setCookie(c, DEVICE_ID_COOKIE_KEY, session.id, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 10000,
+    })
+  }
+  setCookie(c, AUTH_COOKIE_KEY, session.token, {
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 30,
+  })
+}
+
+export const getDeviceId = (c: Context) => {
+  return getCookie(c, DEVICE_ID_COOKIE_KEY)
 }

@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
-import { deleteCookie, setCookie } from "hono/cookie"
+import { deleteCookie } from "hono/cookie"
 
 import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
@@ -13,10 +13,9 @@ import {
   createOrUpdateSession,
   createOrUpdateVerificationToken,
   createPasswordResetToken,
-  createUserLog,
   deletePasswordResetToken,
-  deleteSession,
   deleteVerificationToken,
+  softDeleteSession,
   updateUserPassword,
   verifyUserEmail,
 } from "../lib/queries"
@@ -25,8 +24,10 @@ import {
   comparePassword,
   generateSessionToken,
   generateVerificationToken,
+  getDeviceId,
   getTokenExpired,
   hashPassword,
+  setAuthCookies,
   validateToken,
 } from "../lib/utils"
 import {
@@ -135,26 +136,22 @@ const authApp = new Hono()
           return c.json(response)
         }
 
+        const deviceId = getDeviceId(c)
         const token = await generateSessionToken({
           email,
           userId: existingUser.id,
           username: existingUser.username,
         })
 
-        await createOrUpdateSession({
+        const session = await createOrUpdateSession({
+          id: deviceId,
           token,
           userAgent,
           userId: existingUser.id,
           description: `Login from ${userAgent}`,
         })
 
-        setCookie(c, AUTH_COOKIE_KEY, token, {
-          path: "/",
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24 * 30,
-        })
+        setAuthCookies(c, session)
 
         const response: SignInResponse = successResponse({ status: "success" })
         return c.json(response)
@@ -222,10 +219,12 @@ const authApp = new Hono()
           return c.json(createError(invalidToken), 400)
         }
 
-        await prisma.$transaction([
+        const deviceId = getDeviceId(c)
+        const [, , session] = await prisma.$transaction([
           verifyUserEmail(existingUser.id),
           deleteVerificationToken({ email }),
           createOrUpdateSession({
+            id: deviceId,
             token,
             userAgent,
             userId: existingUser.id,
@@ -233,13 +232,7 @@ const authApp = new Hono()
           }),
         ])
 
-        setCookie(c, AUTH_COOKIE_KEY, token, {
-          path: "/",
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24 * 30,
-        })
+        setAuthCookies(c, session)
 
         const response: VerifyEmailResponse = successResponse(true)
         return c.json(response)
@@ -305,9 +298,11 @@ const authApp = new Hono()
           return c.json(createError(invalidToken), 400)
         }
 
-        await prisma.$transaction([
+        const deviceId = getDeviceId(c)
+        const [, session] = await prisma.$transaction([
           deleteVerificationToken({ email }),
           createOrUpdateSession({
+            id: deviceId,
             token,
             userAgent,
             userId: existingUser.id,
@@ -315,13 +310,7 @@ const authApp = new Hono()
           }),
         ])
 
-        setCookie(c, AUTH_COOKIE_KEY, token, {
-          path: "/",
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24 * 30,
-        })
+        setAuthCookies(c, session)
 
         const response: VerifyEmailResponse = successResponse(true)
         return c.json(response)
@@ -400,17 +389,9 @@ const authApp = new Hono()
   .post("/sign-out", sessionMiddleware, async (c) => {
     try {
       const session = c.get("userSession")
-      const userAgent = c.req.header("User-Agent") ?? "Unknown"
 
       deleteCookie(c, AUTH_COOKIE_KEY)
-      await deleteSession(session.token)
-
-      await createUserLog({
-        userId: session.userId,
-        sessionId: session.id,
-        activity: "LOGIN",
-        description: `Logout from ${userAgent}`,
-      })
+      await softDeleteSession(session)
 
       const response: LogoutResponse = successResponse(true)
       return c.json(response)
