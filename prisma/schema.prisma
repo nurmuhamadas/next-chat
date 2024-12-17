@@ -186,7 +186,7 @@ model Conversation {
   user1 User @relation("initiatedBy", fields: [user1Id], references: [id])
   user2 User @relation("receivedBy", fields: [user2Id], references: [id])
 
-  option       ConversationOption?
+  usersOption  ConversationOption[]
   messages     Message[]
   messageReads MessageRead[]
 
@@ -196,7 +196,7 @@ model Conversation {
 
 model ConversationOption {
   id             String    @id @default(uuid(7))
-  conversationId String    @unique @map("conversation_id")
+  conversationId String    @map("conversation_id")
   userId         String    @map("user_id")
   notification   Boolean
   deletedAt      DateTime? @map("deleted_at")
@@ -228,10 +228,10 @@ model Group {
   owner       User     @relation(fields: [ownerId], references: [id])
   lastMessage Message? @relation("lastMessage", fields: [lastMessageId], references: [id])
 
-  option       GroupOption?
-  members      GroupMember[]
-  messages     Message[]
-  messageReads MessageRead[]
+  membersOption GroupOption[]
+  members       GroupMember[]
+  messages      Message[]
+  messageReads  MessageRead[]
 
   @@unique([ownerId, name])
   @@map("groups")
@@ -239,7 +239,7 @@ model Group {
 
 model GroupOption {
   id           String   @id @default(uuid(7))
-  groupId      String   @unique @map("group_id")
+  groupId      String   @map("group_id")
   userId       String   @map("user_id")
   notification Boolean
   createdAt    DateTime @default(now()) @map("created_at")
@@ -248,6 +248,7 @@ model GroupOption {
   group Group @relation(fields: [groupId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
 
+  @@unique([groupId, userId])
   @@map("group_options")
 }
 
@@ -286,10 +287,10 @@ model Channel {
   owner       User     @relation(fields: [ownerId], references: [id])
   lastMessage Message? @relation("lastMessage", fields: [lastMessageId], references: [id])
 
-  option       ChannelOption?
-  subscribers  ChannelSubscriber[]
-  messages     Message[]
-  messageReads MessageRead[]
+  subscribersOption ChannelOption[]
+  subscribers       ChannelSubscriber[]
+  messages          Message[]
+  messageReads      MessageRead[]
 
   @@unique([ownerId, name])
   @@map("channels")
@@ -297,7 +298,7 @@ model Channel {
 
 model ChannelOption {
   id           String   @id @default(uuid(7))
-  channelId    String   @unique @map("channel_id")
+  channelId    String   @map("channel_id")
   userId       String   @map("user_id")
   notification Boolean
   createdAt    DateTime @default(now()) @map("created_at")
@@ -306,6 +307,7 @@ model ChannelOption {
   channel Channel @relation(fields: [channelId], references: [id])
   user    User    @relation(fields: [userId], references: [id])
 
+  @@unique([channelId, userId])
   @@map("channel_options")
 }
 
