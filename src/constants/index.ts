@@ -79,4 +79,13 @@ export const searchQuerySchema = z.object({
   //   .transform((v) => (isNaN(Number(v)) ? 0 : Number(v))),
 })
 
+export const collectionSchema = z.object({
+  limit: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (isNaN(Number(v)) ? 20 : Number(v))),
+  cursor: z.string().trim().optional(),
+})
+
 export const ROOM_TYPES: RoomType[] = ["channel", "chat", "group"]
