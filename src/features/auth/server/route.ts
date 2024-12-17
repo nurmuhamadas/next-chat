@@ -22,6 +22,7 @@ import {
 import {
   checkUsernameAvailability,
   comparePassword,
+  generateDeviceId,
   generateSessionToken,
   generateVerificationToken,
   getDeviceId,
@@ -136,15 +137,16 @@ const authApp = new Hono()
           return c.json(response)
         }
 
-        const deviceId = getDeviceId(c)
+        const deviceId = getDeviceId(c) ?? generateDeviceId()
         const token = await generateSessionToken({
           email,
           userId: existingUser.id,
           username: existingUser.username,
+          deviceId,
         })
 
         const session = await createOrUpdateSession({
-          id: deviceId,
+          deviceId,
           token,
           userAgent,
           userId: existingUser.id,
@@ -219,12 +221,12 @@ const authApp = new Hono()
           return c.json(createError(invalidToken), 400)
         }
 
-        const deviceId = getDeviceId(c)
+        const deviceId = getDeviceId(c) ?? generateDeviceId()
         const [, , session] = await prisma.$transaction([
           verifyUserEmail(existingUser.id),
           deleteVerificationToken({ email }),
           createOrUpdateSession({
-            id: deviceId,
+            deviceId,
             token,
             userAgent,
             userId: existingUser.id,
@@ -257,10 +259,12 @@ const authApp = new Hono()
           return c.json(createError(ERROR.EMAIL_UNVERIFIED), 403)
         }
 
+        const deviceId = getDeviceId(c) ?? generateDeviceId()
         const token = await generateSessionToken({
           email,
           userId: existingUser.id,
           username: existingUser.username,
+          deviceId,
         })
         await createOrUpdateVerificationToken({ email, token })
 
@@ -298,11 +302,11 @@ const authApp = new Hono()
           return c.json(createError(invalidToken), 400)
         }
 
-        const deviceId = getDeviceId(c)
+        const deviceId = getDeviceId(c) ?? generateDeviceId()
         const [, session] = await prisma.$transaction([
           deleteVerificationToken({ email }),
           createOrUpdateSession({
-            id: deviceId,
+            deviceId,
             token,
             userAgent,
             userId: existingUser.id,

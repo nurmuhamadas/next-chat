@@ -32,6 +32,13 @@ const userApp = new Hono()
 
         const { userId } = c.get("userSession")
 
+        const profile = await prisma.profile.findUnique({
+          where: { userId },
+        })
+        if (profile) {
+          return c.json(createError(ERROR.PROFILE_ALREADY_CREATED), 400)
+        }
+
         let imageUrl: string | undefined
         let fileId: string | undefined
         if (imageFile) {
@@ -78,6 +85,13 @@ const userApp = new Hono()
 
         const { userId } = c.get("userSession")
         const userProfile = c.get("userProfile")
+
+        const profile = await prisma.profile.findUnique({
+          where: { userId },
+        })
+        if (!profile) {
+          return c.json(createError(ERROR.CREATE_PROFILE_FIRST), 400)
+        }
 
         let imageUrl: string | undefined
         let fileId: string | undefined

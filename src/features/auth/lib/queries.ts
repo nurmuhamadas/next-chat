@@ -66,13 +66,13 @@ export const createUserLog = ({
 
 // =============== SESSION ===============
 export const createOrUpdateSession = ({
-  id = "",
+  deviceId,
   token,
   userAgent,
   userId,
   description,
 }: {
-  id?: string
+  deviceId: string
   token: string
   userAgent: string
   userId: string
@@ -83,8 +83,9 @@ export const createOrUpdateSession = ({
     description,
   }
   return prisma.session.upsert({
-    where: { id },
+    where: { token },
     create: {
+      deviceId,
       token,
       userAgent,
       userId,
