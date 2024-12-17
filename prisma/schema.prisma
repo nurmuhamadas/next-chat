@@ -52,6 +52,7 @@ model Session {
   user     User      @relation(fields: [userId], references: [id])
   userLogs UserLog[]
 
+  @@unique([deviceId, userId])
   @@map("sessions")
 }
 
