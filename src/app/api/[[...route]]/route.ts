@@ -18,11 +18,11 @@ const app = new Hono().basePath("/api")
 const routes = app
   .route("/auth", authApp)
   .route("/users", userApp)
+  .route("/settings", settingApp)
   .route("/blocked-users", blockedUserApp)
   .route("/groups", groupApp)
   .route("/channels", channelApp)
   .route("/conversations", conversationApp)
-  .route("/settings", settingApp)
   .route("/messages", messageApp)
 
 export const GET = handle(app)
