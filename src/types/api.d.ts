@@ -23,6 +23,7 @@ declare type ApiCollectionResponse<T> = {
   success: true
   data: T[]
   total: number
+  cursor?: string
 }
 
 // AUTH API
@@ -47,13 +48,13 @@ declare type LogoutResponse = ApiResponse<boolean>
 // USER API
 declare type UsernameAvailabilityResponse = ApiResponse<boolean>
 
-declare type CreateUserProfileResponse = ApiResponse<User>
+declare type CreateUserProfileResponse = ApiResponse<Profile>
 
-declare type PatchUserProfileResponse = ApiResponse<User>
+declare type PatchUserProfileResponse = ApiResponse<Profile>
 
-declare type GetUserProfileResponse = ApiResponse<User>
+declare type GetUserProfileResponse = ApiResponse<Profile>
 
-declare type GetMyProfileResponse = ApiResponse<User>
+declare type GetMyProfileResponse = ApiResponse<Profile>
 
 declare type SearchUsersResponse = ApiCollectionResponse<UserSearch>
 

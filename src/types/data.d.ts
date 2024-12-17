@@ -27,11 +27,9 @@ declare interface QueryResults<T> {
 
 declare type QueryResult<T> = T | null
 
-declare interface User {
+declare interface Profile {
   id: string
-  email: string
-  firstName: string
-  lastName: string | null
+  name: string
   username: string
   gender: Gender
   bio: string | null

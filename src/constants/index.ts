@@ -71,11 +71,12 @@ export const searchQuerySchema = z.object({
     .trim()
     .optional()
     .transform((v) => (isNaN(Number(v)) ? 20 : Number(v))),
-  offset: z
-    .string()
-    .trim()
-    .optional()
-    .transform((v) => (isNaN(Number(v)) ? 0 : Number(v))),
+  cursor: z.string().trim().optional(),
+  // offset: z
+  //   .string()
+  //   .trim()
+  //   .optional()
+  //   .transform((v) => (isNaN(Number(v)) ? 0 : Number(v))),
 })
 
 export const ROOM_TYPES: RoomType[] = ["channel", "chat", "group"]

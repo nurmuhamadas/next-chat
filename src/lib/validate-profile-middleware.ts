@@ -1,17 +1,17 @@
 import "server-only"
 
-import { Profile } from "@prisma/client"
+import { Profile, User } from "@prisma/client"
 import { createMiddleware } from "hono/factory"
 
 import { ERROR } from "@/constants/error"
-import { getProfileByUserId } from "@/features/user/lib/queries"
+import { prisma } from "@/lib/prisma"
 
 import { createError } from "./utils"
 
 type AdditionalContext = {
   Variables: {
     userSession: UserSession
-    userProfile: Profile
+    userProfile: Profile & { user: Pick<User, "username"> }
   }
 }
 
@@ -22,7 +22,10 @@ export const validateProfileMiddleware = createMiddleware<AdditionalContext>(
   async (c, next) => {
     const session = c.get("userSession")
 
-    const profile = await getProfileByUserId(session.userId)
+    const profile = await prisma.profile.findUnique({
+      where: { userId: session.userId },
+      include: { user: { select: { username: true } } },
+    })
 
     if (!profile) {
       return c.json(createError(ERROR.COMPLETE_PROFILE_FIRST), 403)
