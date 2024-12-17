@@ -42,6 +42,7 @@ model User {
 model Session {
   id        String   @id @default(uuid(7))
   token     String   @unique
+  deviceId  String   @map("device_id")
   userAgent String   @map("user_agent")
   userId    String   @map("user_id")
   expiresAt DateTime @map("expires_at")
