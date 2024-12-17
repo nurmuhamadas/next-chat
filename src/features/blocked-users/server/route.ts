@@ -53,7 +53,7 @@ const blockedUserApp = new Hono()
         const { userId } = c.get("userProfile")
 
         const blockedProfile = await prisma.profile.findUnique({
-          where: { id: blockedUserId },
+          where: { userId: blockedUserId },
         })
         if (!blockedProfile) {
           return c.json(createError(ERROR.USER_NOT_FOUND), 404)
