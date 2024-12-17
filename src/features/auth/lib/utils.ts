@@ -37,7 +37,7 @@ export const generateVerificationToken = (data: {
   email: string
   username: string
 }) => {
-  return jwt.sign(data, AUTH_SECRET)
+  return jwt.sign({ ...data, createdAt: new Date() }, AUTH_SECRET)
 }
 
 export const decodeJWT = (jwt: string) => {

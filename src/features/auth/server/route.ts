@@ -131,6 +131,11 @@ const authApp = new Hono()
 
         const setting = existingUser.setting
         if (setting?.enable2FA) {
+          const token = await generateVerificationToken({
+            email,
+            username: existingUser.username,
+          })
+          await createOrUpdateVerificationToken({ email, token })
           // TODO: send email login
 
           const response: SignInResponse = successResponse({ status: "2fa" })
@@ -222,12 +227,18 @@ const authApp = new Hono()
         }
 
         const deviceId = getDeviceId(c) ?? generateDeviceId()
+        const sessionToken = await generateSessionToken({
+          email,
+          userId: existingUser.id,
+          username: existingUser.username,
+          deviceId,
+        })
         const [, , session] = await prisma.$transaction([
           verifyUserEmail(existingUser.id),
           deleteVerificationToken({ email }),
           createOrUpdateSession({
             deviceId,
-            token,
+            token: sessionToken,
             userAgent,
             userId: existingUser.id,
             description: `Login from ${userAgent}`,
@@ -259,12 +270,9 @@ const authApp = new Hono()
           return c.json(createError(ERROR.EMAIL_UNVERIFIED), 403)
         }
 
-        const deviceId = getDeviceId(c) ?? generateDeviceId()
-        const token = await generateSessionToken({
+        const token = await generateVerificationToken({
           email,
-          userId: existingUser.id,
           username: existingUser.username,
-          deviceId,
         })
         await createOrUpdateVerificationToken({ email, token })
 
@@ -303,11 +311,17 @@ const authApp = new Hono()
         }
 
         const deviceId = getDeviceId(c) ?? generateDeviceId()
+        const sessionToken = await generateSessionToken({
+          email,
+          userId: existingUser.id,
+          username: existingUser.username,
+          deviceId,
+        })
         const [, session] = await prisma.$transaction([
           deleteVerificationToken({ email }),
           createOrUpdateSession({
             deviceId,
-            token,
+            token: sessionToken,
             userAgent,
             userId: existingUser.id,
             description: `Login from ${userAgent}`,
