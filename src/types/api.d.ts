@@ -116,7 +116,6 @@ declare type GetChannelSubscribersResponse =
 
 declare type SearchChannelsResponse = ApiCollectionResponse<ChannelSearch>
 
-// TODO:
 declare type DeleteChannelResponse = ApiResponse<{ id: string }>
 
 declare type JoinChannelResponse = ApiResponse<boolean>

@@ -163,7 +163,7 @@ declare interface Channel {
   name: string
   description: string | null
   type: ChannelType
-  owner: ChannelOwner
+  ownerId: string
   imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage | null
@@ -173,7 +173,7 @@ declare interface Channel {
 declare interface ChannelSearch {
   id: string
   name: string
-  imageUrl?: string
+  imageUrl: string | null
   totalSubscribers: number
 }
 
