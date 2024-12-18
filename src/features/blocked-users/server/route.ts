@@ -90,7 +90,7 @@ const blockedUserApp = new Hono()
           where: { userId, blockedUserId },
         })
         if (blockedUsers.length === 0) {
-          return c.json(createError(ERROR.BLOCKED_USER_NOT_FOUND))
+          return c.json(createError(ERROR.BLOCKED_USER_NOT_FOUND), 404)
         }
 
         await unblockUser({ blockedUserId, userId })

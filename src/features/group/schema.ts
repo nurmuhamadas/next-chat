@@ -33,7 +33,8 @@ export const joinGroupSchema = z.object({
       required_error: ERROR.JOIN_CODE_REQUIRED,
       invalid_type_error: ERROR.INVALID_JOIN_CODE,
     })
-    .length(10, ERROR.INVALID_JOIN_CODE),
+    .length(10, ERROR.INVALID_JOIN_CODE)
+    .optional(),
 })
 
 export const updateGroupOptionSchema = z.object({

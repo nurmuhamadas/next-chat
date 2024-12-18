@@ -82,7 +82,6 @@ declare type GetGroupMembersResponse = ApiCollectionResponse<GroupMember>
 
 declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
 
-// TODO:
 declare type DeleteGroupResponse = ApiResponse<{ id: string }>
 
 declare type JoinGroupResponse = ApiResponse<boolean>
@@ -91,7 +90,7 @@ declare type LeaveGroupResponse = ApiResponse<boolean>
 
 declare type AddGroupMemberResponse = ApiResponse<boolean>
 
-declare type KickGroupMemberResponse = ApiResponse<boolean>
+declare type DeleteGroupMemberResponse = ApiResponse<boolean>
 
 declare type SetAdminGroupResponse = ApiResponse<boolean>
 

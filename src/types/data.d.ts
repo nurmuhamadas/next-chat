@@ -46,8 +46,8 @@ declare interface UserSearch {
 
 declare interface LastMessage {
   id: string
-  name: string
-  message?: string
+  sender: string
+  message: string | null
   time: string
 }
 
@@ -124,7 +124,7 @@ declare interface Group {
   name: string
   description: string | null
   type: GroupType
-  owner: GroupOwner
+  ownerId: string
   imageUrl: string | null
   inviteCode: string
   lastMessage: LastMessage | null
@@ -134,7 +134,7 @@ declare interface Group {
 declare interface GroupSearch {
   id: string
   name: string
-  imageUrl?: string
+  imageUrl: string | null
   totalMember: number
 }
 
