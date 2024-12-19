@@ -15,8 +15,21 @@ export const getRoomIncludeQuery = () => ({
       sender: { select: { profile: { select: { name: true } } } },
     },
   },
-  userPair: {
-    select: { profile: { select: { name: true, imageUrl: true } } },
+  privateChat: {
+    select: {
+      user1: {
+        select: {
+          id: true,
+          profile: { select: { name: true, imageUrl: true } },
+        },
+      },
+      user2: {
+        select: {
+          id: true,
+          profile: { select: { name: true, imageUrl: true } },
+        },
+      },
+    },
   },
   group: { select: { name: true, imageUrl: true } },
   channel: { select: { name: true, imageUrl: true } },
@@ -29,7 +42,16 @@ export const mapRoomModelToConversation = (
           sender: { profile: Pick<ProfileModel, "name"> | null }
         })
       | null
-    userPair: { profile: Pick<ProfileModel, "name" | "imageUrl"> | null } | null
+    privateChat: {
+      user1: {
+        id: string
+        profile: Pick<ProfileModel, "name" | "imageUrl"> | null
+      }
+      user2: {
+        id: string
+        profile: Pick<ProfileModel, "name" | "imageUrl"> | null
+      }
+    } | null
     group: Pick<GroupModel, "name" | "imageUrl"> | null
     channel: Pick<ChannelModel, "name" | "imageUrl"> | null
   },
@@ -39,9 +61,13 @@ export const mapRoomModelToConversation = (
   let imageUrl: string | null = null
 
   if (room.type === "PRIVATE") {
-    id = room.userPairId!
-    name = room.userPair?.profile?.name ?? "Unknown"
-    imageUrl = room.userPair?.profile?.imageUrl ?? null
+    const user =
+      room.privateChat?.user1.id === room.ownerId
+        ? room.privateChat?.user2
+        : room.privateChat?.user1
+    id = user?.id!
+    name = user?.profile?.name ?? "Unknown"
+    imageUrl = user?.profile?.imageUrl ?? null
   } else if (room.type === "GROUP") {
     id = room.groupId!
     name = room.group?.name ?? "Group"

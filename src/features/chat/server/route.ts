@@ -34,7 +34,9 @@ const roomApp = new Hono()
 
         const result = await prisma.room.findMany({
           where: { ownerId: userId, deletedAt: null, archivedAt: null },
-          include: { ...getRoomIncludeQuery() },
+          include: {
+            ...getRoomIncludeQuery(),
+          },
           orderBy: [
             { pinnedAt: { sort: "asc", nulls: "last" } },
             { lastMessage: { createdAt: "desc" } },
@@ -117,7 +119,8 @@ const roomApp = new Hono()
           where: {
             ownerId: userId,
             OR: [
-              { userPairId: roomId },
+              { privateChat: { user1Id: roomId, user2Id: userId } },
+              { privateChat: { user2Id: roomId, user1Id: userId } },
               { groupId: roomId },
               { channelId: roomId },
             ],
@@ -160,7 +163,8 @@ const roomApp = new Hono()
           where: {
             ownerId: userId,
             OR: [
-              { userPairId: roomId },
+              { privateChat: { user1Id: roomId, user2Id: userId } },
+              { privateChat: { user2Id: roomId, user1Id: userId } },
               { groupId: roomId },
               { channelId: roomId },
             ],
@@ -243,7 +247,8 @@ const roomApp = new Hono()
           where: {
             ownerId: userId,
             OR: [
-              { userPairId: roomId },
+              { privateChat: { user1Id: roomId, user2Id: userId } },
+              { privateChat: { user2Id: roomId, user1Id: userId } },
               { groupId: roomId },
               { channelId: roomId },
             ],
@@ -283,7 +288,8 @@ const roomApp = new Hono()
           where: {
             ownerId: userId,
             OR: [
-              { userPairId: roomId },
+              { privateChat: { user1Id: roomId, user2Id: userId } },
+              { privateChat: { user2Id: roomId, user1Id: userId } },
               { groupId: roomId },
               { channelId: roomId },
             ],
@@ -319,14 +325,18 @@ const roomApp = new Hono()
         const { roomId } = c.req.param()
         const { userId } = c.get("userProfile")
 
-        const userPairId = roomId
         const groupId = roomId
         const channelId = roomId
 
         const room = await prisma.room.findFirst({
           where: {
             ownerId: userId,
-            OR: [{ userPairId }, { groupId }, { channelId }],
+            OR: [
+              { privateChat: { user1Id: roomId, user2Id: userId } },
+              { privateChat: { user2Id: roomId, user1Id: userId } },
+              { groupId },
+              { channelId },
+            ],
             deletedAt: null,
           },
         })
