@@ -13,13 +13,15 @@ export const createGroupOption = ({
     data: { userId, groupId, notification },
   })
 }
-export const updateGroupOption = ({
-  id,
-  notification,
-}: {
-  id: string
-  notification?: boolean
-}) => {
+
+export const updateGroupOption = (
+  id: string,
+  {
+    notification,
+  }: {
+    notification?: boolean
+  },
+) => {
   return prisma.groupOption.update({
     where: { id },
     data: { notification },

@@ -3,7 +3,6 @@ import {
   ChannelOption as ChannelOptionModel,
   ChannelSubscriber as ChannelSubscriberModel,
   ChannelType,
-  Message as MessageModel,
   Profile as ProfileModel,
 } from "@prisma/client"
 
@@ -21,11 +20,6 @@ export const getChannelWhere = (channelId: string, userId: string) => ({
 
 export const mapChannelModelToChannel = (
   channel: ChannelModel & {
-    lastMessage?:
-      | (Pick<MessageModel, "message" | "createdAt"> & {
-          sender: { profile: Pick<ProfileModel, "name"> | null }
-        })
-      | null
     _count: {
       subscribers: number
     }
@@ -39,15 +33,6 @@ export const mapChannelModelToChannel = (
     ownerId: channel.ownerId,
     type: channel.type,
     inviteCode: channel.inviteCode,
-    lastMessage:
-      channel.lastMessageId && channel.lastMessage
-        ? {
-            id: channel.lastMessageId,
-            sender: channel.lastMessage.sender.profile?.name ?? "User",
-            message: channel.lastMessage.message,
-            time: channel.lastMessage?.createdAt.toISOString(),
-          }
-        : null,
     totalSubscribers: channel._count.subscribers,
   }
 }

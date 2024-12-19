@@ -144,13 +144,6 @@ export const updateGroup = (
       imageUrl: data.imageUrl,
     },
     include: {
-      lastMessage: {
-        select: {
-          message: true,
-          sender: { select: { profile: { select: { name: true } } } },
-          createdAt: true,
-        },
-      },
       _count: { select: { members: { where: { leftAt: null } } } },
     },
   })

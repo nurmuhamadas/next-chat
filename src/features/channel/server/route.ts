@@ -62,13 +62,6 @@ const channelApp = new Hono()
             deletedAt: null,
           },
           include: {
-            lastMessage: {
-              select: {
-                message: true,
-                sender: { select: { profile: { select: { name: true } } } },
-                createdAt: true,
-              },
-            },
             _count: {
               select: { subscribers: { where: { unsubscribedAt: null } } },
             },
@@ -137,7 +130,6 @@ const channelApp = new Hono()
 
           const channelResult = mapChannelModelToChannel({
             ...createdChannel,
-            lastMessage: null,
             _count: { subscribers: 0 },
           })
 
@@ -219,13 +211,6 @@ const channelApp = new Hono()
             deletedAt: undefined,
           },
           include: {
-            lastMessage: {
-              select: {
-                message: true,
-                sender: { select: { profile: { select: { name: true } } } },
-                createdAt: true,
-              },
-            },
             _count: {
               select: { subscribers: { where: { unsubscribedAt: null } } },
             },

@@ -3,7 +3,6 @@ import {
   GroupMember as GroupMemberModel,
   GroupOption as GroupOptionModel,
   GroupType,
-  Message as MessageModel,
   Profile,
 } from "@prisma/client"
 
@@ -21,11 +20,6 @@ export const getGroupWhere = (groupId: string, userId: string) => ({
 
 export const mapGroupModelToGroup = (
   group: GroupModel & {
-    lastMessage?:
-      | (Pick<MessageModel, "message" | "createdAt"> & {
-          sender: { profile: Pick<Profile, "name"> | null }
-        })
-      | null
     _count: {
       members: number
     }
@@ -39,15 +33,6 @@ export const mapGroupModelToGroup = (
     ownerId: group.ownerId,
     type: group.type,
     inviteCode: group.inviteCode,
-    lastMessage:
-      group.lastMessageId && group.lastMessage
-        ? {
-            id: group.lastMessageId,
-            sender: group.lastMessage.sender.profile?.name ?? "User",
-            message: group.lastMessage.message,
-            time: group.lastMessage?.createdAt.toISOString(),
-          }
-        : null,
     totalMembers: group._count.members,
   }
 }

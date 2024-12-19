@@ -65,13 +65,6 @@ const groupApp = new Hono()
             deletedAt: null,
           },
           include: {
-            lastMessage: {
-              select: {
-                message: true,
-                sender: { select: { profile: { select: { name: true } } } },
-                createdAt: true,
-              },
-            },
             _count: {
               select: { members: { where: { leftAt: null } } },
             },
@@ -151,7 +144,6 @@ const groupApp = new Hono()
 
           const groupResult = mapGroupModelToGroup({
             ...createdGroup,
-            lastMessage: null,
             _count: { members: memberIds.length + 1 },
           })
           const response: CreateGroupResponse = successResponse(groupResult)
@@ -222,13 +214,6 @@ const groupApp = new Hono()
       const group = await prisma.group.findUnique({
         where: { ...getGroupWhere(groupId, userId), deletedAt: undefined },
         include: {
-          lastMessage: {
-            select: {
-              message: true,
-              sender: { select: { profile: { select: { name: true } } } },
-              createdAt: true,
-            },
-          },
           _count: {
             select: { members: { where: { leftAt: null } } },
           },
@@ -914,8 +899,7 @@ const groupApp = new Hono()
           return c.json(response)
         }
 
-        const result = await updateGroupOption({
-          id: groupOption.id,
+        const result = await updateGroupOption(groupOption.id, {
           notification,
         })
 
