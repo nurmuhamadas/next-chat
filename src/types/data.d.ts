@@ -53,10 +53,11 @@ declare interface LastMessage {
 
 declare interface Conversation {
   id: string
-  roomId: string
   type: RoomType
   name: string
   imageUrl: string | null
+  pinned: boolean
+  archived: boolean
   totalUnreadMessages: number
   lastMessage: LastMessage | null
 }
@@ -127,7 +128,6 @@ declare interface Group {
   ownerId: string
   imageUrl: string | null
   inviteCode: string
-  lastMessage: LastMessage | null
   totalMembers: number
 }
 
@@ -166,7 +166,6 @@ declare interface Channel {
   ownerId: string
   imageUrl: string | null
   inviteCode: string
-  lastMessage: LastMessage | null
   totalSubscribers: number
 }
 

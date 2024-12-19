@@ -1,13 +1,21 @@
 import { prisma } from "@/lib/prisma"
 
-export const joinGroup = ({
+export const joinGroup = async ({
   userId,
   groupId,
 }: {
   userId: string
   groupId: string
 }) => {
+  const currentRoom = await prisma.room.findFirst({
+    where: { groupId, ownerId: userId, deletedAt: null },
+  })
   return prisma.$transaction([
+    prisma.room.upsert({
+      where: { id: currentRoom?.id ?? "" },
+      create: { groupId, ownerId: userId, type: "GROUP" },
+      update: { deletedAt: null },
+    }),
     prisma.groupMember.create({
       data: { groupId, userId, isAdmin: false },
     }),

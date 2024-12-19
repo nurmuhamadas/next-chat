@@ -47,6 +47,12 @@ export const createChannel = (data: {
           isAdmin: true,
         },
       },
+      rooms: {
+        create: {
+          type: "CHANNEL",
+          ownerId: data.ownerId,
+        },
+      },
     },
   })
 }

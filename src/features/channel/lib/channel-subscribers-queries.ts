@@ -1,13 +1,21 @@
 import { prisma } from "@/lib/prisma"
 
-export const subscribeChannel = ({
+export const subscribeChannel = async ({
   userId,
   channelId,
 }: {
   userId: string
   channelId: string
 }) => {
+  const currentRoom = await prisma.room.findFirst({
+    where: { channelId, ownerId: userId, deletedAt: null },
+  })
   return prisma.$transaction([
+    prisma.room.upsert({
+      where: { id: currentRoom?.id ?? "" },
+      create: { channelId, ownerId: userId, type: "CHANNEL" },
+      update: { deletedAt: null },
+    }),
     prisma.channelSubscriber.create({
       data: { channelId, userId, isAdmin: false },
     }),

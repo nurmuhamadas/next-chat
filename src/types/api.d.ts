@@ -134,15 +134,17 @@ declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
 
 // CONVERSATION API
 /** Include groups and channels chat */
-declare type GetConversationListResponse = ApiCollectionResponse<Conversation>
+declare type GetRoomListResponse = ApiCollectionResponse<Conversation>
 
-declare type GetConversationResponse = ApiResponse<Conversation | null>
+declare type DeleteRoomResponse = ApiResponse<{ id: string }>
 
-declare type CreateConversationResponse = ApiResponse<Conversation>
+declare type PinRoomResponse = ApiResponse<boolean>
 
-declare type DeleteConversationResponse = ApiResponse<{ id: string }>
+declare type UnpinRoomResponse = ApiResponse<boolean>
 
-declare type GetConversationOptResponse = ApiResponse<ConversationOption>
+declare type ArchiveRoomResponse = ApiResponse<boolean>
+
+declare type UnarchiveRoomResponse = ApiResponse<boolean>
 
 // MESSAGE API
 declare type CreateMessageResponse = ApiResponse<Message>

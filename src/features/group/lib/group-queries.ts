@@ -1,4 +1,4 @@
-import { GroupType } from "@prisma/client"
+import { GroupType, RoomType } from "@prisma/client"
 import { StatusCode } from "hono/utils/http-status"
 
 import { ERROR } from "@/constants/error"
@@ -118,6 +118,20 @@ export const createGroup = (data: {
             ...data.memberIds.map((id) => ({
               userId: id,
               isAdmin: false,
+            })),
+          ],
+        },
+      },
+      rooms: {
+        createMany: {
+          data: [
+            {
+              type: RoomType.GROUP,
+              ownerId: data.ownerId,
+            },
+            ...data.memberIds.map((id) => ({
+              type: RoomType.GROUP,
+              ownerId: id,
             })),
           ],
         },
