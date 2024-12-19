@@ -153,12 +153,13 @@ const userApp = new Hono()
           skip: cursor ? 1 : undefined,
         })
 
+        const total = result.length
         const nextCursor =
-          result.length > 0 ? result[result.length - 1].id : undefined
+          total > 0 && total === limit ? result[total - 1].id : undefined
 
         const response: SearchUsersResponse = successCollectionResponse(
           result.map(mapSearchResult),
-          result.length,
+          total,
           nextCursor,
         )
         return c.json(response)

@@ -12,7 +12,7 @@ import {
 } from "@/lib/utils"
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 
-import { blockUser, getBlockedUsers, unblockUser } from "../lib/queries"
+import { blockUser, unblockUser } from "../lib/queries"
 import { mapBlockedUserModelToBlockedUser } from "../lib/utils"
 
 const blockedUserApp = new Hono()
@@ -26,11 +26,26 @@ const blockedUserApp = new Hono()
         const { limit, cursor } = c.req.valid("query")
         const { userId } = c.get("userProfile")
 
-        const blockedUsers = await getBlockedUsers({ userId, limit, cursor })
+        const blockedUsers = await prisma.blockedUser.findMany({
+          where: { userId, unblockedAt: { equals: null } },
+          select: {
+            id: true,
+            blockedUser: {
+              select: {
+                id: true,
+                profile: { select: { name: true, imageUrl: true } },
+              },
+            },
+          },
+          take: limit,
+          cursor: cursor ? { id: cursor } : undefined,
+          skip: cursor ? 1 : undefined,
+        })
 
         const total = blockedUsers.length
         const nextCursor =
-          blockedUsers.length > 0 ? blockedUsers[total - 1].id : undefined
+          total > 0 && total === limit ? blockedUsers[total - 1].id : undefined
+
         const response: GetBlockedUsersResponse = successCollectionResponse(
           blockedUsers.map(mapBlockedUserModelToBlockedUser),
           total,

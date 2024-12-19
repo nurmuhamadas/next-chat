@@ -74,7 +74,8 @@ const channelApp = new Hono()
         const mappedChannel: Channel[] = result.map(mapChannelModelToChannel)
 
         const total = result.length
-        const nextCursor = total > 0 ? result[total - 1].id : undefined
+        const nextCursor =
+          total > 0 && total === limit ? result[total - 1].id : undefined
         const response: GetChannelsResponse = successCollectionResponse(
           mappedChannel,
           total,
@@ -460,7 +461,9 @@ const channelApp = new Hono()
         }
         const total = channel.subscribers.length
         const nextCursor =
-          total > 0 ? channel.subscribers[total - 1].id : undefined
+          total > 0 && total === limit
+            ? channel.subscribers[total - 1].id
+            : undefined
         const response: GetChannelSubscribersResponse =
           successCollectionResponse(
             channel.subscribers.map(mapChannelSubModelToChannelSub),

@@ -77,7 +77,8 @@ const groupApp = new Hono()
         const mappedGroup: Group[] = result.map(mapGroupModelToGroup)
 
         const total = result.length
-        const nextCursor = total > 0 ? result[total - 1].id : undefined
+        const nextCursor =
+          total > 0 && total === limit ? result[total - 1].id : undefined
         const response: GetGroupsResponse = successCollectionResponse(
           mappedGroup,
           total,
@@ -193,7 +194,8 @@ const groupApp = new Hono()
         })
 
         const total = result.length
-        const nextCursor = total > 0 ? result[total - 1].id : undefined
+        const nextCursor =
+          total > 0 && total === limit ? result[total - 1].id : undefined
         const response: SearchGroupsResponse = successCollectionResponse(
           result.map(mapGroupModelToGroupSearch),
           total,
@@ -454,7 +456,8 @@ const groupApp = new Hono()
         }
 
         const total = group.members.length
-        const nextCursor = total > 0 ? group.members[total - 1].id : undefined
+        const nextCursor =
+          total > 0 && total === limit ? group.members[total - 1].id : undefined
         const response: GetGroupMembersResponse = successCollectionResponse(
           group.members.map(mapGroupMemberModelToGroupMember),
           total,
