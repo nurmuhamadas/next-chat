@@ -16,25 +16,26 @@ model User {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
-  sessions           Session[]
-  verificationToken  VerificationToken?
-  passwordResetToken PasswordResetToken?
-  logs               UserLog[]
-  profile            Profile?
-  setting            Setting?
-  ownedGroups        Group[]
-  groupOptions       GroupOption[]
-  groups             GroupMember[]
-  ownedChannels      Channel[]
-  channelOptions     ChannelOption[]
-  channels           ChannelSubscriber[]
-  messages           Message[]
-  messageReads       MessageRead[]
-  reactions          Reaction[]
-  blockingUsers      BlockedUser[]       @relation("blockingUser")
-  blockedUsers       BlockedUser[]       @relation("blockedUser")
-  rooms              Room[]              @relation("owner")
-  pairRooms          Room[]              @relation("userPair")
+  sessions              Session[]
+  verificationToken     VerificationToken?
+  passwordResetToken    PasswordResetToken?
+  logs                  UserLog[]
+  profile               Profile?
+  setting               Setting?
+  initiatedPrivateChats PrivateChat[]       @relation("initiator")
+  receivedprivateChats  PrivateChat[]       @relation("receiver")
+  ownedGroups           Group[]
+  groupOptions          GroupOption[]
+  groups                GroupMember[]
+  ownedChannels         Channel[]
+  channelOptions        ChannelOption[]
+  channels              ChannelSubscriber[]
+  messages              Message[]
+  messageReads          MessageRead[]
+  reactions             Reaction[]
+  blockingUsers         BlockedUser[]       @relation("blockingUser")
+  blockedUsers          BlockedUser[]       @relation("blockedUser")
+  rooms                 Room[]              @relation("owner")
 
   @@map("users")
 }
@@ -175,34 +176,36 @@ model Setting {
   @@map("settings")
 }
 
-// model PrivateChat {
-//   id        String   @id @default(uuid(7))
-//   user1Id   String   @map("user1_id")
-//   user2Id   String   @map("user2_id")
-//   createdAt DateTime @default(now()) @map("created_at")
-//   updatedAt DateTime @updatedAt @map("updated_at")
+model PrivateChat {
+  id            String   @id @default(uuid(7))
+  user1Id       String   @map("user1_id")
+  user2Id       String   @map("user2_id")
+  lastMessageId String?  @unique @map("last_message_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-//   user1 User @relation("initiatedBy", fields: [user1Id], references: [id])
-//   user2 User @relation("receivedBy", fields: [user2Id], references: [id])
+  user1       User     @relation("initiator", fields: [user1Id], references: [id])
+  user2       User     @relation("receiver", fields: [user2Id], references: [id])
+  lastMessage Message? @relation("lastMessagePrivate", fields: [lastMessageId], references: [id])
 
-//   userOptions  PrivateChatOption[]
-//   messageReads MessageRead[]
-//   rooms        Room[]
+  usersOption PrivateChatOption[]
+  messages    Message[]
+  rooms       Room[]
 
-//   @@unique([user1Id, user2Id])
-//   @@map("private_chats")
-// }
+  @@unique([user1Id, user2Id])
+  @@map("private_chats")
+}
 
 model PrivateChatOption {
-  id           String    @id @default(uuid(7))
-  roomId       String    @unique @map("room_id")
-  userId       String    @map("user_id")
-  notification Boolean
-  deletedAt    DateTime? @map("deleted_at")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(uuid(7))
+  privateChatId String    @unique @map("private_chat_id")
+  userId        String    @map("user_id")
+  notification  Boolean
+  deletedAt     DateTime? @map("deleted_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  room Room? @relation(fields: [roomId], references: [id])
+  privateChat PrivateChat? @relation(fields: [privateChatId], references: [id])
 
   @@map("private_chat_options")
 }
@@ -213,22 +216,25 @@ enum GroupType {
 }
 
 model Group {
-  id          String    @id @default(uuid(7))
-  name        String    @db.VarChar(100)
-  description String?
-  type        GroupType
-  imageUrl    String?   @map("image_url")
-  ownerId     String    @map("owner_id")
-  inviteCode  String    @unique @map("invite_code") @db.Char(10)
-  deletedAt   DateTime? @map("deleted_at")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(uuid(7))
+  name          String    @db.VarChar(100)
+  description   String?
+  type          GroupType
+  imageUrl      String?   @map("image_url")
+  ownerId       String    @map("owner_id")
+  inviteCode    String    @unique @map("invite_code") @db.Char(10)
+  lastMessageId String?   @unique @map("last_message_id")
+  deletedAt     DateTime? @map("deleted_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner       User     @relation(fields: [ownerId], references: [id])
+  lastMessage Message? @relation("lastMessageGroup", fields: [lastMessageId], references: [id])
 
   membersOption GroupOption[]
   members       GroupMember[]
   rooms         Room[]
+  messages      Message[]
 
   @@unique([ownerId, name])
   @@map("groups")
@@ -270,22 +276,25 @@ enum ChannelType {
 }
 
 model Channel {
-  id          String      @id @default(uuid(7))
-  name        String      @db.VarChar(100)
-  description String?
-  type        ChannelType
-  imageUrl    String?     @map("image_url")
-  ownerId     String      @map("owner_id")
-  inviteCode  String      @unique @map("invite_code") @db.Char(10)
-  deletedAt   DateTime?   @map("deleted_at")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  id            String      @id @default(uuid(7))
+  name          String      @db.VarChar(100)
+  description   String?
+  type          ChannelType
+  imageUrl      String?     @map("image_url")
+  ownerId       String      @map("owner_id")
+  inviteCode    String      @unique @map("invite_code") @db.Char(10)
+  lastMessageId String?     @unique @map("last_message_id")
+  deletedAt     DateTime?   @map("deleted_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner       User     @relation(fields: [ownerId], references: [id])
+  lastMessage Message? @relation("lastMessageChannel", fields: [lastMessageId], references: [id])
 
   subscribersOption ChannelOption[]
   subscribers       ChannelSubscriber[]
   rooms             Room[]
+  messages          Message[]
 
   @@unique([ownerId, name])
   @@map("channels")
@@ -331,24 +340,19 @@ model Room {
   id            String    @id @default(uuid(7))
   type          RoomType
   ownerId       String    @map("owner_id")
-  userPairId    String?   @map("user_pair_id")
+  privateChatId String?   @map("private_chat_id")
   groupId       String?   @map("group_id")
   channelId     String?   @map("channel_id")
-  lastMessageId String?   @unique @map("last_message_id")
   pinnedAt      DateTime? @map("pinned_at")
   archivedAt    DateTime? @map("archived_at")
   deletedAt     DateTime? @map("deleted_at")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  owner       User      @relation("owner", fields: [ownerId], references: [id])
-  userPair    User?     @relation("userPair", fields: [userPairId], references: [id])
-  group       Group?    @relation(fields: [groupId], references: [id])
-  channel     Channel?  @relation(fields: [channelId], references: [id])
-  lastMessage Message?  @relation("lastMessage", fields: [lastMessageId], references: [id])
-  messages    Message[] @relation("messages")
-
-  privateChatOption PrivateChatOption?
+  owner       User         @relation("owner", fields: [ownerId], references: [id])
+  privateChat PrivateChat? @relation(fields: [privateChatId], references: [id])
+  group       Group?       @relation(fields: [groupId], references: [id])
+  channel     Channel?     @relation(fields: [channelId], references: [id])
 
   @@map("rooms")
 }
@@ -364,7 +368,9 @@ model Message {
   id                String        @id @default(uuid(7))
   message           String?
   senderId          String        @map("sender_id")
-  roomId            String        @map("room_id")
+  privateChatId     String?       @map("private_chat_id")
+  groupId           String?       @map("group_id")
+  channelId         String?       @map("channel_id")
   parentMessageId   String?       @map("parent_message_id")
   parentMessageName String?       @map("parent_message_name") @db.VarChar(100)
   parentMessageText String?       @map("parent_message_text")
@@ -374,17 +380,21 @@ model Message {
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
 
-  sender           User     @relation(fields: [senderId], references: [id])
-  room             Room     @relation("messages", fields: [roomId], references: [id])
-  repliedMessage   Message? @relation("parentMessage", fields: [parentMessageId], references: [id])
-  forwardedMessage Message? @relation("originalMessage", fields: [originalMessageId], references: [id])
+  sender           User         @relation(fields: [senderId], references: [id])
+  privateChat      PrivateChat? @relation(fields: [privateChatId], references: [id])
+  group            Group?       @relation(fields: [groupId], references: [id])
+  channel          Channel?     @relation(fields: [channelId], references: [id])
+  repliedMessage   Message?     @relation("parentMessage", fields: [parentMessageId], references: [id])
+  forwardedMessage Message?     @relation("originalMessage", fields: [originalMessageId], references: [id])
 
-  messageReplies  Message[]     @relation("parentMessage")
-  messageForwards Message[]     @relation("originalMessage")
-  messageReads    MessageRead[]
-  reactions       Reaction[]
-  attachments     Attachment[]
-  lastMessageRoom Room?         @relation("lastMessage")
+  messageReplies     Message[]     @relation("parentMessage")
+  messageForwards    Message[]     @relation("originalMessage")
+  messageReads       MessageRead[]
+  reactions          Reaction[]
+  attachments        Attachment[]
+  lastMessagePrivate PrivateChat?  @relation("lastMessagePrivate")
+  lastMessageChannel Channel?      @relation("lastMessageChannel")
+  lastMessageGroup   Group?        @relation("lastMessageGroup")
 
   @@map("messages")
 }
@@ -393,7 +403,6 @@ model MessageRead {
   id                String   @id @default(uuid(7))
   userId            String   @map("user_id")
   lastMessageReadId String   @map("last_message_read_id")
-  roomId            String?  @map("room_id")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
