@@ -189,7 +189,7 @@ model PrivateChat {
 
   userOptions  PrivateChatOption[]
   messageReads MessageRead[]
-  room         Room?
+  rooms        Room[]
 
   @@unique([user1Id, user2Id])
   @@map("private_chats")
@@ -232,7 +232,7 @@ model Group {
   membersOption GroupOption[]
   members       GroupMember[]
   messageReads  MessageRead[]
-  room          Room?
+  rooms         Room[]
 
   @@unique([ownerId, name])
   @@map("groups")
@@ -291,7 +291,7 @@ model Channel {
   subscribersOption ChannelOption[]
   subscribers       ChannelSubscriber[]
   messageReads      MessageRead[]
-  room              Room?
+  rooms             Room[]
 
   @@unique([ownerId, name])
   @@map("channels")
@@ -337,9 +337,9 @@ model Room {
   id            String    @id @default(uuid(7))
   type          RoomType
   userId        String    @map("user_id")
-  privateChatId String?   @unique @map("private_chat_id")
-  groupId       String?   @unique @map("group_id")
-  channelId     String?   @unique @map("channel_id")
+  privateChatId String?   @map("private_chat_id")
+  groupId       String?   @map("group_id")
+  channelId     String?   @map("channel_id")
   lastMessageId String?   @unique @map("last_message_id")
   pinnedAt      DateTime? @map("pinned_at")
   archivedAt    DateTime? @map("archived_at")
