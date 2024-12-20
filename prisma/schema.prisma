@@ -197,7 +197,7 @@ model PrivateChat {
 
 model PrivateChatOption {
   id            String    @id @default(uuid(7))
-  privateChatId String    @unique @map("private_chat_id")
+  privateChatId String    @map("private_chat_id")
   userId        String    @map("user_id")
   notification  Boolean
   deletedAt     DateTime? @map("deleted_at")
@@ -345,11 +345,12 @@ model Room {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  owner       User         @relation("owner", fields: [ownerId], references: [id])
-  privateChat PrivateChat? @relation(fields: [privateChatId], references: [id])
-  group       Group?       @relation(fields: [groupId], references: [id])
-  channel     Channel?     @relation(fields: [channelId], references: [id])
-  lastMessage Message?     @relation("lastMessageRoom", fields: [lastMessageId], references: [id])
+  owner        User          @relation("owner", fields: [ownerId], references: [id])
+  privateChat  PrivateChat?  @relation(fields: [privateChatId], references: [id])
+  group        Group?        @relation(fields: [groupId], references: [id])
+  channel      Channel?      @relation(fields: [channelId], references: [id])
+  lastMessage  Message?      @relation("lastMessageRoom", fields: [lastMessageId], references: [id])
+  messageReads MessageRead[]
 
   @@map("rooms")
 }
@@ -397,11 +398,13 @@ model Message {
 model MessageRead {
   id                String   @id @default(uuid(7))
   userId            String   @map("user_id")
+  roomId            String   @map("room_id")
   lastMessageReadId String   @map("last_message_read_id")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   user            User    @relation(fields: [userId], references: [id])
+  room            Room    @relation(fields: [roomId], references: [id])
   lastMessageRead Message @relation(fields: [lastMessageReadId], references: [id])
 
   @@map("message_reads")
