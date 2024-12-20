@@ -1,3 +1,4 @@
+import { RoomType } from "@prisma/client"
 import { z } from "zod"
 
 import { attachmentSchema } from "@/constants"
@@ -12,19 +13,9 @@ export const createMessageSchema = z
       .max(1048576, ERROR.MESSAGE_TOO_LONG)
       .optional()
       .transform((v) => (v === "undefined" ? undefined : v)),
+    receiverId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }),
+    roomType: z.nativeEnum(RoomType),
     parentMessageId: z
-      .string({ invalid_type_error: ERROR.INVALID_TYPE })
-      .optional()
-      .transform((v) => (v === "undefined" ? undefined : v)),
-    userId: z
-      .string({ invalid_type_error: ERROR.INVALID_TYPE })
-      .optional()
-      .transform((v) => (v === "undefined" ? undefined : v)),
-    groupId: z
-      .string({ invalid_type_error: ERROR.INVALID_TYPE })
-      .optional()
-      .transform((v) => (v === "undefined" ? undefined : v)),
-    channelId: z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
       .optional()
       .transform((v) => (v === "undefined" ? undefined : v)),
@@ -45,29 +36,6 @@ export const createMessageSchema = z
     message: ERROR.SHOULD_HAVE_MESSAGE_OR_ATTACHMENT,
     path: ["message", "attachment"],
   })
-  .refine(
-    (value) => {
-      return value.userId || value.groupId || value.channelId
-    },
-    {
-      message: ERROR.ROOM_ID_REQUIRED,
-      path: ["userId", "groupId", "channelId"],
-    },
-  )
-  .refine(
-    (value) => {
-      if (value.userId && value.groupId && value.channelId) return false
-      if (value.userId && (value.groupId || value.channelId)) return false
-      if (value.groupId && (value.userId || value.channelId)) return false
-      if (value.channelId && (value.userId || value.groupId)) return false
-
-      return true
-    },
-    {
-      message: ERROR.ROOM_ID_DUPLICATED,
-      path: ["userId", "groupId", "channelId"],
-    },
-  )
 
 export const updateMessageSchema = z.object({
   message: z

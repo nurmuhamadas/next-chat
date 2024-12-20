@@ -6,7 +6,13 @@ declare type MessageStatus =
   | "DELETED_FOR_ALL"
   | "DELETED_BY_ADMIN"
 
-declare type AttachmentType = "IMAGE" | "VIDEO" | "AUDIO" | "PDF" | "OTHER"
+declare type AttachmentType =
+  | "IMAGE"
+  | "VIDEO"
+  | "AUDIO"
+  | "PDF"
+  | "OTHER"
+  | "AUDIO_RECORD"
 
 declare type GroupType = "PUBLIC" | "PRIVATE"
 
@@ -81,16 +87,15 @@ declare interface MessageAuthor {
 declare interface Message {
   id: string
   message: string | null
-  user: MessageAuthor
-  conversationId: string | null
+  sender: MessageAuthor
+  privateChatId: string | null
+  groupId: string | null
+  channelId: string | null
   parentMessageId: string | null
   parentMessageName: string | null
   parentMessageText: string | null
-  groupId: string | null
-  channelId: string | null
   originalMessageId: string | null
   isEmojiOnly: boolean
-  isRead: boolean
   status: MessageStatus
   attachments: Attachment[]
   updatedAt: string | null
