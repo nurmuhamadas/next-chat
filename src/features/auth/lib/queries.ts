@@ -70,12 +70,14 @@ export const createOrUpdateSession = ({
   token,
   userAgent,
   userId,
+  email,
   description,
 }: {
   deviceId: string
   token: string
   userAgent: string
   userId: string
+  email: string
   description: string
 }) => {
   const userLogs = {
@@ -83,12 +85,12 @@ export const createOrUpdateSession = ({
     description,
   }
   return prisma.session.upsert({
-    where: { token },
+    where: { email },
     create: {
       deviceId,
       token,
       userAgent,
-      userId,
+      email,
       expiresAt: getSessionExpired(),
       userLogs: {
         create: { ...userLogs, activity: LogActivity.LOGIN_NEW_DEVICE },
@@ -105,14 +107,14 @@ export const createOrUpdateSession = ({
 }
 
 export const softDeleteSession = ({
-  id,
   userId,
+  email,
 }: {
-  id: string
   userId: string
+  email: string
 }) => {
   return prisma.session.update({
-    where: { id },
+    where: { email },
     data: {
       expiresAt: addDays(new Date(), -10),
       userLogs: {

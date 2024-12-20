@@ -1,10 +1,9 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
-import { deleteCookie } from "hono/cookie"
+import { deleteCookie, getCookie } from "hono/cookie"
 
 import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
-import { sessionMiddleware } from "@/lib/session-middleware"
 import { createError, successResponse } from "@/lib/utils"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
@@ -151,6 +150,7 @@ const authApp = new Hono()
         })
 
         const session = await createOrUpdateSession({
+          email,
           deviceId,
           token,
           userAgent,
@@ -218,7 +218,7 @@ const authApp = new Hono()
         }
 
         const verificationToken = existingUser.verificationToken
-        const invalidToken = validateToken({
+        const invalidToken = await validateToken({
           token,
           originToken: verificationToken,
         })
@@ -237,6 +237,7 @@ const authApp = new Hono()
           verifyUserEmail(existingUser.id),
           deleteVerificationToken({ email }),
           createOrUpdateSession({
+            email,
             deviceId,
             token: sessionToken,
             userAgent,
@@ -302,7 +303,7 @@ const authApp = new Hono()
         }
 
         const verificationToken = existingUser.verificationToken
-        const invalidToken = validateToken({
+        const invalidToken = await validateToken({
           token,
           originToken: verificationToken,
         })
@@ -320,6 +321,7 @@ const authApp = new Hono()
         const [, session] = await prisma.$transaction([
           deleteVerificationToken({ email }),
           createOrUpdateSession({
+            email,
             deviceId,
             token: sessionToken,
             userAgent,
@@ -371,17 +373,17 @@ const authApp = new Hono()
       try {
         const { token, email, password } = c.req.valid("json")
 
-        const existingUser = await prisma.user.findUnique({ where: { email } })
+        const existingUser = await prisma.user.findUnique({
+          where: { email },
+          include: { passwordResetToken: true },
+        })
         if (!existingUser) {
           return c.json(createError(ERROR.EMAIL_NOT_REGISTERED), 400)
         }
 
-        const passwordResetToken = await prisma.passwordResetToken.findUnique({
-          where: { email, token },
-        })
-        const inValid = validateToken({
+        const inValid = await validateToken({
           token,
-          originToken: passwordResetToken,
+          originToken: existingUser.passwordResetToken,
         })
         if (inValid) {
           return c.json(createError(inValid), 400)
@@ -404,16 +406,31 @@ const authApp = new Hono()
       }
     },
   )
-  .post("/sign-out", sessionMiddleware, async (c) => {
+  .post("/sign-out", async (c) => {
     try {
-      const session = c.get("userSession")
+      const token = getCookie(c, AUTH_COOKIE_KEY)
 
+      const session = await prisma.session.findUnique({
+        where: { token },
+        select: { email: true, user: { select: { id: true } } },
+      })
+
+      if (session) {
+        await softDeleteSession({
+          email: session.email,
+          userId: session.user.id,
+        })
+      }
       deleteCookie(c, AUTH_COOKIE_KEY)
-      await softDeleteSession(session)
 
       const response: LogoutResponse = successResponse(true)
       return c.json(response)
-    } catch {}
+    } catch {
+      deleteCookie(c, AUTH_COOKIE_KEY)
+
+      const response: LogoutResponse = successResponse(true)
+      return c.json(response)
+    }
   })
 
 export default authApp

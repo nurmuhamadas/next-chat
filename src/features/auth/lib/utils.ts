@@ -3,7 +3,7 @@ import { addDays, addMinutes, addYears, isBefore } from "date-fns"
 import { Context } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
 import * as jwt from "hono/jwt"
-import { v7 as uuidV7 } from "uuid"
+import { JwtTokenExpired, JwtTokenInvalid } from "hono/utils/jwt/types"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_SECRET } from "@/lib/config"
@@ -30,25 +30,28 @@ export const generateSessionToken = (data: {
   email: string
   deviceId: string
 }) => {
-  return jwt.sign(data, AUTH_SECRET)
+  return jwt.sign(
+    { ...data, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 },
+    AUTH_SECRET,
+  )
 }
 
 export const generateVerificationToken = (data: {
   email: string
   username: string
 }) => {
-  return jwt.sign({ ...data, createdAt: new Date() }, AUTH_SECRET)
+  return jwt.sign(
+    {
+      ...data,
+      createdAt: new Date(),
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 10,
+    },
+    AUTH_SECRET,
+  )
 }
 
-export const decodeJWT = (jwt: string) => {
-  const [header, payload] = jwt.split(".")
-  const decodeBase64 = (str: string) =>
-    Buffer.from(str, "base64url").toString("utf-8")
-
-  const decodedHeader = JSON.parse(decodeBase64(header)) // Dekode Header
-  const decodedPayload = JSON.parse(decodeBase64(payload)) // Dekode Payload
-
-  return { header: decodedHeader, payload: decodedPayload }
+export const verifyToken = <T>(token: string): Promise<T> => {
+  return jwt.verify(token, AUTH_SECRET) as Promise<T>
 }
 
 export const checkUsernameAvailability = async (username: string) => {
@@ -64,18 +67,25 @@ export const getTokenExpired = () => addMinutes(new Date(), 10)
 
 export const getSessionExpired = () => addDays(new Date(), 30)
 
-export const validateToken = ({
+export const validateToken = async ({
   token,
   originToken,
 }: {
   token: string
   originToken: VerificationToken | PasswordResetToken | null
 }) => {
-  if (!originToken || originToken.token !== token) {
-    return ERROR.INVALID_TOKEN
-  }
-  if (isBefore(originToken.expiresAt, new Date())) {
-    return ERROR.TOKEN_EXPIRED
+  try {
+    await verifyToken(token)
+
+    if (!originToken || originToken.token !== token) {
+      return ERROR.INVALID_TOKEN
+    }
+    if (isBefore(originToken.expiresAt, new Date())) {
+      return ERROR.TOKEN_EXPIRED
+    }
+  } catch (error) {
+    if (error instanceof JwtTokenInvalid) return ERROR.INVALID_TOKEN
+    if (error instanceof JwtTokenExpired) return ERROR.TOKEN_EXPIRED
   }
 }
 
@@ -103,4 +113,5 @@ export const getDeviceId = (c: Context) => {
   return getCookie(c, DEVICE_ID_COOKIE_KEY)
 }
 
-export const generateDeviceId = () => `device-${uuidV7()}-${Date.now()}`
+export const generateDeviceId = () =>
+  `device-${Bun.randomUUIDv7()}-${Date.now()}`

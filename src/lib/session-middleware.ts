@@ -3,11 +3,12 @@ import "server-only"
 import { isBefore } from "date-fns"
 import { deleteCookie, getCookie } from "hono/cookie"
 import { createMiddleware } from "hono/factory"
+import { JwtTokenExpired, JwtTokenInvalid } from "hono/utils/jwt/types"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
 import { softDeleteSession } from "@/features/auth/lib/queries"
-import { decodeJWT } from "@/features/auth/lib/utils"
+import { verifyToken } from "@/features/auth/lib/utils"
 
 import { prisma } from "./prisma"
 import { createError } from "./utils"
@@ -24,26 +25,33 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
       const token = getCookie(c, AUTH_COOKIE_KEY)
 
       if (!token) {
-        return c.json(createError(ERROR.UNAUTHORIZE), 401)
+        throw ERROR.UNAUTHORIZE
       }
 
-      const session = await prisma.session.findUnique({ where: { token } })
+      const payload = await verifyToken<UserSession>(token)
+
+      const session = await prisma.session.findUnique({
+        where: { token },
+        include: { user: { select: { id: true } } },
+      })
       if (!session) {
         deleteCookie(c, AUTH_COOKIE_KEY)
 
-        return c.json(createError(ERROR.UNAUTHORIZE), 401)
+        throw ERROR.UNAUTHORIZE
       }
       if (isBefore(session.expiresAt, new Date())) {
         deleteCookie(c, AUTH_COOKIE_KEY)
-        await softDeleteSession(session)
+        await softDeleteSession({
+          email: session.email,
+          userId: session.user.id,
+        })
 
-        return c.json(createError(ERROR.UNAUTHORIZE), 401)
+        throw ERROR.UNAUTHORIZE
       }
 
-      const { payload } = decodeJWT(token)
       const userSession = {
         id: session.id,
-        userId: session.userId,
+        userId: session.user.id,
         email: payload.email,
         username: payload.username,
         token,
@@ -52,7 +60,14 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
       c.set("userSession", userSession)
 
       await next()
-    } catch {
+    } catch (error) {
+      deleteCookie(c, AUTH_COOKIE_KEY)
+      if (error instanceof JwtTokenInvalid) {
+        return c.json(createError(ERROR.INVALID_TOKEN), 401)
+      }
+      if (error instanceof JwtTokenExpired) {
+        return c.json(createError(ERROR.TOKEN_EXPIRED), 401)
+      }
       return c.json(createError(ERROR.UNAUTHORIZE), 401)
     }
   },
