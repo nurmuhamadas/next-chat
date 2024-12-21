@@ -759,8 +759,9 @@ const groupApp = new Hono()
         }
 
         if (group._count.members === 1) {
-          // TODO: change with delete group
-          return c.json(createError(ERROR.THE_ONLY_ONE_MEMBER), 403)
+          await softDeleteGroup(groupId)
+          const response: LeaveGroupResponse = successResponse(true)
+          return c.json(response)
         }
 
         const isOnlyOneAdmin = member.isAdmin && group.members.length === 1

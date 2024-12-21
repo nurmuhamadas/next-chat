@@ -656,8 +656,9 @@ const channelApp = new Hono()
         }
 
         if (channel._count.subscribers === 1) {
-          // TODO: change with delete channel
-          return c.json(createError(ERROR.THE_ONLY_ONE_MEMBER), 403)
+          await softDeleteChannel(channelId)
+          const response: LeaveChannelResponse = successResponse(true)
+          return c.json(response)
         }
 
         const isOnlyOneAdmin = subs.isAdmin && channel.subscribers.length === 1
