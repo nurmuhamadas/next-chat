@@ -86,57 +86,70 @@ export const createGroup = (data: {
   ownerId: string
   memberIds: string[]
 }) => {
-  return prisma.group.create({
-    data: {
-      name: data.name,
-      type: data.type,
-      inviteCode: data.inviteCode,
-      description: data.description,
-      imageUrl: data.imageUrl,
-      ownerId: data.ownerId,
-      membersOption: {
-        createMany: {
-          data: [
-            {
-              userId: data.ownerId,
-              notification: true,
-            },
-            ...data.memberIds.map((id) => ({
-              userId: id,
-              notification: true,
-            })),
-          ],
+  return prisma.$transaction(async (tx) => {
+    const createdGroup = await tx.group.create({
+      data: {
+        name: data.name,
+        type: data.type,
+        inviteCode: data.inviteCode,
+        description: data.description,
+        imageUrl: data.imageUrl,
+        ownerId: data.ownerId,
+        membersOption: {
+          createMany: {
+            data: [
+              {
+                userId: data.ownerId,
+                notification: true,
+              },
+              ...data.memberIds.map((id) => ({
+                userId: id,
+                notification: true,
+              })),
+            ],
+          },
+        },
+        members: {
+          createMany: {
+            data: [
+              {
+                userId: data.ownerId,
+                isAdmin: true,
+              },
+              ...data.memberIds.map((id) => ({
+                userId: id,
+                isAdmin: false,
+              })),
+            ],
+          },
+        },
+        rooms: {
+          createMany: {
+            data: [
+              {
+                type: RoomType.GROUP,
+                ownerId: data.ownerId,
+              },
+              ...data.memberIds.map((id) => ({
+                type: RoomType.GROUP,
+                ownerId: id,
+              })),
+            ],
+          },
         },
       },
-      members: {
-        createMany: {
-          data: [
-            {
-              userId: data.ownerId,
-              isAdmin: true,
-            },
-            ...data.memberIds.map((id) => ({
-              userId: id,
-              isAdmin: false,
-            })),
-          ],
-        },
-      },
-      rooms: {
-        createMany: {
-          data: [
-            {
-              type: RoomType.GROUP,
-              ownerId: data.ownerId,
-            },
-            ...data.memberIds.map((id) => ({
-              type: RoomType.GROUP,
-              ownerId: id,
-            })),
-          ],
-        },
-      },
-    },
+      include: { rooms: { select: { id: true, ownerId: true } } },
+    })
+
+    await tx.userUnreadMessage.createMany({
+      data: createdGroup.rooms.map((room) => ({
+        userId: room.ownerId,
+        roomId: room.id,
+        count: 0,
+      })),
+    })
+
+    return createdGroup
   })
 }
 

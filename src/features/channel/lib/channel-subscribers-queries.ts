@@ -13,8 +13,26 @@ export const subscribeChannel = async ({
   return prisma.$transaction([
     prisma.room.upsert({
       where: { id: currentRoom?.id ?? "" },
-      create: { channelId, ownerId: userId, type: "CHANNEL" },
-      update: { deletedAt: null },
+      create: {
+        channelId,
+        ownerId: userId,
+        type: "CHANNEL",
+        unreadMessage: {
+          create: {
+            userId,
+            count: 0,
+          },
+        },
+      },
+      update: {
+        deletedAt: null,
+        unreadMessage: {
+          create: {
+            userId,
+            count: 0,
+          },
+        },
+      },
     }),
     prisma.channelSubscriber.create({
       data: { channelId, userId, isAdmin: false },
@@ -41,6 +59,9 @@ export const unSubscribeChannel = ({
     }),
     prisma.channelOption.deleteMany({
       where: { channelId, userId },
+    }),
+    prisma.userUnreadMessage.deleteMany({
+      where: { userId, room: { channelId } },
     }),
   ])
 }
@@ -76,6 +97,10 @@ export const clearAllChannelChat = ({
     prisma.channelSubscriber.deleteMany({ where: { userId, channelId } }),
     prisma.channelSubscriber.create({
       data: { userId, channelId, isAdmin },
+    }),
+    prisma.userUnreadMessage.updateMany({
+      where: { userId, room: { channelId } },
+      data: { count: 0 },
     }),
   ])
 }

@@ -4,6 +4,7 @@ import {
   Message as MessageModel,
   Profile as ProfileModel,
   Room as RoomModel,
+  UserUnreadMessage as UserUnreadMessageModel,
 } from "@prisma/client"
 
 export const getRoomIncludeQuery = () => ({
@@ -33,6 +34,7 @@ export const getRoomIncludeQuery = () => ({
   },
   group: { select: { name: true, imageUrl: true } },
   channel: { select: { name: true, imageUrl: true } },
+  unreadMessage: { select: { count: true } },
 })
 
 export const mapRoomModelToConversation = (
@@ -54,6 +56,7 @@ export const mapRoomModelToConversation = (
     } | null
     group: Pick<GroupModel, "name" | "imageUrl"> | null
     channel: Pick<ChannelModel, "name" | "imageUrl"> | null
+    unreadMessage: Pick<UserUnreadMessageModel, "count"> | null
   },
 ): Conversation => {
   let id = ""
@@ -94,7 +97,7 @@ export const mapRoomModelToConversation = (
           time: room.lastMessage.createdAt?.toISOString(),
         }
       : null,
-    totalUnreadMessages: 0,
+    totalUnreadMessages: room.unreadMessage?.count ?? 0,
     type:
       room.type === "PRIVATE"
         ? "chat"

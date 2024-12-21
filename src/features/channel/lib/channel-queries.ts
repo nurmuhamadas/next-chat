@@ -51,6 +51,12 @@ export const createChannel = (data: {
         create: {
           type: "CHANNEL",
           ownerId: data.ownerId,
+          unreadMessage: {
+            create: {
+              userId: data.ownerId,
+              count: 0,
+            },
+          },
         },
       },
     },

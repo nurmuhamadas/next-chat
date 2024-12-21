@@ -51,8 +51,10 @@ export const updateMessageSchema = z.object({
 })
 
 export const getMessageParamSchema = z.object({
-  roomType: z.nativeEnum(RoomType, {
-    invalid_type_error: ERROR.INVALID_ROOM_TYPE,
-  }),
+  roomType: z
+    .enum(["private", "group", "channel"], {
+      invalid_type_error: ERROR.INVALID_ROOM_TYPE,
+    })
+    .transform((v) => v.toUpperCase() as RoomType),
   receiverId: z.string().min(1, ERROR.REQUIRED),
 })

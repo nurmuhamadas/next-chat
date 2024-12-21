@@ -31,7 +31,7 @@ model User {
   channelOptions        ChannelOption[]
   channels              ChannelSubscriber[]
   messages              Message[]
-  messageReads          MessageRead[]
+  unreadMessages        UserUnreadMessage[]
   reactions             Reaction[]
   blockingUsers         BlockedUser[]       @relation("blockingUser")
   blockedUsers          BlockedUser[]       @relation("blockedUser")
@@ -345,12 +345,13 @@ model Room {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  owner        User          @relation("owner", fields: [ownerId], references: [id])
-  privateChat  PrivateChat?  @relation(fields: [privateChatId], references: [id])
-  group        Group?        @relation(fields: [groupId], references: [id])
-  channel      Channel?      @relation(fields: [channelId], references: [id])
-  lastMessage  Message?      @relation("lastMessageRoom", fields: [lastMessageId], references: [id])
-  messageReads MessageRead[]
+  owner       User         @relation("owner", fields: [ownerId], references: [id])
+  privateChat PrivateChat? @relation(fields: [privateChatId], references: [id])
+  group       Group?       @relation(fields: [groupId], references: [id])
+  channel     Channel?     @relation(fields: [channelId], references: [id])
+  lastMessage Message?     @relation("lastMessageRoom", fields: [lastMessageId], references: [id])
+
+  unreadMessage UserUnreadMessage?
 
   @@map("rooms")
 }
@@ -385,29 +386,26 @@ model Message {
   repliedMessage   Message?     @relation("parentMessage", fields: [parentMessageId], references: [id])
   forwardedMessage Message?     @relation("originalMessage", fields: [originalMessageId], references: [id])
 
-  messageReplies   Message[]     @relation("parentMessage")
-  messageForwards  Message[]     @relation("originalMessage")
-  messageReads     MessageRead[]
+  messageReplies   Message[]    @relation("parentMessage")
+  messageForwards  Message[]    @relation("originalMessage")
   reactions        Reaction[]
   attachments      Attachment[]
-  lastMessagesRoom Room[]        @relation("lastMessageRoom")
+  lastMessagesRoom Room[]       @relation("lastMessageRoom")
 
   @@map("messages")
 }
 
-model MessageRead {
-  id                String   @id @default(uuid(7))
-  userId            String   @map("user_id")
-  roomId            String   @map("room_id")
-  lastMessageReadId String   @map("last_message_read_id")
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
+model UserUnreadMessage {
+  userId    String   @map("user_id")
+  roomId    String   @unique @map("room_id")
+  count     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  user            User    @relation(fields: [userId], references: [id])
-  room            Room    @relation(fields: [roomId], references: [id])
-  lastMessageRead Message @relation(fields: [lastMessageReadId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  room Room @relation(fields: [roomId], references: [id])
 
-  @@map("message_reads")
+  @@map("user_unread_messages")
 }
 
 model Reaction {

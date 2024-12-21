@@ -11,6 +11,8 @@ import { StatusCode } from "hono/utils/http-status"
 import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
 
+import { getMessageInludeQuery } from "./utils"
+
 export const validateMessage = async ({
   roomType,
   userId,
@@ -230,27 +232,7 @@ const createMessage = async (
             }
           : undefined,
     },
-    include: {
-      attachments: true,
-      repliedMessage: {
-        select: {
-          id: true,
-          message: true,
-          sender: {
-            select: {
-              id: true,
-              profile: { select: { name: true } },
-            },
-          },
-        },
-      },
-      sender: {
-        select: {
-          id: true,
-          profile: { select: { name: true, imageUrl: true } },
-        },
-      },
-    },
+    include: { ...getMessageInludeQuery() },
   })
 }
 
@@ -309,6 +291,7 @@ export const initiatePrivateMessage = async (
         },
       },
     },
+    include: { rooms: true },
   })
 
   const createdMessage = await createMessage(tx, {
@@ -328,6 +311,16 @@ export const initiatePrivateMessage = async (
       lastMessageId: createdMessage.id,
     },
   })
+
+  if (senderId !== receiverId) {
+    await tx.userUnreadMessage.createMany({
+      data: privateChat.rooms.map((room) => ({
+        userId: room.ownerId,
+        roomId: room.id,
+        count: room.ownerId !== senderId ? 1 : 0,
+      })),
+    })
+  }
 
   return createdMessage
 }
@@ -372,6 +365,7 @@ export const sendMessage = async (
           usersOption: {
             where: { userId: { in: [senderId, receiverId] } },
           },
+          rooms: { select: { id: true, ownerId: true } },
         },
       })
 
@@ -379,12 +373,6 @@ export const sendMessage = async (
         const createdMessage = await initiatePrivateMessage(tx, {
           ...messageModel,
           isBlocked,
-        })
-
-        await readSentMessage(tx, {
-          senderId,
-          receiverId,
-          lastMessageReadId: createdMessage.id,
         })
 
         return createdMessage
@@ -440,11 +428,17 @@ export const sendMessage = async (
           })
         }
 
-        await readSentMessage(tx, {
-          senderId,
-          receiverId: receiverId,
-          lastMessageReadId: createdMessage.id,
-        })
+        if (senderId !== receiverId && !isBlocked) {
+          const receiverRoom = privateChat.rooms.find(
+            (room) => room.ownerId === receiverId,
+          )
+          if (receiverRoom) {
+            await tx.userUnreadMessage.update({
+              where: { roomId: receiverRoom.id },
+              data: { count: { increment: 1 } },
+            })
+          }
+        }
 
         return createdMessage
       }
@@ -460,6 +454,11 @@ export const sendMessage = async (
         where: { groupId: receiverId, deletedAt: null },
         data: { lastMessageId: createdMessage.id },
       })
+
+      await tx.userUnreadMessage.updateMany({
+        where: { room: { groupId: receiverId, ownerId: { not: senderId } } },
+        data: { count: { increment: 1 } },
+      })
     }
 
     if (roomType === "CHANNEL") {
@@ -467,58 +466,13 @@ export const sendMessage = async (
         where: { channelId: receiverId, deletedAt: null },
         data: { lastMessageId: createdMessage.id },
       })
+
+      await tx.userUnreadMessage.updateMany({
+        where: { room: { channelId: receiverId, ownerId: { not: senderId } } },
+        data: { count: { increment: 1 } },
+      })
     }
 
-    await readSentMessage(tx, {
-      senderId,
-      receiverId,
-      lastMessageReadId: createdMessage.id,
-    })
-
     return createdMessage
-  })
-}
-
-const readSentMessage = async (
-  tx: Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-    "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
-  >,
-  {
-    senderId,
-    receiverId,
-    lastMessageReadId,
-  }: {
-    senderId: string
-    receiverId: string
-    lastMessageReadId: string
-  },
-) => {
-  const senderRoom = await tx.room.findFirst({
-    where: {
-      ownerId: senderId,
-      deletedAt: null,
-      OR: [{ groupId: receiverId }, { channelId: receiverId }],
-    },
-    select: {
-      id: true,
-      messageReads: { where: { userId: senderId }, select: { id: true } },
-    },
-  })
-
-  if (!senderRoom) {
-    return
-  }
-
-  await tx.messageRead.upsert({
-    where: { id: senderRoom?.messageReads[0]?.id ?? "" },
-    create: {
-      lastMessageReadId,
-      userId: senderId,
-      roomId: senderRoom.id,
-    },
-    update: {
-      lastMessageReadId,
-    },
   })
 }

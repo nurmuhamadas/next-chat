@@ -5,6 +5,28 @@ import {
 } from "@prisma/client"
 import { isAfter } from "date-fns"
 
+export const getMessageInludeQuery = () => ({
+  attachments: true,
+  repliedMessage: {
+    select: {
+      id: true,
+      message: true,
+      sender: {
+        select: {
+          id: true,
+          profile: { select: { name: true } },
+        },
+      },
+    },
+  },
+  sender: {
+    select: {
+      id: true,
+      profile: { select: { name: true, imageUrl: true } },
+    },
+  },
+})
+
 export const getFileType = (mimeType: string): AttachmentType => {
   switch (mimeType) {
     case "image/jpeg":

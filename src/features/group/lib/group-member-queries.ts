@@ -13,8 +13,20 @@ export const joinGroup = async ({
   return prisma.$transaction([
     prisma.room.upsert({
       where: { id: currentRoom?.id ?? "" },
-      create: { groupId, ownerId: userId, type: "GROUP" },
-      update: { deletedAt: null },
+      create: {
+        groupId,
+        ownerId: userId,
+        type: "GROUP",
+        unreadMessage: {
+          create: { count: 0, userId },
+        },
+      },
+      update: {
+        deletedAt: null,
+        unreadMessage: {
+          create: { count: 0, userId },
+        },
+      },
     }),
     prisma.groupMember.create({
       data: { groupId, userId, isAdmin: false },
@@ -41,6 +53,9 @@ export const leaveGroup = ({
     }),
     prisma.groupOption.deleteMany({
       where: { groupId, userId },
+    }),
+    prisma.userUnreadMessage.deleteMany({
+      where: { userId, room: { groupId } },
     }),
   ])
 }
@@ -72,6 +87,10 @@ export const clearAllChat = ({
     prisma.groupMember.deleteMany({ where: { userId, groupId } }),
     prisma.groupMember.create({
       data: { userId, groupId, isAdmin },
+    }),
+    prisma.userUnreadMessage.updateMany({
+      where: { userId, room: { groupId } },
+      data: { count: 0 },
     }),
   ])
 }
