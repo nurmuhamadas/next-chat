@@ -372,6 +372,7 @@ const roomApp = new Hono()
           id: room.id,
           type: room.type,
           ownerId: userId,
+          privateChatId: room.privateChatId!,
           groupId,
           channelId,
         })

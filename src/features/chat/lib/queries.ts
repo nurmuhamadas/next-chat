@@ -34,19 +34,21 @@ export const deleteRoom = ({
   id,
   type,
   ownerId,
+  privateChatId,
   groupId,
   channelId,
 }: {
   id: string
   type: RoomType
   ownerId: string
+  privateChatId: string
   groupId: string
   channelId: string
 }) => {
   return prisma.$transaction(async (tx) => {
     if (type === "PRIVATE") {
       await tx.privateChatOption.deleteMany({
-        where: { userId: ownerId },
+        where: { privateChatId, userId: ownerId },
       })
     } else if (type === "GROUP") {
       await tx.groupMember.deleteMany({ where: { userId: ownerId, groupId } })
