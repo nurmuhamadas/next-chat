@@ -3,6 +3,7 @@ import {
   Message as MessageModel,
   Profile as ProfileModel,
 } from "@prisma/client"
+import { isAfter } from "date-fns"
 
 export const getFileType = (mimeType: string): AttachmentType => {
   switch (mimeType) {
@@ -75,6 +76,7 @@ export const mapMessageModelToMessage = (
         messageId: message.id,
       }
     }),
+    isUpdated: isAfter(message.updatedAt, message.createdAt),
     createdAt: message.createdAt?.toISOString(),
     updatedAt: message.updatedAt?.toISOString() ?? null,
   }

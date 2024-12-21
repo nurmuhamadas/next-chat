@@ -65,8 +65,12 @@ export const mapRoomModelToConversation = (
       room.privateChat?.user1.id === room.ownerId
         ? room.privateChat?.user2
         : room.privateChat?.user1
-    id = user?.id!
-    name = user?.profile?.name ?? "Unknown"
+    id = user?.id ?? ""
+    if (room.privateChat?.user2.id === room.privateChat?.user1.id) {
+      name = "Saved Messages"
+    } else {
+      name = user?.profile?.name ?? "Unknown"
+    }
     imageUrl = user?.profile?.imageUrl ?? null
   } else if (room.type === "GROUP") {
     id = room.groupId!

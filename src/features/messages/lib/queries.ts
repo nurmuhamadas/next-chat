@@ -286,11 +286,25 @@ export const initiatePrivateMessage = async (
         createMany: {
           data: [
             { ownerId: senderId, type: "PRIVATE" },
-            {
-              ownerId: receiverId,
-              type: "PRIVATE",
-              deletedAt: isBlocked ? new Date() : null,
-            },
+            ...(senderId !== receiverId
+              ? [
+                  {
+                    ownerId: receiverId,
+                    type: RoomType.PRIVATE,
+                    deletedAt: isBlocked ? new Date() : null,
+                  },
+                ]
+              : []),
+          ],
+        },
+      },
+      usersOption: {
+        createMany: {
+          data: [
+            { userId: senderId, notification: senderId !== receiverId },
+            ...(senderId !== receiverId
+              ? [{ userId: receiverId, notification: true }]
+              : []),
           ],
         },
       },
@@ -411,18 +425,20 @@ export const sendMessage = async (
           update: {},
         })
 
-        const receiverOption = privateChat.usersOption.find(
-          (v) => v.userId === receiverId,
-        )
-        await tx.privateChatOption.upsert({
-          where: { id: receiverOption?.id ?? "", deletedAt: null },
-          create: {
-            userId: receiverId,
-            privateChatId: privateChat.id,
-            notification: true,
-          },
-          update: {},
-        })
+        if (senderId !== receiverId) {
+          const receiverOption = privateChat.usersOption.find(
+            (v) => v.userId === receiverId,
+          )
+          await tx.privateChatOption.upsert({
+            where: { id: receiverOption?.id ?? "", deletedAt: null },
+            create: {
+              userId: receiverId,
+              privateChatId: privateChat.id,
+              notification: true,
+            },
+            update: {},
+          })
+        }
 
         await readSentMessage(tx, {
           senderId,

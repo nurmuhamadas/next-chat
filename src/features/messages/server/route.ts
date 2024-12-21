@@ -2,17 +2,23 @@ import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import { Models } from "node-appwrite"
 
+import { collectionSchema } from "@/constants"
 import { ERROR } from "@/constants/error"
 import { constructDownloadUrl, constructFileUrl } from "@/lib/appwrite"
+import { prisma } from "@/lib/prisma"
 import { sessionMiddleware } from "@/lib/session-middleware"
 import { deleteFile, uploadFile } from "@/lib/upload-file"
-import { createError, successResponse } from "@/lib/utils"
+import {
+  createError,
+  successCollectionResponse,
+  successResponse,
+} from "@/lib/utils"
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import { sendMessage, validateMessage } from "../lib/queries"
 import { getFileType, mapMessageModelToMessage } from "../lib/utils"
-import { createMessageSchema } from "../schema"
+import { createMessageSchema, getMessageParamSchema } from "../schema"
 
 /**
  * RULES:
@@ -116,72 +122,163 @@ const messageApp = new Hono()
       }
     },
   )
-  .get()
-// .get(
-//   "/private/:userId",
-//   zValidator("query", getMessageSchema),
-//   sessionMiddleware,
-//   validateProfileMiddleware,
-//   async (c) => {
-//     try {
-//       const { userId } = c.req.param()
-//       const { page } = c.req.valid("query")
+  /**
+   * RULES:
+   * 1. Private Chat
+   *   - filter pesan berdasarkan:
+   *     * privateChatOption: createdAt <= x < deletedAt
+   *     * blockedUsers: x < blockedAt && x > unblockedAt
+   *
+   * 2. Group
+   *   - filter pesan berdasarkan:
+   *     * groupMembers: createdAt <= x < leftAt
+   *
+   * 2. Channel
+   *   - filter pesan berdasarkan:
+   *     * channelSubscribers: createdAt <= x < unsubscribedAt
+   */
+  .get(
+    "/:roomType/:receiverId",
+    zValidator("param", getMessageParamSchema),
+    zValidator("query", collectionSchema),
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { receiverId, roomType } = c.req.valid("param")
+        const { limit, cursor } = c.req.valid("query")
 
-//       const databases = c.get("databases")
-//       const currentProfile = c.get("userProfile")
+        const { userId } = c.get("userProfile")
 
-//       const conversation = await getConversationByUserIds(databases, {
-//         userId1: currentProfile.$id,
-//         userId2: userId,
-//       })
-//       if (!conversation) {
-//         return c.json(createError(ERROR.CONVERSATION_NOT_FOUND), 404)
-//       }
+        const where = []
+        if (roomType === "PRIVATE") {
+          const chatOptions = await prisma.privateChatOption.findMany({
+            where: {
+              userId,
+              privateChat: {
+                OR: [{ user2Id: receiverId }, { user1Id: receiverId }],
+              },
+            },
+          })
+          const datesOption = chatOptions.map((opt) => {
+            return {
+              createdAt: {
+                gte: opt.createdAt,
+                lt: opt.deletedAt ?? new Date(),
+              },
+            }
+          })
 
-//       if (
-//         conversation.userId1 !== currentProfile.$id &&
-//         conversation.userId2 !== currentProfile.$id
-//       ) {
-//         return c.json(createError(ERROR.NOT_ALLOWED), 403)
-//       }
+          const blockeds =
+            userId !== receiverId
+              ? await prisma.blockedUser.findMany({
+                  where: { blockedUserId: receiverId, userId },
+                })
+              : []
+          const datesBlocked = blockeds.map((opt) => {
+            return {
+              OR: [
+                { createdAt: { lt: opt.createdAt } },
+                { createdAt: { gte: opt.unblockedAt ?? new Date() } },
+              ],
+            }
+          })
 
-//       const result = await getMessageByConversationId(databases, {
-//         conversationId: conversation.$id,
-//         userId: currentProfile.$id,
-//         page,
-//       })
-//       const userPair = await getUserProfileById(databases, {
-//         userId,
-//       })
+          where.push({
+            privateChat: {
+              OR: [
+                { user1Id: userId, user2Id: receiverId },
+                { user2Id: userId, user1Id: receiverId },
+              ],
+            },
+            OR: datesOption.length > 0 ? datesOption : undefined,
+            AND: datesBlocked.length > 0 ? datesBlocked : undefined,
+          })
+        } else if (roomType === "GROUP") {
+          const members = await prisma.groupMember.findMany({
+            where: { userId, groupId: receiverId },
+          })
 
-//       const messageIds = result.data.map((v) => v.$id)
-//       const { data: attachments } = await getAttachmentsByMessageIds(
-//         databases,
-//         {
-//           messageIds,
-//         },
-//       )
+          const datesMember = members.map((opt) => {
+            return {
+              createdAt: {
+                gte: opt.createdAt,
+                lt: opt.leftAt ?? new Date(),
+              },
+            }
+          })
 
-//       const messages = result.data.map((message) => {
-//         const attachs = attachments
-//           .filter((att) => att.messageId === message.$id)
-//           .map((a) => mapAttachmentModelToAttachment(a, message.$id))
-//         const user =
-//           message.userId === currentProfile.$id ? currentProfile : userPair
+          where.push({
+            groupId: receiverId,
+            OR: datesMember.length > 0 ? datesMember : undefined,
+          })
+        } else if (roomType === "CHANNEL") {
+          const subscribers = await prisma.channelSubscriber.findMany({
+            where: { userId, channelId: receiverId },
+          })
 
-//         return mapMessageModelToMessage(message, user!, attachs, true)
-//       })
+          const datesSubscribe = subscribers.map((opt) => {
+            return {
+              createdAt: {
+                gte: opt.createdAt,
+                lt: opt.unsubscribedAt ?? new Date(),
+              },
+            }
+          })
 
-//       const response: GetMessagesResponse = successCollectionResponse(
-//         messages,
-//         result.total,
-//       )
-//       return c.json(response)
-//     } catch {
-//       return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
-//     }
-//   },
-// )
+          where.push({
+            channelId: receiverId,
+            OR: datesSubscribe.length > 0 ? datesSubscribe : undefined,
+          })
+        }
+
+        const messages = await prisma.message.findMany({
+          where: {
+            ...where[0],
+            status: { not: "DELETED_FOR_ME" },
+          },
+          orderBy: { createdAt: "desc" },
+          include: {
+            attachments: true,
+            repliedMessage: {
+              select: {
+                id: true,
+                message: true,
+                sender: {
+                  select: {
+                    id: true,
+                    profile: { select: { name: true } },
+                  },
+                },
+              },
+            },
+            sender: {
+              select: {
+                id: true,
+                profile: { select: { name: true, imageUrl: true } },
+              },
+            },
+          },
+          take: limit,
+          cursor: cursor ? { id: cursor } : undefined,
+          skip: cursor ? 1 : undefined,
+        })
+
+        const total = messages.length
+        const nextCursor =
+          total > 0 && total === limit ? messages[total - 1].id : undefined
+
+        const response: GetMessagesResponse = successCollectionResponse(
+          messages.map(mapMessageModelToMessage),
+          total,
+          nextCursor,
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
 // .post(
 //   "/private/:userId/read",
 //   sessionMiddleware,

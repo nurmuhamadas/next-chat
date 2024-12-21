@@ -50,16 +50,9 @@ export const updateMessageSchema = z.object({
     .optional(),
 })
 
-export const getMessageSchema = z.object({
-  page: z
-    .string()
-    .optional()
-    .transform((v) => {
-      const num = Number(v)
-      if (isNaN(num)) {
-        return 1
-      }
-
-      return num
-    }),
+export const getMessageParamSchema = z.object({
+  roomType: z.nativeEnum(RoomType, {
+    invalid_type_error: ERROR.INVALID_ROOM_TYPE,
+  }),
+  receiverId: z.string().min(1, ERROR.REQUIRED),
 })

@@ -98,6 +98,7 @@ declare interface Message {
   isEmojiOnly: boolean
   status: MessageStatus
   attachments: Attachment[]
+  isUpdated: boolean
   updatedAt: string | null
   createdAt: string
 }
