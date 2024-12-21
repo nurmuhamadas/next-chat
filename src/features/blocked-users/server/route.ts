@@ -67,6 +67,10 @@ const blockedUserApp = new Hono()
         const { blockedUserId } = c.req.param()
         const { userId } = c.get("userProfile")
 
+        if (userId === blockedUserId) {
+          return c.json(createError(ERROR.CANNOT_BLOCK_IT_SELF), 403)
+        }
+
         const blockedProfile = await prisma.profile.findUnique({
           where: { userId: blockedUserId },
         })
