@@ -9,6 +9,7 @@ import { LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
 
@@ -16,7 +17,6 @@ import useResetPassword from "../hooks/use-reset-password"
 import { passwordResetSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
-import ErrorAlert from "./error-alert"
 
 const ResetPasswordForm = () => {
   const params = useSearchParams()

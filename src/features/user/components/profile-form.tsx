@@ -7,6 +7,7 @@ import { CameraIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import ErrorAlert from "@/components/error-alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,7 +27,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import ErrorAlert from "@/features/auth/components/error-alert"
 import useLogout from "@/features/auth/hooks/use-logout"
 import { profileSchema } from "@/features/user/schema"
 

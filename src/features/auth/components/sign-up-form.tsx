@@ -9,6 +9,7 @@ import { LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
@@ -18,7 +19,6 @@ import useSignUp from "../hooks/use-sign-up"
 import { signUpSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
-import ErrorAlert from "./error-alert"
 import UsernameFormInput from "./username-form-input"
 
 interface SignUpFormProps {

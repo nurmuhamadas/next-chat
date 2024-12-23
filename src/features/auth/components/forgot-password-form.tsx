@@ -9,6 +9,7 @@ import { LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
@@ -17,7 +18,6 @@ import useRequestPasswordReset from "../hooks/use-request-password-reset"
 import { emailPasswordResetSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
-import ErrorAlert from "./error-alert"
 
 interface ForgotPasswordFormProps {
   showEmailSent: boolean
