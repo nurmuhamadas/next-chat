@@ -99,10 +99,10 @@ const channelApp = new Hono()
 
         const { userId } = c.get("userProfile")
 
-        const existingChannels = await prisma.channel.findMany({
+        const existingChannel = await prisma.channel.findFirst({
           where: { ownerId: userId, name, deletedAt: null },
         })
-        if (existingChannels.length > 0) {
+        if (existingChannel) {
           return c.json(
             createError(ERROR.CHANNEL_NAME_ALREADY_EXIST, ["name"]),
             409,
@@ -142,6 +142,25 @@ const channelApp = new Hono()
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/name-availability/:channelName",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { channelName } = c.req.param()
+        const { userId } = c.get("userProfile")
+
+        const existingChannel = await prisma.channel.findFirst({
+          where: { ownerId: userId, name: channelName, deletedAt: null },
+        })
+
+        return c.json(successResponse(!!existingChannel))
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }

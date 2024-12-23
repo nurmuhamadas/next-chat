@@ -110,10 +110,10 @@ const groupApp = new Hono()
 
         const { userId } = c.get("userProfile")
 
-        const existingGroups = await prisma.group.findMany({
+        const existingGroups = await prisma.group.findFirst({
           where: { ownerId: userId, name, deletedAt: null },
         })
-        if (existingGroups.length > 0) {
+        if (existingGroups) {
           return c.json(createError(ERROR.GROUP_NAME_DUPLICATED, ["name"]), 409)
         }
 
@@ -155,6 +155,25 @@ const groupApp = new Hono()
           }
           return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
         }
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/name-availability/:groupName",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { groupName } = c.req.param()
+        const { userId } = c.get("userProfile")
+
+        const existingGroups = await prisma.group.findFirst({
+          where: { ownerId: userId, name: groupName, deletedAt: null },
+        })
+
+        return c.json(successResponse(!!existingGroups))
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
