@@ -1,9 +1,19 @@
+declare interface SessionToken {
+  userId: string
+  username: string
+  deviceId: string
+  email: string
+  isProfileComplete: boolean
+}
+
 declare interface UserSession {
   id: string
   token: string
   userId: string
   username: string
+  deviceId: string
   email: string
+  isProfileComplete: boolean
 }
 
 declare interface ErrorResponse {

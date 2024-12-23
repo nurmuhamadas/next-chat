@@ -1,13 +1,26 @@
+import { cookies } from "next/headers"
+
 import { LogActivity } from "@prisma/client"
 import { addDays } from "date-fns"
 
 import { prisma } from "@/lib/prisma"
 
-import { getSessionExpired, getTokenExpired } from "./utils"
+import { AUTH_COOKIE_KEY } from "../constants"
+
+import { getSessionExpired, getTokenExpired, verifyToken } from "./utils"
 
 export const validateAuth = async () => {
   try {
-    return { isLoggedIn: false, isProfileCompleted: false }
+    const cookie = await cookies()
+    const session = cookie.get(AUTH_COOKIE_KEY)
+    if (!session) throw ""
+
+    const payload = await verifyToken<SessionToken>(session?.value)
+
+    return {
+      isLoggedIn: !!payload,
+      isProfileCompleted: payload.isProfileComplete,
+    }
   } catch {
     return { isLoggedIn: false, isProfileCompleted: false }
   }

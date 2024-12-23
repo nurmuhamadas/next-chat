@@ -1,5 +1,7 @@
 "use client"
 
+import { useState } from "react"
+
 import { useRouter } from "next/navigation"
 
 import { Card } from "@/components/ui/card"
@@ -9,6 +11,8 @@ import useCreateProfile from "@/features/user/hooks/api/use-create-profile"
 const CompleteProfileForm = () => {
   const router = useRouter()
 
+  const [errorMessage, setErrorMessage] = useState("")
+
   const { mutate: createProfile, isPending } = useCreateProfile()
 
   return (
@@ -16,12 +20,16 @@ const CompleteProfileForm = () => {
       <h2 className="text-center font-bold h2">Complete Your Profile</h2>
       <ProfileForm
         isLoading={isPending}
+        errorMessage={errorMessage}
         onSubmit={(values) =>
           createProfile(
             { form: values },
             {
               onSuccess() {
                 router.push("/")
+              },
+              onError(error) {
+                setErrorMessage(error.message)
               },
             },
           )

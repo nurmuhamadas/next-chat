@@ -1,32 +1,62 @@
 "use client"
 
+import { useState } from "react"
+
+import { redirect, useSearchParams } from "next/navigation"
+
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
 
-import { resetPasswordSchema } from "../schema"
+import useResetPassword from "../hooks/use-reset-password"
+import { passwordResetSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
+import ErrorAlert from "./error-alert"
 
 const ResetPasswordForm = () => {
-  const form = useForm<z.infer<typeof resetPasswordSchema>>({
-    resolver: zodResolver(resetPasswordSchema),
+  const params = useSearchParams()
+  const token = params.get("token")
+  const email = params.get("email")
+
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const { mutate: resetPassword, isPending } = useResetPassword()
+
+  const form = useForm<z.infer<typeof passwordResetSchema>>({
+    resolver: zodResolver(passwordResetSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
   })
 
-  const onSubmit = (values: z.infer<typeof resetPasswordSchema>) => {
-    console.log(values)
+  const onSubmit = (values: z.infer<typeof passwordResetSchema>) => {
+    if (email && token) {
+      resetPassword(
+        { json: { ...values, email, token } },
+        {
+          onError(error) {
+            setErrorMessage(error.message)
+          },
+        },
+      )
+    }
+  }
+
+  if (!token || !email) {
+    return redirect("/sign-up")
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-5">
+        <ErrorAlert message={errorMessage} />
+
         <FormField
           control={form.control}
           name="password"
@@ -51,8 +81,9 @@ const ResetPasswordForm = () => {
             />
           )}
         />
-        <Button type="submit" size="xl" className="w-full">
-          Save Change
+        <Button type="submit" size="xl" className="w-full" disabled={isPending}>
+          {isPending && <LoaderIcon className="size-6 animate-spin" />}
+          Reset Password
         </Button>
       </form>
     </Form>

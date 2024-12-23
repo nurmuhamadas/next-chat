@@ -1,21 +1,20 @@
 import { useMutation } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono"
-import { toast } from "sonner"
 
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-up"]["$post"],
+  (typeof client.api.auth)["email-password-reset"]["$post"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-up"]["$post"]
+  (typeof client.api.auth)["email-password-reset"]["$post"]
 >
 
-const useSignUp = () => {
+const useRequestPasswordReset = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-up"].$post({
+      const response = await client.api.auth["email-password-reset"].$post({
         json,
       })
 
@@ -26,10 +25,7 @@ const useSignUp = () => {
 
       return result
     },
-    onSuccess: () => {
-      toast.success("REGISTER_SUCCESS")
-    },
   })
 }
 
-export default useSignUp
+export default useRequestPasswordReset

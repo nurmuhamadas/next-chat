@@ -1,4 +1,5 @@
 import { zValidator } from "@hono/zod-validator"
+import { Prisma } from "@prisma/client"
 import { Hono } from "hono"
 import { deleteCookie, getCookie } from "hono/cookie"
 
@@ -107,7 +108,10 @@ const authApp = new Hono()
 
         const existingUser = await prisma.user.findUnique({
           where: { email },
-          include: { setting: true },
+          include: {
+            setting: { select: { enable2FA: true } },
+            profile: { select: { id: true } },
+          },
         })
         if (!existingUser) {
           return c.json(createError(ERROR.EMAIL_NOT_REGISTERED), 400)
@@ -147,6 +151,7 @@ const authApp = new Hono()
           userId: existingUser.id,
           username: existingUser.username,
           deviceId,
+          isProfileComplete: !!existingUser.profile,
         })
 
         const session = await createOrUpdateSession({
@@ -162,7 +167,10 @@ const authApp = new Hono()
 
         const response: SignInResponse = successResponse({ status: "success" })
         return c.json(response)
-      } catch {
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+          console.log(e)
+        }
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
     },
@@ -211,7 +219,10 @@ const authApp = new Hono()
 
         const existingUser = await prisma.user.findUnique({
           where: { email },
-          include: { verificationToken: true },
+          include: {
+            verificationToken: true,
+            profile: { select: { id: true } },
+          },
         })
         if (!existingUser) {
           return c.json(createError(ERROR.EMAIL_NOT_REGISTERED), 400)
@@ -232,6 +243,7 @@ const authApp = new Hono()
           userId: existingUser.id,
           username: existingUser.username,
           deviceId,
+          isProfileComplete: !!existingUser.profile,
         })
         const [, , session] = await prisma.$transaction([
           verifyUserEmail(existingUser.id),
@@ -296,7 +308,10 @@ const authApp = new Hono()
 
         const existingUser = await prisma.user.findUnique({
           where: { email },
-          include: { verificationToken: true },
+          include: {
+            verificationToken: true,
+            profile: { select: { id: true } },
+          },
         })
         if (!existingUser) {
           return c.json(createError(ERROR.EMAIL_NOT_REGISTERED), 400)
@@ -317,6 +332,7 @@ const authApp = new Hono()
           userId: existingUser.id,
           username: existingUser.username,
           deviceId,
+          isProfileComplete: !!existingUser.profile,
         })
         const [, session] = await prisma.$transaction([
           deleteVerificationToken({ email }),

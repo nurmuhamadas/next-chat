@@ -7,21 +7,20 @@ import { toast } from "sonner"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["verify-otp"][":userId"]["$post"],
+  (typeof client.api.auth)["password-reset"]["$post"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.auth)["verify-otp"][":userId"]["$post"]
+  (typeof client.api.auth)["password-reset"]["$post"]
 >
 
-const useVerifyOTP = () => {
+const useResetPassword = () => {
   const router = useRouter()
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json, param }) => {
-      const response = await client.api.auth["verify-otp"][":userId"].$post({
+    mutationFn: async ({ json }) => {
+      const response = await client.api.auth["password-reset"].$post({
         json,
-        param,
       })
 
       const result = await response.json()
@@ -32,13 +31,10 @@ const useVerifyOTP = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("OTP_VERIFIED")
-      router.push(`/`)
-    },
-    onError({ message }) {
-      toast.error(message)
+      toast.success("PASSWORD_RESET_SUCCESS")
+      router.push(`/sign-in`)
     },
   })
 }
 
-export default useVerifyOTP
+export default useResetPassword

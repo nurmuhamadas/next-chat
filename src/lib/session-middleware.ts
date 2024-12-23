@@ -28,7 +28,7 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
         throw ERROR.UNAUTHORIZE
       }
 
-      const payload = await verifyToken<UserSession>(token)
+      const payload = await verifyToken<SessionToken>(token)
 
       const session = await prisma.session.findUnique({
         where: { token },
@@ -49,11 +49,9 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
         throw ERROR.UNAUTHORIZE
       }
 
-      const userSession = {
+      const userSession: UserSession = {
+        ...payload,
         id: session.id,
-        userId: session.user.id,
-        email: payload.email,
-        username: payload.username,
         token,
       }
 

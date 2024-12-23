@@ -3,6 +3,13 @@ import { Hono } from "hono"
 
 import { searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
+import { createOrUpdateSession } from "@/features/auth/lib/queries"
+import {
+  generateDeviceId,
+  generateSessionToken,
+  getDeviceId,
+  setAuthCookies,
+} from "@/features/auth/lib/utils"
 import { createSetting } from "@/features/settings/lib/queries"
 import { constructFileUrl, destructFileId } from "@/lib/appwrite"
 import { prisma } from "@/lib/prisma"
@@ -27,10 +34,12 @@ const userApp = new Hono()
     zValidator("form", profileSchema, zodErrorHandler),
     async (c) => {
       try {
+        const userAgent = c.req.header("User-Agent") ?? "Unknown"
+
         const { image, ...form } = c.req.valid("form")
         const imageFile = image as unknown as File
 
-        const { userId } = c.get("userSession")
+        const { userId, email, username } = c.get("userSession")
 
         const profile = await prisma.profile.findUnique({
           where: { userId },
@@ -56,6 +65,25 @@ const userApp = new Hono()
             }),
             createSetting(userId),
           ])
+
+          const deviceId = getDeviceId(c) ?? generateDeviceId()
+          const sessionToken = await generateSessionToken({
+            email,
+            userId,
+            username,
+            deviceId,
+            isProfileComplete: true,
+          })
+          const session = await createOrUpdateSession({
+            email,
+            deviceId,
+            token: sessionToken,
+            userAgent,
+            userId,
+            description: `Update profile ${userAgent}`,
+          })
+
+          setAuthCookies(c, session)
 
           const response: CreateUserProfileResponse = successResponse(
             mapProfileModelToProfile(profile),

@@ -1,10 +1,12 @@
 export const publicRoutes: string[] = []
 
 export const authRoutes = [
+  "/email-verification",
+  "/forgot-password",
+  "/reset-password",
   "/sign-in",
+  "/sign-in-email",
   "/sign-up",
-  "/enter-otp",
-  "/verify-email",
 ]
 
 export const apiPrefix = "/api"

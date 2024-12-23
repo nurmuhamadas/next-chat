@@ -1,9 +1,9 @@
 "use client"
 
-import { ChangeEventHandler, useEffect, useRef, useState } from "react"
+import { ChangeEventHandler, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon, CheckCircleIcon, LoaderIcon } from "lucide-react"
+import { CameraIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -26,18 +26,18 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { ERROR } from "@/constants/error"
+import ErrorAlert from "@/features/auth/components/error-alert"
+import useLogout from "@/features/auth/hooks/use-logout"
 import { profileSchema } from "@/features/user/schema"
-import { debounce } from "@/lib/utils"
 
 import { GENDER_OPT } from "../constants"
-import { useValidateUsername } from "../hooks/api/use-validate-username"
 
 interface ProfileFormProps {
   buttonLabel?: string
   isLoading?: boolean
   initialImageUrl?: string
   initialValues?: z.infer<typeof profileSchema>
+  errorMessage?: string
   onSubmit(values: z.infer<typeof profileSchema>): void
 }
 
@@ -46,35 +46,24 @@ const ProfileForm = ({
   isLoading = false,
   initialValues,
   initialImageUrl = "",
+  errorMessage,
   onSubmit,
 }: ProfileFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [imagePreview, setImagePreview] = useState(initialImageUrl)
-  const [username, setUsername] = useState(initialValues?.username ?? "")
+
+  const { mutate: logout } = useLogout()
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: initialValues?.firstName ?? "",
-      lastName: initialValues?.lastName ?? "",
-      username: initialValues?.username ?? "",
+      name: initialValues?.name ?? "",
       gender: initialValues?.gender ?? "MALE",
       bio: initialValues?.bio ?? "",
       image: initialValues?.image,
     },
   })
-
-  const { data: isUsernameAvailable, isFetching: isCheckingUsername } =
-    useValidateUsername({
-      username,
-    })
-
-  const debouncedCheckUsername = debounce((value: string) => {
-    if (value.trim() !== "") {
-      setUsername(value)
-    }
-  }, 500)
 
   const submitForm = (values: z.infer<typeof profileSchema>) => {
     if (!values.image) delete values.image
@@ -89,20 +78,14 @@ const ProfileForm = ({
     }
   }
 
-  useEffect(() => {
-    if (!isCheckingUsername && isUsernameAvailable === false) {
-      form.setError("username", { message: ERROR.USERNAME_ALREADY_EXIST })
-    } else {
-      form.clearErrors("username")
-    }
-  }, [form, isCheckingUsername, isUsernameAvailable])
-
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
         className="w-full space-y-5"
       >
+        <ErrorAlert message={errorMessage} />
+
         <div className="flex justify-center">
           <input
             type="file"
@@ -132,62 +115,15 @@ const ProfileForm = ({
             )}
           />
         </div>
-        <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name (Optional)</FormLabel>
-                <FormControl>
-                  <Input placeholder="doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
         <FormField
           control={form.control}
-          name="username"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
-              <div className="relative flex">
-                <FormControl>
-                  <Input
-                    placeholder="john_doe"
-                    {...field}
-                    onChange={(e) => {
-                      form.setValue("username", e.target.value)
-                      debouncedCheckUsername(e.target.value)
-                    }}
-                  />
-                </FormControl>
-
-                {isCheckingUsername ? (
-                  <div className="absolute right-3 top-[18px]">
-                    <LoaderIcon className="size-4 animate-spin" />
-                  </div>
-                ) : isUsernameAvailable === true ? (
-                  <div className="absolute right-3 top-[18px]">
-                    <CheckCircleIcon className="size-4 text-success" />
-                  </div>
-                ) : null}
-              </div>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -247,6 +183,11 @@ const ProfileForm = ({
           {isLoading && <LoaderIcon className="size-6 animate-spin" />}
           {buttonLabel}
         </Button>
+        <div className="flex-center">
+          <Button type="button" variant="link" onClick={() => logout()}>
+            Logout
+          </Button>
+        </div>
       </form>
     </Form>
   )

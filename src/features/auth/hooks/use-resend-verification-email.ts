@@ -5,17 +5,17 @@ import { toast } from "sonner"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-up"]["$post"],
+  (typeof client.api.auth)["email-verification"]["$post"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-up"]["$post"]
+  (typeof client.api.auth)["email-verification"]["$post"]
 >
 
-const useSignUp = () => {
+const useResendVerificationEmail = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-up"].$post({
+      const response = await client.api.auth["email-verification"].$post({
         json,
       })
 
@@ -26,10 +26,10 @@ const useSignUp = () => {
 
       return result
     },
-    onSuccess: () => {
-      toast.success("REGISTER_SUCCESS")
+    onError({ message }) {
+      toast.error(message)
     },
   })
 }
 
-export default useSignUp
+export default useResendVerificationEmail

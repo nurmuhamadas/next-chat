@@ -6,15 +6,20 @@ import { toast } from "sonner"
 
 import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<typeof client.api.auth.login.$post, 200>
-type RequestType = InferRequestType<typeof client.api.auth.login.$post>
+type ResponseType = InferResponseType<
+  (typeof client.api.auth)["sign-in"]["$post"],
+  200
+>
+type RequestType = InferRequestType<
+  (typeof client.api.auth)["sign-in"]["$post"]
+>
 
 const useSignIn = () => {
   const router = useRouter()
 
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
-      const response = await client.api.auth.login.$post({
+      const response = await client.api.auth["sign-in"].$post({
         json,
       })
 
@@ -26,17 +31,10 @@ const useSignIn = () => {
       return result
     },
     onSuccess: ({ data }) => {
-      if (data.status === "unverified") {
-        router.push(`/verify-email?otpId=${data.otpId}`)
-      } else if (data.status === "2fa") {
-        router.push(`/enter-otp?otpId=${data.otpId}`)
-      } else {
+      if (data.status === "success") {
         router.push("/")
         toast.success("LOGGED_IN")
       }
-    },
-    onError({ message }) {
-      toast.error(message)
     },
   })
 }

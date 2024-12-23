@@ -6,14 +6,16 @@ import { toast } from "sonner"
 
 import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<typeof client.api.auth.logout.$post>
+type ResponseType = InferResponseType<
+  (typeof client.api.auth)["sign-out"]["$post"]
+>
 
 const useLogout = () => {
   const router = useRouter()
 
   return useMutation<ResponseType, Error>({
     mutationFn: async () => {
-      const response = await client.api.auth.logout.$post()
+      const response = await client.api.auth["sign-out"].$post()
 
       const result = await response.json()
 
@@ -22,9 +24,6 @@ const useLogout = () => {
     onSuccess: () => {
       toast.success("LOGGED_OUT")
       router.push("/sign-in")
-    },
-    onError({ message }) {
-      toast.error(message)
     },
   })
 }

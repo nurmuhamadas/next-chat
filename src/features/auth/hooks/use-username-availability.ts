@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-export const useValidateUsername = ({ username }: { username: string }) => {
+const useUsernameAvaiability = ({ username }: { username: string }) => {
   const query = useQuery({
     queryKey: ["username-availability", username],
     queryFn: async () => {
-      const response = await client.api.users["username-availability"][
+      const response = await client.api.auth["username-availability"][
         ":username"
       ].$get({
         param: { username },
@@ -19,7 +19,10 @@ export const useValidateUsername = ({ username }: { username: string }) => {
 
       return result.data
     },
+    enabled: !!username,
   })
 
   return query
 }
+
+export default useUsernameAvaiability

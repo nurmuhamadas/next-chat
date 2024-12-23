@@ -4,6 +4,7 @@ import { Context } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
 import * as jwt from "hono/jwt"
 import { JwtTokenExpired, JwtTokenInvalid } from "hono/utils/jwt/types"
+import { v7 as uuidV7 } from "uuid"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_SECRET } from "@/lib/config"
@@ -24,12 +25,7 @@ export const comparePassword = (password: string, hashedPassword: string) => {
   return Bun.password.verify(password, hashedPassword)
 }
 
-export const generateSessionToken = (data: {
-  userId: string
-  username: string
-  email: string
-  deviceId: string
-}) => {
+export const generateSessionToken = (data: SessionToken) => {
   return jwt.sign(
     { ...data, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 },
     AUTH_SECRET,
@@ -113,5 +109,4 @@ export const getDeviceId = (c: Context) => {
   return getCookie(c, DEVICE_ID_COOKIE_KEY)
 }
 
-export const generateDeviceId = () =>
-  `device-${Bun.randomUUIDv7()}-${Date.now()}`
+export const generateDeviceId = () => `device-${uuidV7()}-${Date.now()}`
