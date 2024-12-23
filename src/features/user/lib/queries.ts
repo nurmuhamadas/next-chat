@@ -11,7 +11,7 @@ export const createUserProfile = (data: {
 }) => {
   return prisma.profile.create({
     data,
-    include: { user: { select: { username: true } } },
+    include: { user: { select: { username: true, email: true } } },
   })
 }
 
@@ -28,6 +28,6 @@ export const updateUserProfile = (
   return prisma.profile.update({
     where: { id },
     data,
-    include: { user: { select: { username: true } } },
+    include: { user: { select: { username: true, email: true } } },
   })
 }

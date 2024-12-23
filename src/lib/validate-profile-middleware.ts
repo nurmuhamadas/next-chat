@@ -11,7 +11,7 @@ import { createError } from "./utils"
 type AdditionalContext = {
   Variables: {
     userSession: UserSession
-    userProfile: Profile & { user: Pick<User, "username"> }
+    userProfile: Profile & { user: Pick<User, "username" | "email"> }
   }
 }
 
@@ -24,7 +24,7 @@ export const validateProfileMiddleware = createMiddleware<AdditionalContext>(
 
     const profile = await prisma.profile.findUnique({
       where: { userId: session.userId },
-      include: { user: { select: { username: true } } },
+      include: { user: { select: { username: true, email: true } } },
     })
 
     if (!profile) {

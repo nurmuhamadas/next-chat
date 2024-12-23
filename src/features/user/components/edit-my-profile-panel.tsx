@@ -25,9 +25,7 @@ const EditMyProfilePanel = () => {
         <div className="flex flex-col px-4 pb-8 pt-4">
           <ProfileForm
             initialValues={{
-              firstName: data?.firstName ?? "",
-              lastName: data?.lastName ?? "",
-              username: data?.username ?? "",
+              name: data?.name ?? "",
               gender: data?.gender ?? "MALE",
               bio: data?.bio ?? "",
             }}

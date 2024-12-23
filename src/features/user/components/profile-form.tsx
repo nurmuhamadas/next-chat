@@ -38,6 +38,7 @@ interface ProfileFormProps {
   initialImageUrl?: string
   initialValues?: z.infer<typeof profileSchema>
   errorMessage?: string
+  showLogout?: boolean
   onSubmit(values: z.infer<typeof profileSchema>): void
 }
 
@@ -47,6 +48,7 @@ const ProfileForm = ({
   initialValues,
   initialImageUrl = "",
   errorMessage,
+  showLogout,
   onSubmit,
 }: ProfileFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -184,9 +186,11 @@ const ProfileForm = ({
           {buttonLabel}
         </Button>
         <div className="flex-center">
-          <Button type="button" variant="link" onClick={() => logout()}>
-            Logout
-          </Button>
+          {showLogout && (
+            <Button type="button" variant="link" onClick={() => logout()}>
+              Logout
+            </Button>
+          )}
         </div>
       </form>
     </Form>

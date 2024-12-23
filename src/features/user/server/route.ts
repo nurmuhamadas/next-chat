@@ -277,7 +277,7 @@ const userApp = new Hono()
 
       const profile = await prisma.profile.findUnique({
         where: { userId },
-        include: { user: { select: { username: true } } },
+        include: { user: { select: { username: true, email: true } } },
       })
       if (!profile) {
         return c.json(createError(ERROR.PROFILE_NOT_FOUND), 404)

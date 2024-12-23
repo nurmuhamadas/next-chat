@@ -1,11 +1,12 @@
 import { Profile as ProfileModel, User } from "@prisma/client"
 
 export const mapProfileModelToProfile = (
-  profile: ProfileModel & { user: Pick<User, "username"> },
+  profile: ProfileModel & { user: Pick<User, "username" | "email"> },
 ): Profile => {
   return {
     id: profile.id,
     username: profile.user.username,
+    email: profile.user.email,
     name: profile.name,
     bio: profile.bio,
     gender: profile.gender,

@@ -21,6 +21,7 @@ const CompleteProfileForm = () => {
       <ProfileForm
         isLoading={isPending}
         errorMessage={errorMessage}
+        showLogout
         onSubmit={(values) =>
           createProfile(
             { form: values },
