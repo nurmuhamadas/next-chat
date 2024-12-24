@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useGetConversations = () => {
+const useGetRooms = ({ cursor }: { cursor?: string }) => {
   const query = useQuery({
-    queryKey: ["conversations"],
+    queryKey: ["rooms", cursor],
     queryFn: async () => {
-      const response = await client.api.conversations.$get({})
+      const response = await client.api.rooms.$get({ query: { cursor } })
 
       const result = await response.json()
       if (!result.success) {
@@ -20,4 +20,4 @@ const useGetConversations = () => {
   return { ...query, data: query.data?.data ?? [], total: query.data?.total }
 }
 
-export default useGetConversations
+export default useGetRooms

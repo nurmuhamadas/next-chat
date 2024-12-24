@@ -1,16 +1,20 @@
+import { useState } from "react"
+
 import Image from "next/image"
 
 import ChatSkeleton from "@/components/chat-skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 
-import useGetConversations from "../hooks/api/use-get-conversations"
+import useGetRooms from "../hooks/api/use-get-rooms"
 
 import ChatListItem from "./chat-list-item"
 
 const ChatListView = () => {
+  const [cursor] = useState<string | undefined>(undefined)
+
   const { data: settings, isLoading: settingLoading } = useGetSetting()
-  const { data, isLoading } = useGetConversations()
+  const { data, isLoading } = useGetRooms({ cursor })
 
   if (isLoading || settingLoading) {
     return <ChatSkeleton rows={5} />
