@@ -12,7 +12,8 @@ type RequestType = InferRequestType<
   (typeof client.api.conversations)[":conversationId"]["options"]["$patch"]
 >
 
-const useUpdateConversationOption = () => {
+// TODO:
+const useUpdatePrivateChatOption = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json, param }) => {
       const response = await client.api.conversations[":conversationId"][
@@ -35,4 +36,4 @@ const useUpdateConversationOption = () => {
   })
 }
 
-export default useUpdateConversationOption
+export default useUpdatePrivateChatOption

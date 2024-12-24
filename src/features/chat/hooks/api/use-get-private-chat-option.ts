@@ -2,13 +2,12 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useGetConversationOption = ({ id }: { id?: string }) => {
+const useGetPrivateChatOption = ({ id }: { id?: string }) => {
+  // TODO: implement
   const query = useQuery({
-    queryKey: ["get-conversation-option", id],
+    queryKey: ["get-private-chat-option", id],
     queryFn: async () => {
-      const response = await client.api.conversations[
-        ":conversationId"
-      ].options.$get({
+      const response = await client.api.rooms[":conversationId"].options.$get({
         param: { conversationId: id ?? "" },
       })
 
@@ -25,4 +24,4 @@ const useGetConversationOption = ({ id }: { id?: string }) => {
   return query
 }
 
-export default useGetConversationOption
+export default useGetPrivateChatOption
