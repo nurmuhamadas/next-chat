@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import { useQueryClient } from "@tanstack/react-query"
 
 import LeftPanelWrapper from "@/components/left-panel-wrapper"
@@ -12,6 +14,8 @@ const CreateGroupPanel = () => {
 
   const { isCreateGroupOpen, closeCreateGroup } = useCreateGroupPanel()
 
+  const [errorMessage, setErrorMessage] = useState("")
+
   const { mutate: createGroup, isPending } = useCreateGroup()
 
   return (
@@ -23,13 +27,17 @@ const CreateGroupPanel = () => {
       <div className="flex flex-col px-4 pb-8 pt-4">
         <GroupForm
           isLoading={isPending}
+          errorMessage={errorMessage}
           onSubmit={(form) => {
             createGroup(
               { form },
               {
                 onSuccess() {
                   closeCreateGroup()
-                  queryClient.invalidateQueries({ queryKey: ["conversations"] })
+                  queryClient.invalidateQueries({ queryKey: ["rooms"] })
+                },
+                onError(error) {
+                  setErrorMessage(error.message)
                 },
               },
             )

@@ -24,6 +24,7 @@ export const validateGroupMember = async (
     },
     select: { id: true },
   })
+  console.log(validUsers)
   if (validUsers.length < memberIds.length) {
     const validUserIds = validUsers.map((v) => v.id)
     const notValidUserId = memberIds.find((id) => !validUserIds.includes(id))

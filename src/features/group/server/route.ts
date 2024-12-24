@@ -104,7 +104,8 @@ const groupApp = new Hono()
           memberIds: memberIdsStr,
           description,
         } = c.req.valid("form")
-        const memberIds = memberIdsStr ? memberIdsStr.split(",") : []
+        const memberIds = !!memberIdsStr ? memberIdsStr.split(",") : []
+        console.log(memberIds, typeof memberIdsStr)
 
         const imageFile = image as unknown as File
 
@@ -173,7 +174,7 @@ const groupApp = new Hono()
           where: { ownerId: userId, name: groupName, deletedAt: null },
         })
 
-        return c.json(successResponse(!!existingGroups))
+        return c.json(successResponse(!existingGroups))
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }

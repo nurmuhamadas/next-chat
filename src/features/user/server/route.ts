@@ -168,14 +168,22 @@ const userApp = new Hono()
       try {
         const { query, limit, cursor } = c.req.valid("query")
 
+        const { userId } = c.get("userProfile")
+
         const result = await prisma.profile.findMany({
           where: {
+            userId: { not: userId },
             OR: [
               { name: { contains: query } },
               { user: { username: { contains: query } } },
             ],
           },
-          select: { id: true, name: true, imageUrl: true, lastSeenAt: true },
+          select: {
+            name: true,
+            imageUrl: true,
+            lastSeenAt: true,
+            userId: true,
+          },
           take: limit,
           cursor: cursor ? { id: cursor } : undefined,
           skip: cursor ? 1 : undefined,
@@ -183,8 +191,9 @@ const userApp = new Hono()
 
         const total = result.length
         const nextCursor =
-          total > 0 && total === limit ? result[total - 1].id : undefined
+          total > 0 && total === limit ? result[total - 1].userId : undefined
 
+        console.log(result)
         const response: SearchUsersResponse = successCollectionResponse(
           result.map(mapSearchResult),
           total,

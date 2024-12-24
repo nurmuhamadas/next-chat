@@ -26,11 +26,7 @@ const SelectUsers = ({
 }: SelectUsersProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const {
-    data: users,
-    total,
-    isLoading,
-  } = useSearchUsers({ queryKey: "", limit: "0" })
+  const { data: users, total, isLoading } = useSearchUsers({ queryKey: "" })
 
   const selectedUsers = users.filter((v) => selectedIds.includes(v.id))
 
@@ -95,10 +91,14 @@ const SelectUsers = ({
         </DropdownMenuContent>
       </DropdownMenu>
       <div className="flex flex-wrap gap-2">
-        {selectedUsers.map(({ id, name }) => {
+        {selectedUsers.map(({ id, name, imageUrl }) => {
           return (
             <Badge key={id} variant="secondary" className="rounded-full py-1.5">
-              <ChatAvatar className="size-6" fallbackClassName="caption" />
+              <ChatAvatar
+                src={imageUrl ?? ""}
+                className="size-6"
+                fallbackClassName="caption"
+              />
               <p className="mx-2 line-clamp-1">{name}</p>
               <Button
                 variant="icon"

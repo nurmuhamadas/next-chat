@@ -5,17 +5,17 @@ import { client } from "@/lib/rpc"
 const useSearchUsers = ({
   queryKey,
   limit,
-  offset,
+  cursor,
 }: {
   queryKey?: string
   limit?: string
-  offset?: string
+  cursor?: string
 }) => {
   const query = useQuery({
-    queryKey: ["search-users", queryKey, limit, offset],
+    queryKey: ["search-users", queryKey, limit, cursor],
     queryFn: async () => {
       const response = await client.api.users.search.$get({
-        query: { query: queryKey, limit, offset },
+        query: { query: queryKey, limit, cursor },
       })
 
       const result = await response.json()

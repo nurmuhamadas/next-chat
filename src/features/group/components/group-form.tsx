@@ -1,12 +1,13 @@
 "use client"
 
-import { ChangeEventHandler, useRef, useState } from "react"
+import { ChangeEventHandler, useEffect, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon, LoaderIcon } from "lucide-react"
+import { CameraIcon, CheckCircleIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import ErrorAlert from "@/components/error-alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,8 +27,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { ERROR } from "@/constants/error"
+import { debounce } from "@/lib/utils"
 
 import { GROUP_TYPE_OPT } from "../constants"
+import useGroupNameAvailability from "../hooks/api/use-group-name-availability"
 import { groupSchema } from "../schema"
 
 import SelectUsers from "./select-users"
@@ -36,6 +40,7 @@ interface GroupFormProps {
   isLoading?: boolean
   initialImageUrl?: string
   initialValues?: Partial<z.infer<typeof groupSchema>>
+  errorMessage?: string
   onSubmit(values: z.infer<typeof groupSchema>): void
 }
 
@@ -43,11 +48,18 @@ const GroupForm = ({
   isLoading = false,
   initialValues,
   initialImageUrl = "",
+  errorMessage,
   onSubmit,
 }: GroupFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const [groupName, setGroupName] = useState(initialValues?.name ?? "")
   const [imagePreview, setImagePreview] = useState(initialImageUrl)
+
+  const { data: isGroupNameAvailable, isFetching: isCheckingGroupName } =
+    useGroupNameAvailability({
+      groupName: groupName !== initialValues?.name ? groupName : undefined,
+    })
 
   const form = useForm<z.infer<typeof groupSchema>>({
     resolver: zodResolver(groupSchema),
@@ -73,12 +85,26 @@ const GroupForm = ({
     }
   }
 
+  const debouncedCheckGroupName = debounce((value: string) => {
+    setGroupName(value)
+  }, 500)
+
+  useEffect(() => {
+    if (!isCheckingGroupName && isGroupNameAvailable === false) {
+      form.setError("name", { message: ERROR.GROUP_NAME_DUPLICATED })
+    } else {
+      form.clearErrors("name")
+    }
+  }, [form, isCheckingGroupName, isGroupNameAvailable])
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
         className="w-full space-y-5"
       >
+        <ErrorAlert message={errorMessage} />
+
         <div className="flex justify-center">
           <input
             type="file"
@@ -115,9 +141,28 @@ const GroupForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your group name" {...field} />
-              </FormControl>
+              <div className="relative flex">
+                <FormControl>
+                  <Input
+                    placeholder="Enter your group name"
+                    {...field}
+                    onChange={(e) => {
+                      form.setValue("name", e.target.value)
+                      debouncedCheckGroupName(e.target.value)
+                    }}
+                  />
+                </FormControl>
+
+                {groupName && (
+                  <div className="absolute right-3 top-[18px]">
+                    {isCheckingGroupName ? (
+                      <LoaderIcon className="size-4 animate-spin" />
+                    ) : isGroupNameAvailable === true ? (
+                      <CheckCircleIcon className="size-4 text-success" />
+                    ) : null}
+                  </div>
+                )}
+              </div>
               <FormMessage />
             </FormItem>
           )}

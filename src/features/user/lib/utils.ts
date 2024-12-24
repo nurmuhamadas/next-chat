@@ -16,10 +16,10 @@ export const mapProfileModelToProfile = (
 }
 
 export const mapSearchResult = (
-  user: Pick<ProfileModel, "name" | "id" | "imageUrl" | "lastSeenAt">,
+  user: Pick<ProfileModel, "name" | "userId" | "imageUrl" | "lastSeenAt">,
 ): UserSearch => {
   return {
-    id: user.id,
+    id: user.userId,
     name: user.name,
     imageUrl: user.imageUrl,
     lastSeenAt: user.lastSeenAt?.toISOString() ?? null,

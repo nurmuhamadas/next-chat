@@ -23,7 +23,8 @@ export const groupSchema = z.object({
   }),
   memberIds: z
     .string({ description: "string of memberId separated with comma" })
-    .optional(),
+    .optional()
+    .default(""),
   image: imageProfileSchema,
 })
 
