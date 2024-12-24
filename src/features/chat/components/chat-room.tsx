@@ -107,12 +107,7 @@ const ChatRoom = () => {
   return (
     <div className="flex h-screen flex-1 overflow-x-hidden">
       <div className="h-full flex-1 flex-col-center">
-        <ChatRoomHeader
-          isGroupMember={isGroupMember}
-          isPrivateGroup={isPrivateGroup}
-          isChannelSubs={isChannelSubs}
-          isPrivateChannel={isPrivateChannel}
-        />
+        <ChatRoomHeader />
 
         {isLoading ? (
           <Loading />

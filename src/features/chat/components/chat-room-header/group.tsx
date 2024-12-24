@@ -10,64 +10,24 @@ import ChatAvatar from "@/components/chat-avatar"
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
-import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
-import { useRoomType } from "@/hooks/use-room-type"
-import { cn, mergeName } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
-import { useRoomProfile } from "../hooks/use-room-profile"
+import { useRoomProfile } from "../../hooks/use-room-profile"
 
-interface ChatRoomHeaderProps {
-  conversation?: Conversation
-  group?: Group
-  isGroupMember?: boolean
-  isPrivateGroup?: boolean
-  channel?: Channel
-  isChannelSubs?: boolean
-  isPrivateChannel?: boolean
-}
-const ChatRoomHeader = ({
-  isGroupMember,
-  isChannelSubs,
-}: ChatRoomHeaderProps) => {
+const ChatRoomHeaderGroup = () => {
   const router = useRouter()
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   const { openRoomProfile } = useRoomProfile()
-  const type = useRoomType()
+
   const id = useRoomId()
 
-  const { data: user, isLoading: userLoading } = useGetUserProfileById({
-    id: type === "chat" ? id : undefined,
-  })
-  const { data: group, isLoading: groupLoading } = useGetGroupById({
-    id: type === "group" ? id : undefined,
-  })
-  const { data: channel, isLoading: channelLoading } = useGetChannelById({
-    id: type === "channel" ? id : undefined,
-  })
-  const isLoading = userLoading || groupLoading || channelLoading
+  const { data: group, isLoading: loadingGroup } = useGetGroupById({ id })
 
-  const name = {
-    chat: user
-      ? mergeName(user.firstName, user.lastName ?? undefined)
-      : undefined,
-    group: group ? group?.name : undefined,
-    channel: channel ? channel?.name : undefined,
-  }
-  const info = {
-    chat: undefined,
-    group: group ? `${group?.totalMembers} members` : undefined,
-    channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
-  }
-  const avatar = {
-    chat: user ? (user?.imageUrl ?? "") : undefined,
-    group: group ? (group?.imageUrl ?? "") : undefined,
-    channel: channel ? (channel?.imageUrl ?? "") : undefined,
-  }
+  const isLoading = loadingGroup
 
   return (
     <header className="w-full gap-x-4 bg-surface px-4 py-2 flex-center-between">
@@ -92,8 +52,8 @@ const ChatRoomHeader = ({
           <Skeleton className="size-10 rounded-full" />
         ) : (
           <ChatAvatar
-            src={avatar[type]}
-            name={name[type]}
+            src={group?.imageUrl ?? ""}
+            name={group?.name}
             className="size-10"
           />
         )}
@@ -104,20 +64,19 @@ const ChatRoomHeader = ({
               <Skeleton className="h-5 w-[200px]" />
               <Skeleton className="mt-1 h-4 w-[100px]" />
             </>
-          ) : (
+          ) : group ? (
             <>
-              {name[type] && <h2 className="line-clamp-1 h5">{name[type]}</h2>}
-              {info[type] && (
-                <p className="line-clamp-1 text-muted-foreground caption">
-                  {info[type]}
-                </p>
-              )}
+              <h2 className="line-clamp-1 h5">{group?.name}</h2>
+              <p className="line-clamp-1 text-muted-foreground caption">
+                {group?.totalMembers} members
+              </p>
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
-      {(isGroupMember || isChannelSubs || !!user) && (
+      {/* TODO: search feature, s only shown for members */}
+      {false && (
         <div className="flex-center-end">
           <div className="">
             {isSearchOpen ? (
@@ -140,4 +99,4 @@ const ChatRoomHeader = ({
   )
 }
 
-export default ChatRoomHeader
+export default ChatRoomHeaderGroup

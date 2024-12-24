@@ -27,7 +27,7 @@ import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import useWindowSize from "@/hooks/use-window-size"
-import { cn, mergeName } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
 import ChatAvatar from "../../../components/chat-avatar"
 import { useRoomProfile } from "../hooks/use-room-profile"
@@ -198,9 +198,7 @@ const ProfileView = () => {
   }
 
   const name = {
-    chat: user
-      ? mergeName(user?.firstName, user?.lastName ?? undefined)
-      : undefined,
+    chat: user ? user.name : undefined,
     group: group ? group?.name : undefined,
     channel: channel ? channel?.name : undefined,
   }
@@ -247,6 +245,10 @@ const ProfileView = () => {
         <ul className="flex flex-col p-2">
           {infoList[type].map((info) => {
             const Icon = info.icon
+
+            if (!info.value) {
+              return null
+            }
 
             return (
               <li key={info.label} className="">
