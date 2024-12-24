@@ -1,12 +1,13 @@
 "use client"
 
-import { ChangeEventHandler, useRef, useState } from "react"
+import { ChangeEventHandler, useEffect, useRef, useState } from "react"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CameraIcon, LoaderIcon } from "lucide-react"
+import { CameraIcon, CheckCircleIcon, LoaderIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import ErrorAlert from "@/components/error-alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,14 +27,18 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { ERROR } from "@/constants/error"
+import { debounce } from "@/lib/utils"
 
 import { CHANNEL_TYPE_OPT } from "../constants"
+import useChannelNameAvailability from "../hooks/api/use-channel-name-availability"
 import { channelSchema } from "../schema"
 
 interface ChannelFormProps {
   isLoading?: boolean
   initialImageUrl?: string
   initialValues?: Partial<z.infer<typeof channelSchema>>
+  errorMessage?: string
   onSubmit(values: z.infer<typeof channelSchema>): void
 }
 
@@ -41,11 +46,19 @@ const ChannelForm = ({
   isLoading = false,
   initialValues,
   initialImageUrl = "",
+  errorMessage,
   onSubmit,
 }: ChannelFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const [channelName, setChannelName] = useState(initialValues?.name ?? "")
   const [imagePreview, setImagePreview] = useState(initialImageUrl)
+
+  const { data: isChannelNameAvailable, isFetching: isCheckingChannelName } =
+    useChannelNameAvailability({
+      channelName:
+        channelName !== initialValues?.name ? channelName : undefined,
+    })
 
   const form = useForm<z.infer<typeof channelSchema>>({
     resolver: zodResolver(channelSchema),
@@ -70,12 +83,26 @@ const ChannelForm = ({
     }
   }
 
+  const debouncedCheckChannelName = debounce((value: string) => {
+    setChannelName(value.trim())
+  }, 500)
+
+  useEffect(() => {
+    if (!isCheckingChannelName && isChannelNameAvailable === false) {
+      form.setError("name", { message: ERROR.CHANNEL_NAME_DUPLICATED })
+    } else {
+      form.clearErrors("name")
+    }
+  }, [form, isCheckingChannelName, isChannelNameAvailable])
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(submitForm)}
         className="w-full space-y-5"
       >
+        <ErrorAlert message={errorMessage} />
+
         <div className="flex justify-center">
           <input
             type="file"
@@ -112,9 +139,28 @@ const ChannelForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your channel name" {...field} />
-              </FormControl>
+              <div className="relative flex">
+                <FormControl>
+                  <Input
+                    placeholder="Enter your group name"
+                    {...field}
+                    onChange={(e) => {
+                      form.setValue("name", e.target.value)
+                      debouncedCheckChannelName(e.target.value)
+                    }}
+                  />
+                </FormControl>
+
+                {channelName && (
+                  <div className="absolute right-3 top-[18px]">
+                    {isCheckingChannelName ? (
+                      <LoaderIcon className="size-4 animate-spin" />
+                    ) : isChannelNameAvailable === true ? (
+                      <CheckCircleIcon className="size-4 text-success" />
+                    ) : null}
+                  </div>
+                )}
+              </div>
               <FormMessage />
             </FormItem>
           )}

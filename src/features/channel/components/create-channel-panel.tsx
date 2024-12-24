@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import { useQueryClient } from "@tanstack/react-query"
 
 import LeftPanelWrapper from "@/components/left-panel-wrapper"
@@ -12,6 +14,8 @@ const CreateChannelPanel = () => {
 
   const { isCreateChannelOpen, closeCreateChannel } = useCreateChannelPanel()
 
+  const [errorMessage, setErrorMessage] = useState("")
+
   const { mutate: createChannel, isPending } = useCreateChannel()
 
   return (
@@ -23,13 +27,17 @@ const CreateChannelPanel = () => {
       <div className="flex flex-col px-4 pb-8 pt-4">
         <ChannelForm
           isLoading={isPending}
+          errorMessage={errorMessage}
           onSubmit={(form) => {
             createChannel(
               { form },
               {
                 onSuccess() {
                   closeCreateChannel()
-                  queryClient.invalidateQueries({ queryKey: ["conversations"] })
+                  queryClient.invalidateQueries({ queryKey: ["rooms"] })
+                },
+                onError(error) {
+                  setErrorMessage(error.message)
                 },
               },
             )

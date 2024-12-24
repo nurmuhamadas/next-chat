@@ -1,3 +1,5 @@
+import { useQueryClient } from "@tanstack/react-query"
+
 import Loading from "@/components/loader"
 import RightPanelWrapper from "@/components/right-panel-wrapper"
 import { useEditChannelPanel } from "@/features/channel/hooks/use-edit-channel-panel"
@@ -11,6 +13,8 @@ import useUpdateChannel from "../hooks/api/use-update-channel"
 import ChannelForm from "./channel-form"
 
 const EditChannelPanel = () => {
+  const queryClient = useQueryClient()
+
   const type = useRoomType()
   const id = useRoomId()
 
@@ -21,7 +25,9 @@ const EditChannelPanel = () => {
     data: channel,
     isLoading: isDataLoading,
     refetch,
-  } = useGetChannelById({ id: type === "channel" ? id : undefined })
+  } = useGetChannelById({
+    id: type === "channel" ? id : undefined,
+  })
   const { data: isChannelAdmin, isLoading: isAdminLoading } =
     useGetIsChannelAdmin({ id: type === "channel" ? id : undefined })
   const isLoading = isAdminLoading || isDataLoading
@@ -50,6 +56,7 @@ const EditChannelPanel = () => {
                 {
                   onSuccess() {
                     refetch()
+                    queryClient.invalidateQueries({ queryKey: ["rooms"] })
                     closeEditChannel()
                   },
                 },

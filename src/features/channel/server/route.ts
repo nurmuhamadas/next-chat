@@ -160,7 +160,7 @@ const channelApp = new Hono()
           where: { ownerId: userId, name: channelName, deletedAt: null },
         })
 
-        return c.json(successResponse(!!existingChannel))
+        return c.json(successResponse(!existingChannel))
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
       }
