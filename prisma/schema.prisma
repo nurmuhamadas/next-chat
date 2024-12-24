@@ -24,6 +24,7 @@ model User {
   setting               Setting?
   initiatedPrivateChats PrivateChat[]       @relation("initiator")
   receivedprivateChats  PrivateChat[]       @relation("receiver")
+  privateChatOptions    PrivateChatOption[]
   ownedGroups           Group[]
   groupOptions          GroupOption[]
   groups                GroupMember[]
@@ -205,6 +206,7 @@ model PrivateChatOption {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   privateChat PrivateChat? @relation(fields: [privateChatId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
 
   @@map("private_chat_options")
 }

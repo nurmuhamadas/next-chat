@@ -79,6 +79,11 @@ declare type BlockUserResponse = ApiResponse<{ id: string }>
 
 declare type UnblockUserResponse = ApiResponse<{ id: string }>
 
+// PRIVATE CHAT API
+declare type GetPrivateChatOption = ApiResponse<PrivateChatOption>
+
+declare type UpdatePrivateChatOption = ApiResponse<PrivateChatOption>
+
 // GROUP API
 declare type CreateGroupResponse = ApiResponse<Group>
 
@@ -142,9 +147,9 @@ declare type GetChannelOptionResponse = ApiResponse<ChannelOption | null>
 
 declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
 
-// CONVERSATION API
+// ROOM API
 /** Include groups and channels chat */
-declare type GetRoomListResponse = ApiCollectionResponse<Conversation>
+declare type GetRoomListResponse = ApiCollectionResponse<PrivateChat>
 
 declare type DeleteRoomResponse = ApiResponse<{ id: string }>
 

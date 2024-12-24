@@ -58,7 +58,7 @@ declare interface LastMessage {
   time: string
 }
 
-declare interface Conversation {
+declare interface Room {
   id: string
   type: RoomType
   name: string
@@ -69,8 +69,9 @@ declare interface Conversation {
   lastMessage: LastMessage | null
 }
 
-declare interface ConversationOption {
-  conversationId: string
+declare interface PrivateChatOption {
+  userId: string
+  privateChatId: string
   notification: boolean
 }
 
