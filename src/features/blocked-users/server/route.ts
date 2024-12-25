@@ -27,7 +27,7 @@ const blockedUserApp = new Hono()
         const { userId } = c.get("userProfile")
 
         const blockedUsers = await prisma.blockedUser.findMany({
-          where: { userId, unblockedAt: { equals: null } },
+          where: { userId, unblockedAt: null },
           select: {
             id: true,
             blockedUser: {
@@ -58,6 +58,44 @@ const blockedUserApp = new Hono()
       }
     },
   )
+  .get(
+    "/:blockedUserId/is-blocked",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { blockedUserId } = c.req.param()
+        const { userId } = c.get("userProfile")
+
+        if (userId === blockedUserId) {
+          const response: GetIsBlockedUserResponse = successResponse(false)
+          return c.json(response)
+        }
+
+        const blockedProfile = await prisma.profile.findUnique({
+          where: { userId: blockedUserId },
+        })
+        if (!blockedProfile) {
+          return c.json(createError(ERROR.USER_NOT_FOUND), 404)
+        }
+
+        const blockedUser = await prisma.blockedUser.findFirst({
+          select: { id: true },
+          where: { blockedUserId, userId, unblockedAt: null },
+          take: 1,
+        })
+        if (!blockedUser) {
+          const response: GetIsBlockedUserResponse = successResponse(false)
+          return c.json(response)
+        }
+
+        const response: GetIsBlockedUserResponse = successResponse(true)
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
   .post(
     "/:blockedUserId",
     sessionMiddleware,
@@ -80,7 +118,7 @@ const blockedUserApp = new Hono()
 
         const blockedUsers = await prisma.blockedUser.findMany({
           select: { id: true },
-          where: { blockedUserId, userId, unblockedAt: { equals: null } },
+          where: { blockedUserId, userId, unblockedAt: null },
           take: 1,
         })
         if (blockedUsers.length > 0) {

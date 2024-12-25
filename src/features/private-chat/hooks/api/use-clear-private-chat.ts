@@ -5,20 +5,19 @@ import { toast } from "sonner"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.conversations)[":conversationId"]["options"]["$patch"],
+  (typeof client.api)["private-chat"][":userId"]["chat"]["$delete"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.conversations)[":conversationId"]["options"]["$patch"]
+  (typeof client.api)["private-chat"][":userId"]["chat"]["$delete"]
 >
 
-// TODO:
-const useUpdatePrivateChatOption = () => {
+const useClearPrivateChat = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json, param }) => {
-      const response = await client.api.conversations[":conversationId"][
-        "options"
-      ]["$patch"]({ json, param })
+    mutationFn: async ({ param }) => {
+      const response = await client.api["private-chat"][":userId"][
+        "chat"
+      ].$delete({ param })
 
       const result = await response.json()
       if (!result.success) {
@@ -28,7 +27,7 @@ const useUpdatePrivateChatOption = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("SETTING_UPDATED")
+      toast.success("CHAT_CLEARED")
     },
     onError({ message }) {
       toast.error(message)
@@ -36,4 +35,4 @@ const useUpdatePrivateChatOption = () => {
   })
 }
 
-export default useUpdatePrivateChatOption
+export default useClearPrivateChat

@@ -75,14 +75,18 @@ declare type UpdateUserLastSeenResponse = ApiResponse<string>
 // BLOCKED USERS
 declare type GetBlockedUsersResponse = ApiCollectionResponse<BlockedUser>
 
+declare type GetIsBlockedUserResponse = ApiResponse<boolean>
+
 declare type BlockUserResponse = ApiResponse<{ id: string }>
 
 declare type UnblockUserResponse = ApiResponse<{ id: string }>
 
 // PRIVATE CHAT API
-declare type GetPrivateChatOption = ApiResponse<PrivateChatOption>
+declare type GetPrivateChatOptionResponse = ApiResponse<PrivateChatOption>
 
-declare type UpdatePrivateChatOption = ApiResponse<PrivateChatOption>
+declare type UpdatePrivateChatOptionResponse = ApiResponse<PrivateChatOption>
+
+declare type DeleteAllPrivateChatResponse = ApiResponse<boolean>
 
 // GROUP API
 declare type CreateGroupResponse = ApiResponse<Group>

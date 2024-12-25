@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query"
 import { client } from "@/lib/rpc"
 
 const useGetPrivateChatOption = ({ userId = "" }: { userId?: string }) => {
-  // TODO: implement
   const query = useQuery({
     queryKey: ["get-private-chat-option", userId],
     queryFn: async () => {
