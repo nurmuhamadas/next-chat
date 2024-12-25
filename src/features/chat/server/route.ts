@@ -19,7 +19,7 @@ import {
   unarchiveRoom,
   unpinRoom,
 } from "../lib/queries"
-import { getRoomIncludeQuery, mapRoomModelToConversation } from "../lib/utils"
+import { getRoomIncludeQuery, mapRoomModelToRoom } from "../lib/utils"
 
 const roomApp = new Hono()
   .get(
@@ -47,7 +47,7 @@ const roomApp = new Hono()
           skip: cursor ? 1 : undefined,
         })
 
-        const roomList: Conversation[] = result.map(mapRoomModelToConversation)
+        const roomList: Room[] = result.map(mapRoomModelToRoom)
 
         const total = result.length
         const nextCursor =
@@ -90,7 +90,7 @@ const roomApp = new Hono()
           skip: cursor ? 1 : undefined,
         })
 
-        const roomList: Conversation[] = result.map(mapRoomModelToConversation)
+        const roomList: Room[] = result.map(mapRoomModelToRoom)
 
         const total = result.length
         const nextCursor =
@@ -218,7 +218,7 @@ const roomApp = new Hono()
           skip: cursor ? 1 : undefined,
         })
 
-        const roomList: Conversation[] = result.map(mapRoomModelToConversation)
+        const roomList: Room[] = result.map(mapRoomModelToRoom)
 
         const total = result.length
         const nextCursor =
@@ -316,6 +316,42 @@ const roomApp = new Hono()
       }
     },
   )
+  .get("/:roomId", sessionMiddleware, validateProfileMiddleware, async (c) => {
+    try {
+      const { roomId } = c.req.param()
+      const { userId } = c.get("userProfile")
+
+      const groupId = roomId
+      const channelId = roomId
+
+      const room = await prisma.room.findFirst({
+        where: {
+          ownerId: userId,
+          OR: [
+            { privateChat: { user1Id: roomId, user2Id: userId } },
+            { privateChat: { user2Id: roomId, user1Id: userId } },
+            { groupId },
+            { channelId },
+          ],
+          deletedAt: null,
+        },
+        include: {
+          ...getRoomIncludeQuery(),
+        },
+      })
+
+      if (!room) {
+        return c.json(createError(ERROR.ROOM_NOT_FOUND), 404)
+      }
+
+      const response: GetRoomResponse = successResponse(
+        mapRoomModelToRoom(room),
+      )
+      return c.json(response)
+    } catch {
+      return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+    }
+  })
   .delete(
     "/:roomId",
     sessionMiddleware,

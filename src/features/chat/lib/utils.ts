@@ -37,7 +37,7 @@ export const getRoomIncludeQuery = () => ({
   unreadMessage: { select: { count: true } },
 })
 
-export const mapRoomModelToConversation = (
+export const mapRoomModelToRoom = (
   room: RoomModel & {
     lastMessage:
       | (Pick<MessageModel, "id" | "message" | "createdAt"> & {
@@ -58,7 +58,7 @@ export const mapRoomModelToConversation = (
     channel: Pick<ChannelModel, "name" | "imageUrl"> | null
     unreadMessage: Pick<UserUnreadMessageModel, "count"> | null
   },
-): Conversation => {
+): Room => {
   let id = ""
   let name = ""
   let imageUrl: string | null = null
