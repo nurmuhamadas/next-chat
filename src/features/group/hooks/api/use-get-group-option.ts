@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useGetGroupOption = ({ id }: { id?: string }) => {
+const useGetGroupOption = ({ groupId }: { groupId?: string }) => {
   const query = useQuery({
-    queryKey: ["get-group-option", id],
+    queryKey: ["get-group-option", groupId],
     queryFn: async () => {
       const response = await client.api.groups[":groupId"].options.$get({
-        param: { groupId: id ?? "" },
+        param: { groupId: groupId ?? "" },
       })
 
       const result = await response.json()
@@ -17,7 +17,7 @@ const useGetGroupOption = ({ id }: { id?: string }) => {
 
       return result.data
     },
-    enabled: !!id,
+    enabled: !!groupId,
   })
 
   return query

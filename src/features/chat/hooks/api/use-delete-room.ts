@@ -5,17 +5,17 @@ import { toast } from "sonner"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.groups)[":groupId"]["left"]["$post"],
+  (typeof client.api.rooms)[":roomId"]["$delete"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.groups)[":groupId"]["left"]["$post"]
+  (typeof client.api.rooms)[":roomId"]["$delete"]
 >
 
-const useLeaveGroup = () => {
+const useDeleteRoom = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param }) => {
-      const response = await client.api.groups[":groupId"]["left"].$post({
+      const response = await client.api.rooms[":roomId"].$delete({
         param,
       })
 
@@ -26,13 +26,11 @@ const useLeaveGroup = () => {
 
       return result
     },
-    onSuccess: () => {
-      toast.success("LEFT_GROUP")
-    },
+    onSuccess: () => {},
     onError({ message }) {
       toast.error(message)
     },
   })
 }
 
-export default useLeaveGroup
+export default useDeleteRoom

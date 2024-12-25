@@ -155,6 +155,8 @@ declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
 /** Include groups and channels chat */
 declare type GetRoomListResponse = ApiCollectionResponse<PrivateChat>
 
+declare type GetRoomResponse = ApiResponse<PrivateChat>
+
 declare type DeleteRoomResponse = ApiResponse<{ id: string }>
 
 declare type PinRoomResponse = ApiResponse<boolean>

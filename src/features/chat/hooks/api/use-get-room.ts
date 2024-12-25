@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useGetConversationByUserId = ({ id }: { id?: string }) => {
+const useGetRoom = ({ id = "" }: { id?: string }) => {
   const query = useQuery({
-    queryKey: ["conversation", id],
+    queryKey: ["room", id],
     queryFn: async () => {
-      const response = await client.api.conversations["user"][":userId"].$get({
-        param: { userId: id ?? "" },
+      const response = await client.api.rooms[":roomId"].$get({
+        param: { roomId: id },
       })
 
       const result = await response.json()
@@ -23,4 +23,4 @@ const useGetConversationByUserId = ({ id }: { id?: string }) => {
   return query
 }
 
-export default useGetConversationByUserId
+export default useGetRoom
