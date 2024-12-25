@@ -16,11 +16,9 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { cn, formatChatTime } from "@/lib/utils"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
+import ChatRoomMenuPrivate from "../chat-room-menu/private"
 
-interface ChatRoomHeaderPrivateProps {
-  conversation?: Conversation
-}
-const ChatRoomHeaderPrivate = ({}: ChatRoomHeaderPrivateProps) => {
+const ChatRoomHeaderPrivate = () => {
   const router = useRouter()
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -106,6 +104,10 @@ const ChatRoomHeaderPrivate = ({}: ChatRoomHeaderPrivateProps) => {
           {/* <ChatRoomMenu type={type} /> */}
         </div>
       )}
+
+      <div className="flex-center-end">
+        <ChatRoomMenuPrivate />
+      </div>
     </header>
   )
 }

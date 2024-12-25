@@ -1,4 +1,5 @@
 import {
+  BellIcon,
   BellOffIcon,
   BookmarkIcon,
   BugIcon,
@@ -67,6 +68,40 @@ export const MAIN_MENU: {
     label: "Logout",
     icon: LogOutIcon,
     action: "logout",
+  },
+]
+
+export const chatRoomPrivateMenu: {
+  label: string
+  icon: LucideIcon
+  danger?: boolean
+  action: ChatRoomPrivateMenuAction
+}[] = [
+  {
+    label: "Mute",
+    icon: BellOffIcon,
+    action: "mute-chat",
+  },
+  {
+    label: "Unmute",
+    icon: BellIcon,
+    action: "unmute-chat",
+  },
+  {
+    label: "Block User",
+    icon: UserXIcon,
+    action: "block-user",
+  },
+  {
+    label: "Unblock User",
+    icon: UserIcon,
+    action: "unblock-user",
+  },
+  {
+    label: "Delete Chat",
+    icon: TrashIcon,
+    danger: true,
+    action: "delete-chat",
   },
 ]
 

@@ -27,7 +27,7 @@ const useUnblockUser = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("USER_BLOCKED")
+      toast.success("USER_UNBLOCKED")
     },
     onError({ message }) {
       toast.error(message)

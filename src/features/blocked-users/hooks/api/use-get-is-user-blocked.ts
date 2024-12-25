@@ -16,7 +16,7 @@ const useGetIsUserBlocked = ({ userId = "" }: { userId?: string }) => {
         throw new Error(result.error.message)
       }
 
-      return result
+      return result.data
     },
   })
 

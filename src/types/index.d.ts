@@ -11,6 +11,13 @@ declare type MainMenuAction =
   | "open-about"
   | "logout"
 
+declare type ChatRoomPrivateMenuAction =
+  | "mute-chat"
+  | "unmute-chat"
+  | "block-user"
+  | "unblock-user"
+  | "delete-chat"
+
 declare type ChatRoomMenuAction =
   | "mute-chat"
   | "block-user"
