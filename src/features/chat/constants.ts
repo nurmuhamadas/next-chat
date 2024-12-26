@@ -105,70 +105,63 @@ export const chatRoomPrivateMenu: {
   },
 ]
 
-export const chatRoomMenu: Record<
-  RoomType,
+export const chatRoomGroupMenu: {
+  label: string
+  icon: LucideIcon
+  danger?: boolean
+  action: ChatRoomGroupMenuAction
+}[] = [
   {
-    label: string
-    icon: LucideIcon
-    danger?: boolean
-    action: ChatRoomMenuAction
-  }[]
-> = {
-  chat: [
-    {
-      label: "Mute",
-      icon: BellOffIcon,
-      action: "mute-chat",
-    },
-    {
-      label: "Block User",
-      icon: UserXIcon,
-      action: "block-user",
-    },
-    {
-      label: "Delete Chat",
-      icon: TrashIcon,
-      danger: true,
-      action: "delete-chat",
-    },
-  ],
-  group: [
-    {
-      label: "Mute",
-      icon: BellOffIcon,
-      action: "mute-group",
-    },
-    {
-      label: "Leave Group",
-      icon: LogOutIcon,
-      action: "leave-group",
-    },
-    {
-      label: "Delete and Exit",
-      icon: TrashIcon,
-      danger: true,
-      action: "delete-and-exit-group",
-    },
-  ],
-  channel: [
-    {
-      label: "Mute",
-      icon: BellOffIcon,
-      action: "mute-channel",
-    },
-    {
-      label: "Leave Channel",
-      icon: LogOutIcon,
-      action: "leave-channel",
-    },
-    {
-      label: "Delete and Exit",
-      icon: TrashIcon,
-      danger: true,
-      action: "delete-and-exit-channel",
-    },
-  ],
-}
+    label: "Mute",
+    icon: BellOffIcon,
+    action: "mute-group",
+  },
+  {
+    label: "Unmute",
+    icon: BellIcon,
+    action: "unmute-group",
+  },
+  {
+    label: "Leave Group",
+    icon: LogOutIcon,
+    action: "leave-group",
+  },
+  {
+    label: "Delete Chat",
+    icon: TrashIcon,
+    danger: true,
+    action: "delete-chat",
+  },
+]
+
+export const chatRoomChannelMenu: {
+  label: string
+  icon: LucideIcon
+  danger?: boolean
+  action: ChatRoomChannelMenuAction
+}[] = [
+  {
+    label: "Mute",
+    icon: BellOffIcon,
+    action: "mute-channel",
+  },
+  {
+    label: "Unmute",
+    icon: BellIcon,
+    action: "unmute-channel",
+  },
+  {
+    label: "Leave Channel",
+    icon: LogOutIcon,
+    action: "leave-channel",
+  },
+  {
+    label: "Delete Chat",
+    icon: TrashIcon,
+    danger: true,
+    action: "delete-chat",
+  },
+]
 
 export const messageItemMenu: {
   label: string

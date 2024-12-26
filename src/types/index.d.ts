@@ -18,16 +18,17 @@ declare type ChatRoomPrivateMenuAction =
   | "unblock-user"
   | "delete-chat"
 
-declare type ChatRoomMenuAction =
-  | "mute-chat"
-  | "block-user"
-  | "delete-chat"
+declare type ChatRoomGroupMenuAction =
   | "mute-group"
+  | "unmute-group"
   | "leave-group"
-  | "delete-and-exit-group"
+  | "delete-chat"
+
+declare type ChatRoomChannelMenuAction =
   | "mute-channel"
+  | "unmute-channel"
   | "leave-channel"
-  | "delete-and-exit-channel"
+  | "delete-chat"
 
 declare type MessageItemMenuAction =
   | "reply"

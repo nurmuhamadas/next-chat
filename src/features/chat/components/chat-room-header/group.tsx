@@ -15,6 +15,7 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { cn } from "@/lib/utils"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
+import ChatRoomMenuGroup from "../chat-room-menu/group"
 
 const ChatRoomHeaderGroup = () => {
   const router = useRouter()
@@ -91,10 +92,12 @@ const ChatRoomHeaderGroup = () => {
               </Button>
             )}
           </div>
-
-          {/* <ChatRoomMenu type={type} /> */}
         </div>
       )}
+
+      <div className="flex-center-end">
+        <ChatRoomMenuGroup />
+      </div>
     </header>
   )
 }

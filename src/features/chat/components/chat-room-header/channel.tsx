@@ -15,6 +15,7 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { cn } from "@/lib/utils"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
+import ChatRoomMenuChannel from "../chat-room-menu/channel"
 
 const ChatRoomHeaderChannel = () => {
   const router = useRouter()
@@ -91,10 +92,12 @@ const ChatRoomHeaderChannel = () => {
               </Button>
             )}
           </div>
-
-          {/* <ChatRoomMenu type={type} /> */}
         </div>
       )}
+
+      <div className="flex-center-end">
+        <ChatRoomMenuChannel />
+      </div>
     </header>
   )
 }
