@@ -18,8 +18,9 @@ const RoomProfileOptionsGroup = () => {
     data: option,
     isLoading: isOptionLoading,
     refetch: refetchOption,
-  } = useGetGroupOption({ id })
-  const isNoOption = !isOptionLoading && !option
+  } = useGetGroupOption({ groupId: id })
+
+  const isNoOption = isOptionLoading || !option
 
   const handleNotifChange = (value: boolean) => {
     setIsNotifActive(value)

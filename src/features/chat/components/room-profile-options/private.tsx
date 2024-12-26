@@ -5,8 +5,8 @@ import { BellIcon } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { useRoomId } from "@/hooks/use-room-id"
 
-import useGetPrivateChatOption from "../../hooks/api/use-get-private-chat-option"
-import useUpdatePrivateChatOption from "../../hooks/api/use-update-private-chat-option"
+import useGetPrivateChatOption from "../../../private-chat/hooks/api/use-get-private-chat-option"
+import useUpdatePrivateChatOption from "../../../private-chat/hooks/api/use-update-private-chat-option"
 
 const RoomProfileOptionsPrivate = () => {
   const id = useRoomId()
@@ -20,15 +20,16 @@ const RoomProfileOptionsPrivate = () => {
     data: convOption,
     isLoading: isOptionLoading,
     refetch: refetchOption,
-  } = useGetPrivateChatOption({ id })
-  const isNoOption = !isOptionLoading && !convOption
+  } = useGetPrivateChatOption({ userId: id })
+
+  const isNoOption = isOptionLoading || !convOption
 
   const handleNotifChange = (value: boolean) => {
     setIsNotifActive(value)
     updateOption(
       {
         json: { notification: value },
-        param: { conversationId: id },
+        param: { userId: id },
       },
       {
         onSuccess() {

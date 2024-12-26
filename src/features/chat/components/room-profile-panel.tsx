@@ -128,6 +128,7 @@ const ProfileView = () => {
   const { data: channel, isLoading: channelLoading } = useGetChannelById({
     id: type === "channel" ? id : undefined,
   })
+
   const isLoading = userLoading || groupLoading || channelLoading
   const isNoData = !isLoading && !group && !channel && !user
 

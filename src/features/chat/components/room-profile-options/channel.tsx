@@ -19,8 +19,9 @@ const RoomProfileOptionsChannel = () => {
     data: option,
     isLoading: isOptionLoading,
     refetch: refetchChannel,
-  } = useGetChannelOption({ id })
-  const isNoOption = !isOptionLoading && !option
+  } = useGetChannelOption({ channelId: id })
+
+  const isNoOption = isOptionLoading || !option
 
   const handleNotifChange = (value: boolean) => {
     setIsNotifActive(value)
