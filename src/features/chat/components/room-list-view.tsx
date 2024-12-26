@@ -8,9 +8,9 @@ import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 
 import useGetRooms from "../hooks/api/use-get-rooms"
 
-import ChatListItem from "./chat-list-item"
+import RoomListItem from "./room-list-item"
 
-const ChatListView = () => {
+const RoomListView = () => {
   const [cursor] = useState<string | undefined>(undefined)
 
   const { data: settings, isLoading: settingLoading } = useGetSetting()
@@ -45,7 +45,7 @@ const ChatListView = () => {
       <ul className="flex min-w-10 flex-col px-1.5 pt-2">
         {rooms.map((room) => {
           return (
-            <ChatListItem
+            <RoomListItem
               key={room.id}
               timeFormat={settings?.timeFormat ?? "12-HOUR"}
               data={room}
@@ -57,4 +57,4 @@ const ChatListView = () => {
   )
 }
 
-export default ChatListView
+export default RoomListView

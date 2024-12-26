@@ -18,11 +18,11 @@ import useDeleteRoom from "../hooks/api/use-delete-room"
 import usePinRoom from "../hooks/api/use-pin-room"
 import useUnpinRoom from "../hooks/api/use-unpin-room"
 
-interface ChatListItemMenuProps {
+interface RoomListItemMenuProps {
   room: Room
 }
 
-const ChatListItemMenu = ({ room }: ChatListItemMenuProps) => {
+const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
   const queryClient = useQueryClient()
 
   const { data: groupOption, isLoading: loadingGroupOpt } = useGetGroupOption({
@@ -165,4 +165,4 @@ const ChatListItemMenu = ({ room }: ChatListItemMenuProps) => {
   )
 }
 
-export default ChatListItemMenu
+export default RoomListItemMenu

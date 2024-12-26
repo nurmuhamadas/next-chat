@@ -1,5 +1,5 @@
 import CreateChannelPanel from "@/features/channel/components/create-channel-panel"
-import ChatListPanel from "@/features/chat/components/chat-list-panel"
+import RoomListPanel from "@/features/chat/components/room-list-panel"
 import CreateGroupPanel from "@/features/group/components/create-group-panel"
 import BlockedUsersPanel from "@/features/user/components/blocked-users-panel"
 import EditMyProfilePanel from "@/features/user/components/edit-my-profile-panel"
@@ -14,7 +14,7 @@ const Sidebar = ({ className }: PropwWithClassName) => {
     <aside className={cn("h-screen bg-surface", className)}>
       <ComingSoonModal />
 
-      <ChatListPanel />
+      <RoomListPanel />
 
       <BlockedUsersPanel />
 

@@ -8,12 +8,12 @@ import { debounce } from "@/lib/utils"
 
 import { useSearchQuery } from "../hooks/use-search-query"
 
-import ChatListView from "./chat-list-view"
 import FloatingButton from "./floating-button"
 import MainMenu from "./main-menu"
+import RoomListView from "./room-list-view"
 import SearchResultView from "./search-result-view"
 
-const ChatListPanel = () => {
+const RoomListPanel = () => {
   const { setSearchQuery } = useSearchQuery()
 
   const [isSearching, setIsSearching] = useState(false)
@@ -44,11 +44,11 @@ const ChatListPanel = () => {
         </div>
       </div>
 
-      {isSearching ? <SearchResultView /> : <ChatListView />}
+      {isSearching ? <SearchResultView /> : <RoomListView />}
 
       <FloatingButton />
     </div>
   )
 }
 
-export default ChatListPanel
+export default RoomListPanel

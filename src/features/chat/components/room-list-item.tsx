@@ -7,19 +7,19 @@ import { cn, formatChatTime } from "@/lib/utils"
 
 import ChatAvatar from "../../../components/chat-avatar"
 
-import ChatListItemMenu from "./chat-list-item-menu"
+import RoomListItemMenu from "./room-list-item-menu"
 
-interface ChatListItemProps {
+interface RoomListItemProps {
   selected?: boolean
   timeFormat?: TimeFormat
   data: Room
 }
 
-const ChatListItem = ({
+const RoomListItem = ({
   selected = false,
   data,
   timeFormat = "12-HOUR",
-}: ChatListItemProps) => {
+}: RoomListItemProps) => {
   return (
     <Link href={`/${data.type}/${data.id}`}>
       <li
@@ -70,10 +70,10 @@ const ChatListItem = ({
           </div>
         </div>
 
-        <ChatListItemMenu room={data} />
+        <RoomListItemMenu room={data} />
       </li>
     </Link>
   )
 }
 
-export default ChatListItem
+export default RoomListItem
