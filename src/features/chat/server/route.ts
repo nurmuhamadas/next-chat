@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 
-import { collectionSchema } from "@/constants"
+import { collectionSchema, searchQuerySchema } from "@/constants"
 import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
 import { sessionMiddleware } from "@/lib/session-middleware"
@@ -19,7 +19,11 @@ import {
   unarchiveRoom,
   unpinRoom,
 } from "../lib/queries"
-import { getRoomIncludeQuery, mapRoomModelToRoom } from "../lib/utils"
+import {
+  getRoomIncludeQuery,
+  mapRoomModelToRoom,
+  mapRoomModelToUserSearch,
+} from "../lib/utils"
 
 const roomApp = new Hono()
   .get(
@@ -54,6 +58,82 @@ const roomApp = new Hono()
           total > 0 && total === limit ? result[total - 1].id : undefined
         const response: GetRoomListResponse = successCollectionResponse(
           roomList,
+          total,
+          nextCursor,
+        )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/search-private",
+    zValidator("query", searchQuerySchema),
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { query, limit, cursor } = c.req.valid("query")
+        const { userId } = c.get("userProfile")
+
+        const result = await prisma.room.findMany({
+          where: {
+            OR: [
+              {
+                privateChat: {
+                  user1: { profile: { name: { contains: query } } },
+                },
+              },
+              {
+                privateChat: {
+                  user2: { profile: { name: { contains: query } } },
+                },
+              },
+            ],
+            ownerId: userId,
+            deletedAt: null,
+            archivedAt: null,
+          },
+          include: {
+            privateChat: {
+              select: {
+                user1: {
+                  select: {
+                    id: true,
+                    profile: {
+                      select: { name: true, imageUrl: true, lastSeenAt: true },
+                    },
+                  },
+                },
+                user2: {
+                  select: {
+                    id: true,
+                    profile: {
+                      select: { name: true, imageUrl: true, lastSeenAt: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: [
+            { pinnedAt: { sort: "asc", nulls: "last" } },
+            { lastMessage: { createdAt: "desc" } },
+            { createdAt: "desc" },
+          ],
+          take: limit,
+          cursor: cursor ? { id: cursor } : undefined,
+          skip: cursor ? 1 : undefined,
+        })
+
+        const userSearch: UserSearch[] = result.map(mapRoomModelToUserSearch)
+
+        const total = result.length
+        const nextCursor =
+          total > 0 && total === limit ? result[total - 1].id : undefined
+        const response: SearchPrivateRoomResponse = successCollectionResponse(
+          userSearch,
           total,
           nextCursor,
         )

@@ -6,6 +6,7 @@ import {
   Room as RoomModel,
   UserUnreadMessage as UserUnreadMessageModel,
 } from "@prisma/client"
+import { UserSearch } from "lucide-react"
 
 export const getRoomIncludeQuery = () => ({
   lastMessage: {
@@ -106,5 +107,46 @@ export const mapRoomModelToRoom = (
           : "channel",
     pinned: !!room.pinnedAt,
     archived: !!room.archivedAt,
+  }
+}
+
+export const mapRoomModelToUserSearch = (
+  room: RoomModel & {
+    privateChat: {
+      user1: {
+        id: string
+        profile: Pick<ProfileModel, "name" | "imageUrl" | "lastSeenAt"> | null
+      }
+      user2: {
+        id: string
+        profile: Pick<ProfileModel, "name" | "imageUrl" | "lastSeenAt"> | null
+      }
+    } | null
+  },
+): UserSearch => {
+  let id = ""
+  let name = ""
+  let imageUrl: string | null = null
+  let lastSeenAt: string | null = null
+
+  const user =
+    room.privateChat?.user1.id === room.ownerId
+      ? room.privateChat?.user2
+      : room.privateChat?.user1
+  id = user?.id ?? ""
+  if (room.privateChat?.user2.id === room.privateChat?.user1.id) {
+    name = "Saved Messages"
+  } else {
+    name = user?.profile?.name ?? "Unknown"
+    lastSeenAt = user?.profile?.lastSeenAt?.toISOString() ?? null
+  }
+
+  imageUrl = user?.profile?.imageUrl ?? null
+
+  return {
+    id,
+    name,
+    imageUrl,
+    lastSeenAt,
   }
 }

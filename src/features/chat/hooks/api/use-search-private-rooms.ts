@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useSearchUsers = ({
+const useSearchPrivateRooms = ({
   queryKey,
   limit,
   cursor,
@@ -12,10 +12,10 @@ const useSearchUsers = ({
   cursor?: string
 }) => {
   const query = useQuery({
-    queryKey: ["search-users", queryKey, limit, cursor],
+    queryKey: ["rooms", cursor, limit, queryKey],
     queryFn: async () => {
-      const response = await client.api.users.search.$get({
-        query: { query: queryKey, limit, cursor },
+      const response = await client.api.rooms["search-private"].$get({
+        query: { cursor, limit, query: queryKey },
       })
 
       const result = await response.json()
@@ -30,9 +30,9 @@ const useSearchUsers = ({
   return {
     ...query,
     data: query.data?.data ?? [],
-    total: query.data?.total ?? 0,
+    total: query.data?.total,
     cursor: query.data?.cursor,
   }
 }
 
-export default useSearchUsers
+export default useSearchPrivateRooms
