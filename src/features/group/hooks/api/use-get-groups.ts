@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useSearchGroups = ({
+const useGetGroups = ({
   queryKey,
   limit,
   cursor,
@@ -12,9 +12,9 @@ const useSearchGroups = ({
   cursor?: string
 }) => {
   const query = useQuery({
-    queryKey: ["search-groups", queryKey, limit, cursor],
+    queryKey: ["get-groups", queryKey, limit, cursor],
     queryFn: async () => {
-      const response = await client.api.groups.search.$get({
+      const response = await client.api.groups.$get({
         query: { query: queryKey, limit, cursor },
       })
 
@@ -35,4 +35,4 @@ const useSearchGroups = ({
   }
 }
 
-export default useSearchGroups
+export default useGetGroups

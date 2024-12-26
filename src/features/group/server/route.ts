@@ -53,15 +53,16 @@ const groupApp = new Hono()
     "/",
     sessionMiddleware,
     validateProfileMiddleware,
-    zValidator("query", collectionSchema, zodErrorHandler),
+    zValidator("query", searchQuerySchema, zodErrorHandler),
     async (c) => {
       try {
-        const { limit, cursor } = c.req.valid("query")
+        const { query, limit, cursor } = c.req.valid("query")
         const { userId } = c.get("userProfile")
 
         const result = await prisma.group.findMany({
           where: {
             members: { some: { userId, leftAt: null } },
+            name: { contains: query, mode: "insensitive" },
             deletedAt: null,
           },
           include: {
@@ -193,10 +194,8 @@ const groupApp = new Hono()
 
         const result = await prisma.group.findMany({
           where: {
-            OR: [
-              { type: "PRIVATE", members: { some: { userId, leftAt: null } } },
-              { type: { equals: "PUBLIC" } },
-            ],
+            type: "PUBLIC",
+            members: { none: { userId, leftAt: null } },
             name: { contains: query, mode: "insensitive" },
             deletedAt: null,
           },

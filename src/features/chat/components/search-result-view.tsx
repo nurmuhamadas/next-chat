@@ -1,9 +1,15 @@
+import { useEffect, useState } from "react"
+
 import Link from "next/link"
+
+import { LoaderIcon } from "lucide-react"
 
 import ChatAvatar from "@/components/chat-avatar"
 import ChatSkeleton from "@/components/chat-skeleton"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import useSearchChannels from "@/features/channel/hooks/api/use-search-channels"
+import useGetGroups from "@/features/group/hooks/api/use-get-groups"
 import useSearchGroups from "@/features/group/hooks/api/use-search-groups"
 import useSearchUsers from "@/features/user/hooks/api/use-search-users"
 
@@ -76,13 +82,65 @@ const UserResult = () => {
 const GroupResult = () => {
   const { searchQuery } = useSearchQuery()
 
-  const { data, total, isLoading } = useSearchGroups({ queryKey: searchQuery })
+  const [joinedCursor, setJoinedCursor] = useState<string | undefined>()
+  const [publicCursor, setPublicCursor] = useState<string | undefined>()
+  const [joinedGroups, setJoinedGroups] = useState<GroupSearch[]>([])
+  const [publicGroups, setPublicGroups] = useState<GroupSearch[]>([])
 
-  if (isLoading) {
+  const {
+    data: joinedResult,
+    cursor: joinedCursorResult,
+    isLoading: loadingJoined,
+  } = useGetGroups({
+    queryKey: searchQuery,
+    cursor: joinedCursor,
+    limit: "5",
+  })
+  const {
+    data: publicResult,
+    cursor: publicCursorResult,
+    isLoading: loadingPublic,
+  } = useSearchGroups({
+    queryKey: searchQuery,
+    cursor: publicCursor,
+    limit: "5",
+  })
+
+  const isLoading = loadingPublic || loadingJoined
+  const isEmpty = joinedGroups.length === 0 && publicGroups.length === 0
+
+  useEffect(() => {
+    if (!loadingJoined && joinedResult.length > 0) {
+      setJoinedGroups((v) => [
+        ...v,
+        ...joinedResult.map((g) => ({
+          id: g.id,
+          name: g.name,
+          imageUrl: g.imageUrl,
+          totalMember: g.totalMembers,
+        })),
+      ])
+    }
+  }, [loadingJoined])
+
+  useEffect(() => {
+    if (!loadingPublic && publicResult.length > 0) {
+      setPublicGroups((v) => [...v, ...publicResult])
+    }
+  }, [loadingPublic])
+
+  useEffect(() => {
+    setJoinedCursor(undefined)
+    setPublicCursor(undefined)
+    setJoinedGroups([])
+    setPublicGroups([])
+  }, [searchQuery])
+
+  if (isLoading && isEmpty) {
     return <ChatSkeleton />
   }
 
-  if (total === 0) {
+  if (isEmpty) {
     return (
       <div className="size-full pt-8 flex-col-center">
         <p className="text-muted-foreground">No search found</p>
@@ -91,19 +149,72 @@ const GroupResult = () => {
   }
 
   return (
-    <div>
-      {data.map((user) => {
-        return (
-          <ResultItem
-            key={user.id}
-            id={user.id}
-            type="group"
-            title={user.name}
-            imageUrl={user.imageUrl ?? undefined}
-            description={`${user.totalMember} members`}
-          />
-        )
-      })}
+    <div className="flex flex-col gap-y-6 px-2">
+      {joinedGroups.length > 0 && (
+        <div className="flex flex-col gap-y-1">
+          <h4 className="px-2 text-grey-2 subtitle-2">Groups you joined</h4>
+          {joinedGroups.map((user) => {
+            return (
+              <ResultItem
+                key={user.id}
+                id={user.id}
+                type="group"
+                title={user.name}
+                imageUrl={user.imageUrl ?? undefined}
+                description={`${user.totalMember} members`}
+              />
+            )
+          })}
+
+          {loadingJoined && joinedGroups.length > 0 && (
+            <div className="h-24 flex-center">
+              <LoaderIcon className="size-4 animate-spin" />
+            </div>
+          )}
+
+          {joinedCursorResult && (
+            <Button
+              variant="link"
+              onClick={() => setJoinedCursor(joinedCursorResult)}
+            >
+              Show more
+            </Button>
+          )}
+        </div>
+      )}
+
+      {publicGroups.length > 0 && (
+        <div className="flex flex-col gap-y-1">
+          <h4 className="px-2 text-grey-2 subtitle-2">Public Groups</h4>
+          {publicGroups.map((user) => {
+            return (
+              <ResultItem
+                key={user.id}
+                id={user.id}
+                type="group"
+                title={user.name}
+                imageUrl={user.imageUrl ?? undefined}
+                description={`${user.totalMember} members`}
+              />
+            )
+          })}
+
+          {loadingPublic && publicGroups.length > 0 && (
+            <div className="h-24 flex-center">
+              <LoaderIcon className="size-4 animate-spin" />
+            </div>
+          )}
+
+          {publicCursorResult && (
+            <Button
+              variant="link"
+              onClick={() => setPublicCursor(publicCursorResult)}
+            >
+              Show more
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
