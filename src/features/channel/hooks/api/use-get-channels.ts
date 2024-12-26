@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useSearchChannels = ({
+const useGetChannels = ({
   queryKey,
   limit,
   cursor,
@@ -12,9 +12,9 @@ const useSearchChannels = ({
   cursor?: string
 }) => {
   const query = useQuery({
-    queryKey: ["search-channels", queryKey, limit, cursor],
+    queryKey: ["get-channels", queryKey, limit, cursor],
     queryFn: async () => {
-      const response = await client.api.channels.search.$get({
+      const response = await client.api.channels.$get({
         query: { query: queryKey, limit, cursor },
       })
 
@@ -35,4 +35,4 @@ const useSearchChannels = ({
   }
 }
 
-export default useSearchChannels
+export default useGetChannels

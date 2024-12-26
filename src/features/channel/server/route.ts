@@ -50,15 +50,16 @@ const channelApp = new Hono()
     "/",
     sessionMiddleware,
     validateProfileMiddleware,
-    zValidator("query", collectionSchema, zodErrorHandler),
+    zValidator("query", searchQuerySchema, zodErrorHandler),
     async (c) => {
       try {
-        const { limit, cursor } = c.req.valid("query")
+        const { query, limit, cursor } = c.req.valid("query")
         const { userId } = c.get("userProfile")
 
         const result = await prisma.channel.findMany({
           where: {
             subscribers: { some: { userId, unsubscribedAt: null } },
+            name: { contains: query, mode: "insensitive" },
             deletedAt: null,
           },
           include: {
@@ -179,13 +180,8 @@ const channelApp = new Hono()
 
         const result = await prisma.channel.findMany({
           where: {
-            OR: [
-              {
-                type: "PRIVATE",
-                subscribers: { some: { userId, unsubscribedAt: null } },
-              },
-              { type: { equals: "PUBLIC" } },
-            ],
+            type: "PUBLIC",
+            subscribers: { none: { userId, unsubscribedAt: null } },
             name: { contains: query, mode: "insensitive" },
             deletedAt: null,
           },
