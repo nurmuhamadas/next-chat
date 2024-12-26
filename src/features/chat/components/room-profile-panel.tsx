@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils"
 import ChatAvatar from "../../../components/chat-avatar"
 import { useRoomProfile } from "../hooks/use-room-profile"
 
-import RoomProfilActions from "./room-profil-actions"
+import RoomProfileMembers from "./room-profile-members"
 import RoomProfileOptions from "./room-profile-options"
 
 const RoomProfilePanel = () => {
@@ -288,7 +288,8 @@ const ProfileView = () => {
         </ul>
       )}
 
-      {<RoomProfilActions />}
+      {/* <Room?ProfilActions /> */}
+      <RoomProfileMembers />
     </>
   )
 }
