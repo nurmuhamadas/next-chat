@@ -143,7 +143,7 @@ declare interface GroupSearch {
   id: string
   name: string
   imageUrl: string | null
-  totalMember: number
+  totalMembers: number
 }
 
 declare interface GroupMember {

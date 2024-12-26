@@ -43,15 +43,7 @@ const SearchGroupResult = () => {
 
   useEffect(() => {
     if (!loadingJoined && joinedResult.length > 0) {
-      setJoinedGroups((v) => [
-        ...v,
-        ...joinedResult.map((g) => ({
-          id: g.id,
-          name: g.name,
-          imageUrl: g.imageUrl,
-          totalMember: g.totalMembers,
-        })),
-      ])
+      setJoinedGroups((v) => [...v, ...joinedResult])
     }
   }, [loadingJoined])
 
@@ -93,7 +85,7 @@ const SearchGroupResult = () => {
                 type="group"
                 title={user.name}
                 imageUrl={user.imageUrl ?? undefined}
-                description={`${user.totalMember} members`}
+                description={`${user.totalMembers} members`}
               />
             )
           })}
@@ -126,7 +118,7 @@ const SearchGroupResult = () => {
                 type="group"
                 title={user.name}
                 imageUrl={user.imageUrl ?? undefined}
-                description={`${user.totalMember} members`}
+                description={`${user.totalMembers} members`}
               />
             )
           })}

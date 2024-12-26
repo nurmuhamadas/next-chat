@@ -48,7 +48,7 @@ export const mapGroupModelToGroupSearch = (
     id: group.id,
     name: group.name,
     imageUrl: group.imageUrl,
-    totalMember: group._count.members,
+    totalMembers: group._count.members,
   }
 }
 
