@@ -30,6 +30,8 @@ declare type ChatRoomChannelMenuAction =
   | "leave-channel"
   | "delete-chat"
 
+declare type ChatRoomListMenuAction = "pin" | "unpin" | "archive" | "delete"
+
 declare type MessageItemMenuAction =
   | "reply"
   | "edit"

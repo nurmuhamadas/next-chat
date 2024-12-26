@@ -1,4 +1,5 @@
 import {
+  ArchiveIcon,
   BellIcon,
   BellOffIcon,
   BookmarkIcon,
@@ -11,6 +12,8 @@ import {
   LucideIcon,
   MoonStarIcon,
   PencilIcon,
+  PinIcon,
+  PinOffIcon,
   ReplyIcon,
   SettingsIcon,
   SunIcon,
@@ -68,6 +71,35 @@ export const MAIN_MENU: {
     label: "Logout",
     icon: LogOutIcon,
     action: "logout",
+  },
+]
+
+export const chatRoomListMenu: {
+  label: string
+  icon: LucideIcon
+  danger?: boolean
+  action: ChatRoomListMenuAction
+}[] = [
+  {
+    label: "Pin to top",
+    icon: PinIcon,
+    action: "pin",
+  },
+  {
+    label: "Unpin from top",
+    icon: PinOffIcon,
+    action: "unpin",
+  },
+  {
+    label: "Archive",
+    icon: ArchiveIcon,
+    action: "archive",
+  },
+  {
+    label: "Delete",
+    icon: TrashIcon,
+    danger: true,
+    action: "delete",
   },
 ]
 

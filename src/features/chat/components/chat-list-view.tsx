@@ -14,13 +14,13 @@ const ChatListView = () => {
   const [cursor] = useState<string | undefined>(undefined)
 
   const { data: settings, isLoading: settingLoading } = useGetSetting()
-  const { data, isLoading } = useGetRooms({ cursor })
+  const { data: rooms, isLoading } = useGetRooms({ cursor })
 
   if (isLoading || settingLoading) {
     return <ChatSkeleton rows={5} />
   }
 
-  if (data.length === 0) {
+  if (rooms.length === 0) {
     return (
       <div className="flex-1 flex-center">
         <div className="gap-y-6 flex-col-center">
@@ -43,12 +43,12 @@ const ChatListView = () => {
   return (
     <ScrollArea className="chat-list-scroll-area">
       <ul className="flex min-w-10 flex-col px-1.5 pt-2">
-        {data.map((v) => {
+        {rooms.map((room) => {
           return (
             <ChatListItem
-              key={v.id}
+              key={room.id}
               timeFormat={settings?.timeFormat ?? "12-HOUR"}
-              data={v}
+              data={room}
             />
           )
         })}

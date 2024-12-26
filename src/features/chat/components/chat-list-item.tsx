@@ -1,14 +1,18 @@
 import Link from "next/link"
 
+import { PinIcon } from "lucide-react"
+
 import { Badge } from "@/components/ui/badge"
 import { cn, formatChatTime } from "@/lib/utils"
 
 import ChatAvatar from "../../../components/chat-avatar"
 
+import ChatListItemMenu from "./chat-list-item-menu"
+
 interface ChatListItemProps {
   selected?: boolean
   timeFormat?: TimeFormat
-  data: Conversation
+  data: Room
 }
 
 const ChatListItem = ({
@@ -20,7 +24,7 @@ const ChatListItem = ({
     <Link href={`/${data.type}/${data.id}`}>
       <li
         className={cn(
-          "flex items-center gap-x-3 rounded-lg p-1.5 px-3 hover:bg-grey-4",
+          "flex items-center gap-x-3 rounded-lg p-1.5 pl-3 hover:bg-grey-4 group",
           selected && "bg-primary text-white hover:bg-primary",
         )}
       >
@@ -60,8 +64,13 @@ const ChatListItem = ({
                 {data.totalUnreadMessages}
               </Badge>
             )}
+            {data.pinned && (
+              <PinIcon className="size-3 text-muted-foreground" />
+            )}
           </div>
         </div>
+
+        <ChatListItemMenu room={data} />
       </li>
     </Link>
   )
