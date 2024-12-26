@@ -17,7 +17,7 @@ import useReadPrivateMessage from "@/features/messages/hooks/api/use-read-privat
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 
-import useGetConversationByUserId from "../hooks/api/use-get-conversation-by-user-id"
+import useGetConversationByUserId from "../hooks/api/use-get-room"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
 import ChatInput from "./chat-input"

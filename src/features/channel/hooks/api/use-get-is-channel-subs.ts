@@ -2,11 +2,13 @@ import { useQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
-const useGetIsChanelSubs = ({ id }: { id?: string }) => {
+const useGetIsChannelSubs = ({ id }: { id?: string }) => {
   const query = useQuery({
     queryKey: ["get-is-channel-subs", id],
     queryFn: async () => {
-      const response = await client.api.channels[":channelId"]["is-subs"].$get({
+      const response = await client.api.channels[":channelId"][
+        "is-subscriber"
+      ].$get({
         param: { channelId: id ?? "" },
       })
 
@@ -23,4 +25,4 @@ const useGetIsChanelSubs = ({ id }: { id?: string }) => {
   return query
 }
 
-export default useGetIsChanelSubs
+export default useGetIsChannelSubs

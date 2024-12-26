@@ -19,7 +19,7 @@ import MessageList, { GroupedMessage, MessageLoading } from "./message-list"
 
 interface ChatRoomMessagesProps {
   showBlank?: boolean
-  conversation?: Conversation
+  conversation?: Room
   isGroupMember?: boolean
   isPrivateGroup?: boolean
   isChannelSubs?: boolean
