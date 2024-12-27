@@ -39,7 +39,7 @@ const roomApp = new Hono()
         const result = await prisma.room.findMany({
           where: { ownerId: userId, deletedAt: null, archivedAt: null },
           include: {
-            ...getRoomIncludeQuery(),
+            ...getRoomIncludeQuery({ userId }),
           },
           orderBy: [
             { pinnedAt: { sort: "asc", nulls: "last" } },
@@ -160,7 +160,7 @@ const roomApp = new Hono()
             archivedAt: null,
             pinnedAt: { not: null },
           },
-          include: { ...getRoomIncludeQuery() },
+          include: { ...getRoomIncludeQuery({ userId }) },
           orderBy: [
             { lastMessage: { createdAt: "desc" } },
             { createdAt: "desc" },
@@ -288,7 +288,7 @@ const roomApp = new Hono()
             pinnedAt: null,
             archivedAt: { not: null },
           },
-          include: { ...getRoomIncludeQuery() },
+          include: { ...getRoomIncludeQuery({ userId }) },
           orderBy: [
             { lastMessage: { createdAt: "desc" } },
             { createdAt: "desc" },
@@ -416,7 +416,7 @@ const roomApp = new Hono()
           deletedAt: null,
         },
         include: {
-          ...getRoomIncludeQuery(),
+          ...getRoomIncludeQuery({ userId }),
         },
       })
 

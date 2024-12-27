@@ -7,10 +7,10 @@ import { useQueryClient } from "@tanstack/react-query"
 import Loading from "@/components/loader"
 import RightPanel from "@/components/right-panel"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
+import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
 import useGetIsChannelAdmin from "@/features/channel/hooks/api/use-get-is-channel-admin"
-import useGetIsChanelSubs from "@/features/channel/hooks/api/use-get-is-channel-subs"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
-import useGetIsGroupMember from "@/features/group/hooks/api/use-get-is-group-member"
+import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import useReadChannelMessage from "@/features/messages/hooks/api/use-read-channel-message"
 import useReadGroupMessage from "@/features/messages/hooks/api/use-read-group-message"
 import useReadPrivateMessage from "@/features/messages/hooks/api/use-read-private-message"
@@ -44,13 +44,16 @@ const ChatRoom = () => {
   const { data: conversation, isLoading: loadingConversation } =
     useGetConversationByUserId({ id: type === "chat" ? id : undefined })
 
-  const { data: isGroupMember, isLoading: loadingGMember } =
-    useGetIsGroupMember({ id: type === "group" ? id : undefined })
+  const { data: groupOption, isLoading: loadingGMember } = useGetGroupOption({
+    groupId: type === "group" ? id : undefined,
+  })
+  const isGroupMember = !!groupOption
   const { data: group, isLoading: loadingGroup } = useGetGroupById({
     id: type === "group" ? id : undefined,
   })
-  const { data: isChannelSubs, isLoading: loadingChannelSubs } =
-    useGetIsChanelSubs({ id: type === "channel" ? id : undefined })
+  const { data: channelOption, isLoading: loadingChannelSubs } =
+    useGetChannelOption({ channelId: type === "channel" ? id : undefined })
+  const isChannelSubs = !!channelOption
   const { data: isChannelAdmin, isLoading: loadingChannelAdmin } =
     useGetIsChannelAdmin({ id: type === "channel" ? id : undefined })
   const { data: channel, isLoading: loadingChannel } = useGetChannelById({

@@ -7,8 +7,12 @@ import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import useUpdateGroupOption from "@/features/group/hooks/api/use-update-group-option"
 import { useRoomId } from "@/hooks/use-room-id"
 
+import { useRoomProfile } from "../../hooks/use-room-profile"
+
 const RoomProfileOptionsGroup = () => {
   const id = useRoomId()
+
+  const { roomProfileOpen } = useRoomProfile()
 
   const [isNotifActive, setIsNotifActive] = useState(false)
 
@@ -18,7 +22,7 @@ const RoomProfileOptionsGroup = () => {
     data: option,
     isLoading: isOptionLoading,
     refetch: refetchOption,
-  } = useGetGroupOption({ groupId: id })
+  } = useGetGroupOption({ groupId: roomProfileOpen ? id : undefined })
 
   const isNoOption = isOptionLoading || !option
 

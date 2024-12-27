@@ -8,16 +8,20 @@ import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-op
 import useGetChannelSubscribers from "@/features/channel/hooks/api/use-get-channel-subscribers"
 import { useRoomId } from "@/hooks/use-room-id"
 
+import { useRoomProfile } from "../../hooks/use-room-profile"
+
 const RoomProfileMembersChannel = () => {
   const id = useRoomId()
+
+  const { roomProfileOpen } = useRoomProfile()
 
   const [subscribers, setSubscribers] = useState<ChannelSubscriber[]>([])
 
   const { data: channelOption, isLoading: loadingOption } = useGetChannelOption(
-    { channelId: id },
+    { channelId: roomProfileOpen ? id : undefined },
   )
   const { data: subsResult, isLoading: loadingSubs } = useGetChannelSubscribers(
-    { channelId: id },
+    { channelId: roomProfileOpen ? id : undefined },
   )
 
   const isLoading = loadingOption || loadingSubs

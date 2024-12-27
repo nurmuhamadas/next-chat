@@ -5,12 +5,15 @@ import { client } from "@/lib/rpc"
 const useGetBlockedUsers = ({
   cursor,
   limit,
+  enabled = false,
 }: {
   limit?: string
   cursor?: string
+  enabled?: boolean
 }) => {
   const query = useQuery({
     queryKey: ["get-blocked-users", cursor, limit],
+    enabled,
     queryFn: async () => {
       const response = await client.api["blocked-users"].$get({
         query: { cursor, limit },

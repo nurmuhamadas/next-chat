@@ -8,8 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
-import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import { cn } from "@/lib/utils"
 
 import { chatRoomListMenu } from "../constants"
@@ -25,20 +23,10 @@ interface RoomListItemMenuProps {
 const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
   const queryClient = useQueryClient()
 
-  const { data: groupOption, isLoading: loadingGroupOpt } = useGetGroupOption({
-    groupId: room.type === "group" ? room.id : undefined,
-  })
-  const { data: channelOption, isLoading: loadingChannelOpt } =
-    useGetChannelOption({
-      channelId: room.type === "channel" ? room.id : undefined,
-    })
-
   const { mutate: pinRoom, isPending: isPinning } = usePinRoom()
   const { mutate: unpinRoom, isPending: isUnpinning } = useUnpinRoom()
   const { mutate: archiveRoom, isPending: isArchiving } = useArchiveRoom()
   const { mutate: deleteRoom, isPending: isDeleting } = useDeleteRoom()
-
-  const isLoading = loadingGroupOpt || loadingChannelOpt
 
   const handlePinRoom = () => {
     pinRoom(
@@ -116,8 +104,8 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
     archive: !room.archived,
     delete:
       room.type === "chat" ||
-      (room.type === "group" && !groupOption) ||
-      (room.type === "channel" && !channelOption),
+      (room.type === "group" && room.isActive) ||
+      (room.type === "channel" && room.isActive),
   }
 
   const menuList = chatRoomListMenu.filter((menu) => {
@@ -132,34 +120,28 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="min-w-52">
-        {isLoading && (
-          <div className="h-24 flex-center">
-            <LoaderIcon className="size-4 animate-spin" />
-          </div>
-        )}
-        {!isLoading &&
-          menuList.map((menu) => {
-            return (
-              <DropdownMenuItem
-                key={menu.label}
-                className={cn(
-                  "py-2.5 body-2",
-                  menu.danger && "text-error hover:!text-error",
-                )}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleMenuClick(menu.action)
-                }}
-              >
-                {isActionLoading[menu.action] ? (
-                  <LoaderIcon className="animate-spin" />
-                ) : (
-                  <menu.icon className="!size-4" />
-                )}{" "}
-                {menu.label}
-              </DropdownMenuItem>
-            )
-          })}
+        {menuList.map((menu) => {
+          return (
+            <DropdownMenuItem
+              key={menu.label}
+              className={cn(
+                "py-2.5 body-2",
+                menu.danger && "text-error hover:!text-error",
+              )}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleMenuClick(menu.action)
+              }}
+            >
+              {isActionLoading[menu.action] ? (
+                <LoaderIcon className="animate-spin" />
+              ) : (
+                <menu.icon className="!size-4" />
+              )}{" "}
+              {menu.label}
+            </DropdownMenuItem>
+          )
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -41,20 +41,20 @@ const RoomProfilePanel = () => {
   const type = useRoomType()
   const id = useRoomId()
 
-  const { data: isGroupAdmin } = useGetIsGroupAdmin({
-    id: type === "group" ? id : undefined,
-  })
-  const { data: isChannelAdmin } = useGetIsChannelAdmin({
-    id: type === "channel" ? id : undefined,
-  })
-  const isAdmin = isGroupAdmin || isChannelAdmin
-
   const { openEditGroup } = useEditGroupPanel()
   const { openEditChannel } = useEditChannelPanel()
 
   const { roomProfileOpen, closeRoomProfile } = useRoomProfile()
 
   const isOpen = roomProfileOpen
+
+  const { data: isGroupAdmin } = useGetIsGroupAdmin({
+    id: isOpen && type === "group" ? id : undefined,
+  })
+  const { data: isChannelAdmin } = useGetIsChannelAdmin({
+    id: isOpen && type === "channel" ? id : undefined,
+  })
+  const isAdmin = isGroupAdmin || isChannelAdmin
 
   const handleEdit = () => {
     if (!isAdmin) return
@@ -119,14 +119,16 @@ const ProfileView = () => {
   const type = useRoomType()
   const id = useRoomId()
 
+  const { roomProfileOpen } = useRoomProfile()
+
   const { data: user, isLoading: userLoading } = useGetUserProfileById({
-    id: type === "chat" ? id : undefined,
+    id: roomProfileOpen && type === "chat" ? id : undefined,
   })
   const { data: group, isLoading: groupLoading } = useGetGroupById({
-    id: type === "group" ? id : undefined,
+    id: roomProfileOpen && type === "group" ? id : undefined,
   })
   const { data: channel, isLoading: channelLoading } = useGetChannelById({
-    id: type === "channel" ? id : undefined,
+    id: roomProfileOpen && type === "channel" ? id : undefined,
   })
 
   const isLoading = userLoading || groupLoading || channelLoading

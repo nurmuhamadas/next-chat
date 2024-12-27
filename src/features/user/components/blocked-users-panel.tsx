@@ -27,14 +27,13 @@ const BlockedUsersPanel = () => {
     isLoading,
     cursor: cursorResult,
     refetch,
-  } = useGetBlockedUsers({ cursor })
+  } = useGetBlockedUsers({ cursor, enabled: isBlockedUsersOpen })
 
   useEffect(() => {
     if (!isLoading) {
-      console.log(data)
       setBlockedUsers(data)
     }
-  }, [isLoading, data])
+  }, [isLoading, data.length])
 
   const handleUnblockUser = async (id: string) => {
     unblockUser(

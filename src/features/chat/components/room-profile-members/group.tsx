@@ -8,16 +8,20 @@ import useGetGroupMembers from "@/features/group/hooks/api/use-get-group-members
 import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import { useRoomId } from "@/hooks/use-room-id"
 
+import { useRoomProfile } from "../../hooks/use-room-profile"
+
 const RoomProfileMembersGroup = () => {
   const id = useRoomId()
+
+  const { roomProfileOpen } = useRoomProfile()
 
   const [members, setMembers] = useState<GroupMember[]>([])
 
   const { data: groupOption, isLoading: loadingOption } = useGetGroupOption({
-    groupId: id,
+    groupId: roomProfileOpen ? id : undefined,
   })
   const { data: memberResult, isLoading: loadingMembers } = useGetGroupMembers({
-    groupId: id,
+    groupId: roomProfileOpen ? id : undefined,
   })
 
   const isLoading = loadingOption || loadingMembers

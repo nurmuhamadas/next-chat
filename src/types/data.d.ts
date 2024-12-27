@@ -65,6 +65,8 @@ declare interface Room {
   imageUrl: string | null
   pinned: boolean
   archived: boolean
+  /** determine if user is group members/channel subs or not */
+  isActive: boolean
   totalUnreadMessages: number
   lastMessage: LastMessage | null
 }

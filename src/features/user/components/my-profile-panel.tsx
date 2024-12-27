@@ -25,7 +25,7 @@ const MyProfilePanel = () => {
   const { isMyProfileOpen, closeMyProfile } = useMyProfilePanel()
   const { openEditMyProfile } = useEditMyProfilePanel()
 
-  const { data, isLoading } = useGetMyProfile()
+  const { data, isLoading } = useGetMyProfile({ enabled: isMyProfileOpen })
 
   const infoList: {
     label: string

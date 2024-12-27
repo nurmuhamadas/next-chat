@@ -7,8 +7,12 @@ import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-op
 import useUpdateChannelOption from "@/features/channel/hooks/api/use-update-channel-option"
 import { useRoomId } from "@/hooks/use-room-id"
 
+import { useRoomProfile } from "../../hooks/use-room-profile"
+
 const RoomProfileOptionsChannel = () => {
   const id = useRoomId()
+
+  const { roomProfileOpen } = useRoomProfile()
 
   const [isNotifActive, setIsNotifActive] = useState(false)
 
@@ -19,7 +23,7 @@ const RoomProfileOptionsChannel = () => {
     data: option,
     isLoading: isOptionLoading,
     refetch: refetchChannel,
-  } = useGetChannelOption({ channelId: id })
+  } = useGetChannelOption({ channelId: roomProfileOpen ? id : undefined })
 
   const isNoOption = isOptionLoading || !option
 

@@ -1,14 +1,15 @@
 import {
   Channel as ChannelModel,
+  ChannelSubscriber as ChannelSubscriberModel,
   Group as GroupModel,
+  GroupMember as GroupMemberModel,
   Message as MessageModel,
   Profile as ProfileModel,
   Room as RoomModel,
   UserUnreadMessage as UserUnreadMessageModel,
 } from "@prisma/client"
-import { UserSearch } from "lucide-react"
 
-export const getRoomIncludeQuery = () => ({
+export const getRoomIncludeQuery = ({ userId }: { userId: string }) => ({
   lastMessage: {
     select: {
       id: true,
@@ -33,8 +34,26 @@ export const getRoomIncludeQuery = () => ({
       },
     },
   },
-  group: { select: { name: true, imageUrl: true } },
-  channel: { select: { name: true, imageUrl: true } },
+  group: {
+    select: {
+      name: true,
+      imageUrl: true,
+      members: {
+        where: { userId, leftAt: null },
+        select: { id: true },
+      },
+    },
+  },
+  channel: {
+    select: {
+      name: true,
+      imageUrl: true,
+      subscribers: {
+        where: { userId, unsubscribedAt: null },
+        select: { id: true },
+      },
+    },
+  },
   unreadMessage: { select: { count: true } },
 })
 
@@ -55,8 +74,16 @@ export const mapRoomModelToRoom = (
         profile: Pick<ProfileModel, "name" | "imageUrl"> | null
       }
     } | null
-    group: Pick<GroupModel, "name" | "imageUrl"> | null
-    channel: Pick<ChannelModel, "name" | "imageUrl"> | null
+    group:
+      | (Pick<GroupModel, "name" | "imageUrl"> & {
+          members: Pick<GroupMemberModel, "id">[]
+        })
+      | null
+    channel:
+      | (Pick<ChannelModel, "name" | "imageUrl"> & {
+          subscribers: Pick<ChannelSubscriberModel, "id">[]
+        })
+      | null
     unreadMessage: Pick<UserUnreadMessageModel, "count"> | null
   },
 ): Room => {
@@ -107,6 +134,16 @@ export const mapRoomModelToRoom = (
           : "channel",
     pinned: !!room.pinnedAt,
     archived: !!room.archivedAt,
+    isActive:
+      room.type === "GROUP"
+        ? room.group
+          ? room.group.members.length > 0
+          : false
+        : room.type === "CHANNEL"
+          ? room.channel
+            ? room.channel.subscribers.length > 0
+            : false
+          : false,
   }
 }
 

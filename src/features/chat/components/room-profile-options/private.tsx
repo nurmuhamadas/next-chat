@@ -7,9 +7,12 @@ import { useRoomId } from "@/hooks/use-room-id"
 
 import useGetPrivateChatOption from "../../../private-chat/hooks/api/use-get-private-chat-option"
 import useUpdatePrivateChatOption from "../../../private-chat/hooks/api/use-update-private-chat-option"
+import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileOptionsPrivate = () => {
   const id = useRoomId()
+
+  const { roomProfileOpen } = useRoomProfile()
 
   const [isNotifActive, setIsNotifActive] = useState(false)
 
@@ -20,7 +23,7 @@ const RoomProfileOptionsPrivate = () => {
     data: convOption,
     isLoading: isOptionLoading,
     refetch: refetchOption,
-  } = useGetPrivateChatOption({ userId: id })
+  } = useGetPrivateChatOption({ userId: roomProfileOpen ? id : undefined })
 
   const isNoOption = isOptionLoading || !convOption
 
