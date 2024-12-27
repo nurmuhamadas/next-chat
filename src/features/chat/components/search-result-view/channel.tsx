@@ -94,7 +94,7 @@ const SearchChannelResult = () => {
               <SearchResultItem
                 key={user.id}
                 id={user.id}
-                type="group"
+                type="channel"
                 title={user.name}
                 imageUrl={user.imageUrl ?? undefined}
                 description={`${user.totalSubscribers} subscribers`}
@@ -127,7 +127,7 @@ const SearchChannelResult = () => {
               <SearchResultItem
                 key={user.id}
                 id={user.id}
-                type="group"
+                type="channel"
                 title={user.name}
                 imageUrl={user.imageUrl ?? undefined}
                 description={`${user.totalSubscribers} subscribers`}

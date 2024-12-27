@@ -132,7 +132,7 @@ const SearchUserResult = () => {
               <SearchResultItem
                 key={user.id}
                 id={user.id}
-                type="group"
+                type="chat"
                 title={user.name}
                 imageUrl={user.imageUrl ?? undefined}
                 description={user.lastSeenAt ?? undefined}

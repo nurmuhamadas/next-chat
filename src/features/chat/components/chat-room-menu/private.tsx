@@ -1,5 +1,6 @@
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon, MoreVerticalIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -22,6 +23,8 @@ import { cn } from "@/lib/utils"
 import { chatRoomPrivateMenu } from "../../constants"
 
 const ChatRoomMenuPrivate = () => {
+  const queryClient = useQueryClient()
+
   const id = useRoomId()
 
   const [Dialog, confirm] = useConfirm()
@@ -77,6 +80,7 @@ const ChatRoomMenuPrivate = () => {
       {
         onSuccess() {
           refetchBlocked()
+          queryClient.invalidateQueries({ queryKey: ["get-blocked-users"] })
         },
       },
     )
@@ -94,6 +98,7 @@ const ChatRoomMenuPrivate = () => {
       {
         onSuccess() {
           refetchBlocked()
+          queryClient.invalidateQueries({ queryKey: ["get-blocked-users"] })
         },
       },
     )
