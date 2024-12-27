@@ -71,7 +71,7 @@ const MessageItem = ({
             <div className="flex items-center gap-x-1">
               {!isSender && type !== "private" && (
                 <span className="line-clamp-1 !font-medium text-primary caption">
-                  {message.user.name}
+                  {message.sender.name}
                 </span>
               )}
 

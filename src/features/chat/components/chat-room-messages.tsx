@@ -3,10 +3,12 @@ import { useCallback, useEffect, useState } from "react"
 import Image from "next/image"
 
 import { isToday, parseISO } from "date-fns"
+import { LoaderIcon } from "lucide-react"
 
-import useGetChannelMessages from "@/features/messages/hooks/api/use-get-channel-messages"
-import useGetGroupMessages from "@/features/messages/hooks/api/use-get-group-messages"
-import useGetPrivateMessages from "@/features/messages/hooks/api/use-get-private-messages"
+import { Button } from "@/components/ui/button"
+import useJoinChannel from "@/features/channel/hooks/api/use-join-channel"
+import useJoinGroup from "@/features/group/hooks/api/use-join-group"
+import useGetMessages from "@/features/messages/hooks/api/use-get-messages"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
@@ -18,20 +20,16 @@ import { useRepliedMessageId } from "../hooks/use-replied-message-id"
 import MessageList, { GroupedMessage, MessageLoading } from "./message-list"
 
 interface ChatRoomMessagesProps {
-  showBlank?: boolean
-  conversation?: Room
-  isGroupMember?: boolean
-  isPrivateGroup?: boolean
-  isChannelSubs?: boolean
-  isPrivateChannel?: boolean
+  hideMessage?: boolean
+  group?: Group
+  channel?: Channel
   onRepliedMessageChange(message: Message | undefined): void
   onEditMessageChange(message: Message | undefined): void
 }
 const ChatRoomMessages = ({
-  isGroupMember = false,
-  isPrivateGroup = true,
-  isChannelSubs,
-  isPrivateChannel,
+  hideMessage,
+  group,
+  channel,
   onRepliedMessageChange,
   onEditMessageChange,
 }: ChatRoomMessagesProps) => {
@@ -41,22 +39,20 @@ const ChatRoomMessages = ({
   const { repliedMessageId } = useRepliedMessageId()
   const { editedMessageId } = useEditedMessageId()
 
+  const [cursor, setCursor] = useState<string | undefined>()
   const [messages, setMessages] = useState<Message[]>([])
-  const [canLoadMore, setCanLoadMore] = useState(true)
-  const [page, setPage] = useState(1)
+
+  const { mutate: joinGroup, isPending: isJoiningGroup } = useJoinGroup()
+  const { mutate: joinChannel, isPending: isJoiningChannel } = useJoinChannel()
 
   const { data: setting } = useGetSetting()
+  const {
+    data: messagesResult,
+    isLoading: loadingMessage,
+    cursor: cursorResult,
+  } = useGetMessages({ id, roomType: type, cursor })
 
-  const { data: privateMessages, isLoading: privateLoading } =
-    useGetPrivateMessages({ id: type === "chat" ? id : undefined, page })
-  const { data: groupMessages, isLoading: groupLoading } = useGetGroupMessages({
-    id: type === "group" ? id : undefined,
-    page,
-  })
-  const { data: channelMessages, isLoading: channelLoading } =
-    useGetChannelMessages({ id: type === "channel" ? id : undefined, page })
-
-  const isLoading = privateLoading || groupLoading || channelLoading
+  const isLoading = loadingMessage
   const isEmpty = messages.length === 0
 
   const groupingMessage = useCallback(
@@ -95,20 +91,19 @@ const ChatRoomMessages = ({
   const groupedMessages = groupingMessage(messages)
 
   useEffect(() => {
-    const rawMessage = {
-      chat: privateMessages,
-      group: groupMessages,
-      channel: channelMessages,
-    }
-
     if (!isLoading) {
-      setMessages((prev) => [...prev, ...rawMessage[type]])
-
-      if (rawMessage[type].length < 20) {
-        setCanLoadMore(false)
+      if (cursor) {
+        setMessages((prev) =>
+          [
+            ...prev.filter((m) => !messagesResult.some((r) => r.id === m.id)),
+            ...messagesResult,
+          ].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+        )
+      } else {
+        setMessages([...messagesResult])
       }
     }
-  }, [groupingMessage, type, isLoading])
+  }, [type, isLoading, cursor])
 
   useEffect(() => {
     if (!isLoading) {
@@ -122,12 +117,53 @@ const ChatRoomMessages = ({
     }
   }, [editedMessageId, onEditMessageChange, isLoading])
 
-  const showBlank =
-    (type === "group" && isPrivateGroup && !isGroupMember) ||
-    (type === "channel" && isPrivateChannel && !isChannelSubs)
+  const handleJoinGroup = () => {
+    if (group) {
+      joinGroup({
+        param: { groupId: group.id },
+        json: { code: group.inviteCode },
+      })
+    }
+  }
 
-  if (showBlank) {
-    return <div className="w-full flex-1"></div>
+  const handleJoinChannel = () => {
+    if (channel) {
+      joinChannel({
+        param: { channelId: channel.id },
+        json: { code: channel.inviteCode },
+      })
+    }
+  }
+
+  if (hideMessage) {
+    return (
+      <div className="w-full flex-1 flex-center">
+        {type === "group" && (
+          <div className="w-56 gap-y-6 rounded-lg bg-surface p-6 flex-col-center">
+            <p className="text-center body-2">
+              Only group members can view the messages.
+            </p>
+            <Button onClick={handleJoinGroup} disabled={isJoiningGroup}>
+              {isJoiningGroup && <LoaderIcon className="size-4 animate-spin" />}
+              Join Group
+            </Button>
+          </div>
+        )}
+        {type === "channel" && (
+          <div className="w-56 gap-y-6 rounded-lg bg-surface p-6 flex-col-center">
+            <p className="text-center body-2">
+              Only channel subscribers can view the messages.
+            </p>
+            <Button onClick={handleJoinChannel} disabled={isJoiningChannel}>
+              {isJoiningChannel && (
+                <LoaderIcon className="size-4 animate-spin" />
+              )}
+              Subscribe Channel
+            </Button>
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -161,10 +197,12 @@ const ChatRoomMessages = ({
         <MessageList
           messages={groupedMessages}
           timeFormat={setting?.timeFormat ?? "12-HOUR"}
-          canLoadMore={canLoadMore}
+          canLoadMore={!!cursorResult}
           isLoading={isLoading}
           loadMore={() => {
-            setPage(page + 1)
+            if (cursorResult) {
+              setCursor(cursorResult)
+            }
           }}
         />
       )}

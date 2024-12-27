@@ -81,7 +81,7 @@ const MessageList = ({
                       message={message}
                       type="private"
                       isSelected={selectedMessageIds.includes(message.id)}
-                      isSender={myProfile?.id === message.user.id}
+                      isSender={myProfile?.id === message.sender.id}
                       timeFormat={timeFormat}
                       onClickParentMessage={(id) => {
                         const container = chatRef.current

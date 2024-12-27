@@ -33,6 +33,7 @@ import {
   unSubscribeChannel,
 } from "../lib/channel-subscribers-queries"
 import {
+  getChannelIncludeQuery,
   getChannelWhere,
   mapChannelModelToChannel,
   mapChannelModelToChannelSearch,
@@ -62,11 +63,7 @@ const channelApp = new Hono()
             name: { contains: query, mode: "insensitive" },
             deletedAt: null,
           },
-          include: {
-            _count: {
-              select: { subscribers: { where: { unsubscribedAt: null } } },
-            },
-          },
+          include: { ...getChannelIncludeQuery({ userId }) },
           take: limit,
           cursor: cursor ? { id: cursor } : undefined,
           skip: cursor ? 1 : undefined,
@@ -133,6 +130,7 @@ const channelApp = new Hono()
           const channelResult = mapChannelModelToChannel({
             ...createdChannel,
             _count: { subscribers: 0 },
+            subscribers: [{ isAdmin: true }],
           })
 
           const response: CreateChannelResponse = successResponse(channelResult)
@@ -226,11 +224,7 @@ const channelApp = new Hono()
             ...getChannelWhere(channelId, userId),
             deletedAt: undefined,
           },
-          include: {
-            _count: {
-              select: { subscribers: { where: { unsubscribedAt: null } } },
-            },
-          },
+          include: { ...getChannelIncludeQuery({ userId }) },
         })
         if (!channel) {
           return c.json(createError(ERROR.CHANNEL_NOT_FOUND), 404)
@@ -299,7 +293,7 @@ const channelApp = new Hono()
         }
 
         try {
-          const updatedChannel = await updateChannel(channelId, {
+          const updatedChannel = await updateChannel(channelId, userId, {
             name,
             description,
             type,

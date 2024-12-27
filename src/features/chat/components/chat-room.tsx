@@ -7,17 +7,12 @@ import { useQueryClient } from "@tanstack/react-query"
 import Loading from "@/components/loader"
 import RightPanel from "@/components/right-panel"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
-import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
-import useGetIsChannelAdmin from "@/features/channel/hooks/api/use-get-is-channel-admin"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
-import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
-import useReadChannelMessage from "@/features/messages/hooks/api/use-read-channel-message"
-import useReadGroupMessage from "@/features/messages/hooks/api/use-read-group-message"
-import useReadPrivateMessage from "@/features/messages/hooks/api/use-read-private-message"
+import useReadMessage from "@/features/messages/hooks/api/use-read-message"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 
-import useGetConversationByUserId from "../hooks/api/use-get-room"
+import useGetRoom from "../hooks/api/use-get-room"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
 import ChatInput from "./chat-input"
@@ -32,80 +27,51 @@ const ChatRoom = () => {
   const type = useRoomType()
   const id = useRoomId()
 
+  const groupId = type === "group" ? id : undefined
+  const channelId = type === "channel" ? id : undefined
+
   const [repliedMessage, setRepliedMessage] = useState<Message | undefined>()
   const [editedMessage, setEditedMessage] = useState<Message | undefined>()
 
   const { isSelectMode } = useSelectedMessageIds()
 
-  const { mutate: readPrivate } = useReadPrivateMessage()
-  const { mutate: readGroup } = useReadGroupMessage()
-  const { mutate: readChannel } = useReadChannelMessage()
+  const { mutate: readMessage } = useReadMessage()
 
-  const { data: conversation, isLoading: loadingConversation } =
-    useGetConversationByUserId({ id: type === "chat" ? id : undefined })
-
-  const { data: groupOption, isLoading: loadingGMember } = useGetGroupOption({
-    groupId: type === "group" ? id : undefined,
-  })
-  const isGroupMember = !!groupOption
+  const { data: room, isLoading: loadingRoom } = useGetRoom({ id })
   const { data: group, isLoading: loadingGroup } = useGetGroupById({
-    id: type === "group" ? id : undefined,
+    id: groupId,
   })
-  const { data: channelOption, isLoading: loadingChannelSubs } =
-    useGetChannelOption({ channelId: type === "channel" ? id : undefined })
-  const isChannelSubs = !!channelOption
-  const { data: isChannelAdmin, isLoading: loadingChannelAdmin } =
-    useGetIsChannelAdmin({ id: type === "channel" ? id : undefined })
   const { data: channel, isLoading: loadingChannel } = useGetChannelById({
-    id: type === "channel" ? id : undefined,
+    id: channelId,
   })
 
-  const isLoading =
-    loadingConversation ||
-    loadingGMember ||
-    loadingGroup ||
-    loadingChannel ||
-    loadingChannelSubs ||
-    loadingChannelAdmin
-  const isPrivateGroup = group ? group?.type === "PRIVATE" : true
-  const isPrivateChannel = channel ? channel?.type === "PRIVATE" : true
+  const isLoading = loadingGroup || loadingChannel || loadingRoom
+  const isGroupMember = group?.isMember ?? false
+  const isChannelSubs = channel?.isSubscribers ?? false
+  const isChannelAdmin = channel?.isAdmin ?? false
 
   const hideInput =
     (type === "group" && !isGroupMember) ||
     (type === "channel" && !isChannelAdmin)
+  const hideMessage =
+    (type === "group" && !isGroupMember) ||
+    (type === "channel" && !isChannelSubs)
 
   useEffect(() => {
-    if (type === "chat" && !!conversation) {
-      readPrivate(
-        { param: { userId: id } },
+    const roomType =
+      type === "chat" ? "private" : type === "group" ? "group" : "channel"
+
+    if ((room?.totalUnreadMessages ?? 0) > 0) {
+      readMessage(
+        { param: { receiverId: id, roomType } },
         {
           onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms"] })
           },
         },
       )
     }
-    if (type === "group" && isGroupMember) {
-      readGroup(
-        { param: { groupId: id } },
-        {
-          onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] })
-          },
-        },
-      )
-    }
-    if (type === "channel" && isChannelSubs) {
-      readChannel(
-        { param: { channelId: id } },
-        {
-          onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] })
-          },
-        },
-      )
-    }
-  }, [conversation, id, isChannelSubs, isGroupMember, type, queryClient])
+  }, [id, queryClient, readMessage, room?.totalUnreadMessages, type])
 
   return (
     <div className="flex h-screen flex-1 overflow-x-hidden">
@@ -117,11 +83,9 @@ const ChatRoom = () => {
         ) : (
           <>
             <ChatRoomMessages
-              conversation={conversation ?? undefined}
-              isGroupMember={isGroupMember}
-              isPrivateGroup={isPrivateGroup}
-              isChannelSubs={isChannelSubs}
-              isPrivateChannel={isPrivateChannel}
+              hideMessage={hideMessage}
+              group={group}
+              channel={channel}
               onRepliedMessageChange={setRepliedMessage}
               onEditMessageChange={setEditedMessage}
             />

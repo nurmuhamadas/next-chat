@@ -18,8 +18,21 @@ export const getGroupWhere = (groupId: string, userId: string) => ({
   deletedAt: null,
 })
 
+export const getGroupIncludeQuery = ({ userId }: { userId: string }) => {
+  return {
+    members: {
+      where: { userId, leftAt: null },
+      select: { isAdmin: true },
+    },
+    _count: {
+      select: { members: { where: { leftAt: null } } },
+    },
+  }
+}
+
 export const mapGroupModelToGroup = (
   group: GroupModel & {
+    members: Pick<GroupMemberModel, "isAdmin">[]
     _count: {
       members: number
     }
@@ -34,6 +47,8 @@ export const mapGroupModelToGroup = (
     type: group.type,
     inviteCode: group.inviteCode,
     totalMembers: group._count.members,
+    isMember: group.members.length > 0,
+    isAdmin: group.members[0]?.isAdmin ?? false,
   }
 }
 

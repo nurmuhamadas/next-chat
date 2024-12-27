@@ -5,17 +5,17 @@ import { toast } from "sonner"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.channels)[":channelId"]["left"]["$delete"],
+  (typeof client.api.channels)[":channelId"]["left"]["$post"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.channels)[":channelId"]["left"]["$delete"]
+  (typeof client.api.channels)[":channelId"]["left"]["$post"]
 >
 
 const useLeaveChannel = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param }) => {
-      const response = await client.api.channels[":channelId"]["left"].$delete({
+      const response = await client.api.channels[":channelId"]["left"].$post({
         param,
       })
 

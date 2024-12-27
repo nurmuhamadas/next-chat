@@ -5,6 +5,8 @@ import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
 import { generateInviteCode } from "@/lib/utils"
 
+import { getGroupIncludeQuery } from "./utils"
+
 export const validateGroupMember = async (
   userId: string,
   memberIds: string[],
@@ -156,6 +158,7 @@ export const createGroup = (data: {
 
 export const updateGroup = (
   id: string,
+  userId: string,
   data: {
     name?: string
     type?: GroupType
@@ -171,9 +174,7 @@ export const updateGroup = (
       description: data.description,
       imageUrl: data.imageUrl,
     },
-    include: {
-      _count: { select: { members: { where: { leftAt: null } } } },
-    },
+    include: { ...getGroupIncludeQuery({ userId }) },
   })
 }
 

@@ -36,6 +36,7 @@ import {
   validateGroupMember,
 } from "../lib/group-queries"
 import {
+  getGroupIncludeQuery,
   getGroupWhere,
   mapGroupMemberModelToGroupMember,
   mapGroupModelToGroup,
@@ -65,11 +66,7 @@ const groupApp = new Hono()
             name: { contains: query, mode: "insensitive" },
             deletedAt: null,
           },
-          include: {
-            _count: {
-              select: { members: { where: { leftAt: null } } },
-            },
-          },
+          include: { ...getGroupIncludeQuery({ userId }) },
           take: limit,
           cursor: cursor ? { id: cursor } : undefined,
           skip: cursor ? 1 : undefined,
@@ -106,7 +103,6 @@ const groupApp = new Hono()
           description,
         } = c.req.valid("form")
         const memberIds = !!memberIdsStr ? memberIdsStr.split(",") : []
-        console.log(memberIds, typeof memberIdsStr)
 
         const imageFile = image as unknown as File
 
@@ -148,6 +144,7 @@ const groupApp = new Hono()
           const groupResult = mapGroupModelToGroup({
             ...createdGroup,
             _count: { members: memberIds.length + 1 },
+            members: [{ isAdmin: true }],
           })
           const response: CreateGroupResponse = successResponse(groupResult)
           return c.json(response)
@@ -234,11 +231,7 @@ const groupApp = new Hono()
 
       const group = await prisma.group.findUnique({
         where: { ...getGroupWhere(groupId, userId), deletedAt: undefined },
-        include: {
-          _count: {
-            select: { members: { where: { leftAt: null } } },
-          },
-        },
+        include: { ...getGroupIncludeQuery({ userId }) },
       })
       if (!group) {
         return c.json(createError(ERROR.GROUP_NOT_FOUND), 404)
@@ -304,7 +297,7 @@ const groupApp = new Hono()
         }
 
         try {
-          const updatedGroup = await updateGroup(groupId, {
+          const updatedGroup = await updateGroup(groupId, userId, {
             name,
             description,
             type,

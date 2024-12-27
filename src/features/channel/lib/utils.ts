@@ -18,8 +18,21 @@ export const getChannelWhere = (channelId: string, userId: string) => ({
   deletedAt: null,
 })
 
+export const getChannelIncludeQuery = ({ userId }: { userId: string }) => {
+  return {
+    subscribers: {
+      where: { userId, unsubscribedAt: null },
+      select: { isAdmin: true },
+    },
+    _count: {
+      select: { subscribers: { where: { unsubscribedAt: null } } },
+    },
+  }
+}
+
 export const mapChannelModelToChannel = (
   channel: ChannelModel & {
+    subscribers: Pick<ChannelSubscriberModel, "isAdmin">[]
     _count: {
       subscribers: number
     }
@@ -34,6 +47,8 @@ export const mapChannelModelToChannel = (
     type: channel.type,
     inviteCode: channel.inviteCode,
     totalSubscribers: channel._count.subscribers,
+    isSubscribers: channel.subscribers.length > 0,
+    isAdmin: channel.subscribers[0]?.isAdmin ?? false,
   }
 }
 

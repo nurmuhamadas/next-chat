@@ -3,6 +3,8 @@ import { ChannelType } from "@prisma/client"
 import { prisma } from "@/lib/prisma"
 import { generateInviteCode } from "@/lib/utils"
 
+import { getChannelIncludeQuery } from "./utils"
+
 export const createChannelInviteCode = async () => {
   let isExist = true
   let inviteCode = generateInviteCode(10)
@@ -65,6 +67,7 @@ export const createChannel = (data: {
 
 export const updateChannel = (
   id: string,
+  userId: string,
   data: {
     name?: string
     type?: GroupType
@@ -80,9 +83,7 @@ export const updateChannel = (
       description: data.description,
       imageUrl: data.imageUrl,
     },
-    include: {
-      _count: { select: { subscribers: { where: { unsubscribedAt: null } } } },
-    },
+    include: { ...getChannelIncludeQuery({ userId }) },
   })
 }
 

@@ -139,6 +139,8 @@ declare interface Group {
   imageUrl: string | null
   inviteCode: string
   totalMembers: number
+  isMember: boolean
+  isAdmin: boolean
 }
 
 declare interface GroupSearch {
@@ -177,6 +179,8 @@ declare interface Channel {
   imageUrl: string | null
   inviteCode: string
   totalSubscribers: number
+  isSubscribers: boolean
+  isAdmin: boolean
 }
 
 declare interface ChannelSearch {

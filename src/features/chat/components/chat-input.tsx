@@ -84,9 +84,13 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
       sendMessage(
         {
           form: {
-            userId: type === "chat" ? id : undefined,
-            groupId: type === "group" ? id : undefined,
-            channelId: type === "channel" ? id : undefined,
+            receiverId: id,
+            roomType:
+              type === "chat"
+                ? "PRIVATE"
+                : type === "group"
+                  ? "GROUP"
+                  : "CHANNEL",
             attachments: att,
             message,
             isEmojiOnly: String(isEmojiOnly),
@@ -177,7 +181,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
               <ReplyIcon className="mr-2 size-6 text-muted-foreground" />
               <div className="flex flex-1 flex-col rounded-sm border-l-4 bg-bubble-reply-1 py-1 pl-2 pr-1">
                 <p className="line-clamp-1 font-semibold caption">
-                  {repliedMessage.user.name}
+                  {repliedMessage.sender.name}
                 </p>
                 <p className={cn("line-clamp-1 text-foreground/50 caption")}>
                   {repliedMessage.message}

@@ -4,19 +4,19 @@ import { InferRequestType, InferResponseType } from "hono"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
-  (typeof client.api.messages.private)[":userId"]["read"]["$post"],
+  (typeof client.api.messages)[":roomType"][":receiverId"]["read"]["$post"],
   200
 >
 type RequestType = InferRequestType<
-  (typeof client.api.messages.private)[":userId"]["read"]["$post"]
+  (typeof client.api.messages)[":roomType"][":receiverId"]["read"]["$post"]
 >
 
-const useReadPrivateMessage = () => {
+const useReadMessage = () => {
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param }) => {
-      const response = await client.api.messages.private[":userId"].read.$post({
-        param,
-      })
+      const response = await client.api.messages[":roomType"][
+        ":receiverId"
+      ].read.$post({ param })
 
       const result = await response.json()
       if (!result.success) {
@@ -28,4 +28,4 @@ const useReadPrivateMessage = () => {
   })
 }
 
-export default useReadPrivateMessage
+export default useReadMessage
