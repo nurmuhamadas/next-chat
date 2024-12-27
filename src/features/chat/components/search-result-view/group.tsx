@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { LoaderIcon } from "lucide-react"
 
@@ -13,6 +13,8 @@ import SearchResultItem from "./item"
 
 const SearchGroupResult = () => {
   const { searchQuery } = useSearchQuery()
+
+  const lastQuery = useRef<string | undefined>(searchQuery)
 
   const [joinedCursor, setJoinedCursor] = useState<string | undefined>()
   const [publicCursor, setPublicCursor] = useState<string | undefined>()
@@ -43,24 +45,34 @@ const SearchGroupResult = () => {
 
   useEffect(() => {
     if (!loadingJoined && joinedResult.length > 0) {
-      setJoinedGroups((v) => [...v, ...joinedResult])
+      if (joinedCursor) {
+        setJoinedGroups((v) => [...v, ...joinedResult])
+      } else {
+        setJoinedGroups([...joinedResult])
+      }
+
+      lastQuery.current = searchQuery
     }
-  }, [loadingJoined])
+  }, [loadingJoined, joinedCursor])
 
   useEffect(() => {
     if (!loadingPublic && publicResult.length > 0) {
-      setPublicGroups((v) => [...v, ...publicResult])
+      if (publicCursor) {
+        setPublicGroups((v) => [...v, ...publicResult])
+      } else {
+        setPublicGroups([...publicResult])
+      }
+
+      lastQuery.current = searchQuery
     }
-  }, [loadingPublic])
+  }, [loadingPublic, publicCursor])
 
   useEffect(() => {
     setJoinedCursor(undefined)
     setPublicCursor(undefined)
-    setJoinedGroups([])
-    setPublicGroups([])
   }, [searchQuery])
 
-  if (isLoading && isEmpty) {
+  if (isLoading && searchQuery !== lastQuery.current) {
     return <ChatSkeleton />
   }
 
@@ -73,7 +85,7 @@ const SearchGroupResult = () => {
   }
 
   return (
-    <div className="flex flex-col gap-y-6 px-2">
+    <div className="flex flex-col gap-y-6 px-2 pb-10">
       {joinedGroups.length > 0 && (
         <div className="flex flex-col gap-y-1">
           <h4 className="px-2 text-grey-2 subtitle-2">Groups you joined</h4>
@@ -90,13 +102,13 @@ const SearchGroupResult = () => {
             )
           })}
 
-          {loadingJoined && joinedGroups.length > 0 && (
+          {loadingJoined && searchQuery === lastQuery.current && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {joinedCursorResult && (
+          {!loadingJoined && joinedCursorResult && (
             <Button
               variant="link"
               onClick={() => setJoinedCursor(joinedCursorResult)}
@@ -123,13 +135,13 @@ const SearchGroupResult = () => {
             )
           })}
 
-          {loadingPublic && publicGroups.length > 0 && (
+          {loadingPublic && searchQuery === lastQuery.current && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {publicCursorResult && (
+          {!loadingPublic && publicCursorResult && (
             <Button
               variant="link"
               onClick={() => setPublicCursor(publicCursorResult)}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { LoaderIcon } from "lucide-react"
 
@@ -12,6 +12,8 @@ import { useSearchQuery } from "../../hooks/use-search-query"
 import SearchResultItem from "./item"
 const SearchUserResult = () => {
   const { searchQuery } = useSearchQuery()
+
+  const lastQuery = useRef<string | undefined>(searchQuery)
 
   const [roomCursor, setRoomCursor] = useState<string | undefined>()
   const [userCursor, setUserCursor] = useState<string | undefined>()
@@ -42,32 +44,40 @@ const SearchUserResult = () => {
 
   useEffect(() => {
     if (!loadingRoom && roomResult.length > 0) {
-      setRooms((v) => [
-        ...v,
-        ...roomResult.map((room) => ({
-          id: room.id,
-          name: room.name,
-          imageUrl: room.imageUrl,
-          lastSeenAt: null,
-        })),
-      ])
+      const result = roomResult.map((room) => ({
+        id: room.id,
+        name: room.name,
+        imageUrl: room.imageUrl,
+        lastSeenAt: null,
+      }))
+      if (roomCursor) {
+        setRooms((v) => [...v, ...result])
+      } else {
+        setRooms([...result])
+      }
+
+      lastQuery.current = searchQuery
     }
-  }, [loadingRoom])
+  }, [loadingRoom, roomCursor])
 
   useEffect(() => {
     if (!loadingUsers && usersResult.length > 0) {
-      setUsers((v) => [...v, ...usersResult])
+      if (userCursor) {
+        setUsers((v) => [...v, ...usersResult])
+      } else {
+        setUsers([...usersResult])
+      }
+
+      lastQuery.current = searchQuery
     }
-  }, [loadingUsers])
+  }, [loadingUsers, userCursor])
 
   useEffect(() => {
     setRoomCursor(undefined)
     setUserCursor(undefined)
-    setRooms([])
-    setUsers([])
   }, [searchQuery])
 
-  if (isLoading && isEmpty) {
+  if (isLoading && searchQuery !== lastQuery.current) {
     return <ChatSkeleton />
   }
 
@@ -80,7 +90,7 @@ const SearchUserResult = () => {
   }
 
   return (
-    <div className="flex flex-col gap-y-6 px-2">
+    <div className="flex flex-col gap-y-6 px-2 pb-10">
       {rooms.length > 0 && (
         <div className="flex flex-col gap-y-1">
           <h4 className="px-2 text-grey-2 subtitle-2">Recent users</h4>
@@ -97,13 +107,13 @@ const SearchUserResult = () => {
             )
           })}
 
-          {loadingRoom && rooms.length > 0 && (
+          {loadingRoom && searchQuery === lastQuery.current && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {roomCursorResult && (
+          {!loadingRoom && roomCursorResult && (
             <Button
               variant="link"
               onClick={() => setRoomCursor(roomCursorResult)}
@@ -130,13 +140,13 @@ const SearchUserResult = () => {
             )
           })}
 
-          {loadingUsers && users.length > 0 && (
+          {loadingUsers && searchQuery === lastQuery.current && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {usersCursorResult && (
+          {!loadingUsers && usersCursorResult && (
             <Button
               variant="link"
               onClick={() => setUserCursor(usersCursorResult)}

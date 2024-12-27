@@ -6,5 +6,8 @@ export const useSearchQuery = () => {
     parseAsString.withDefault("").withOptions({ clearOnDefault: true }),
   )
 
-  return { searchQuery, setSearchQuery }
+  return {
+    searchQuery: searchQuery === "" ? undefined : searchQuery,
+    setSearchQuery,
+  }
 }

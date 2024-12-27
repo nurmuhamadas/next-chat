@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { LoaderIcon } from "lucide-react"
 
@@ -13,6 +13,8 @@ import SearchResultItem from "./item"
 
 const SearchChannelResult = () => {
   const { searchQuery } = useSearchQuery()
+
+  const lastQuery = useRef<string | undefined>(searchQuery)
 
   const [joinedCursor, setJoinedCursor] = useState<string | undefined>()
   const [publicCursor, setPublicCursor] = useState<string | undefined>()
@@ -43,34 +45,40 @@ const SearchChannelResult = () => {
 
   useEffect(() => {
     if (!loadingJoined && joinedResult.length > 0) {
-      setJoinedChannels((v) => [...v, ...joinedResult])
+      if (joinedCursor) {
+        setJoinedChannels((v) => [...v, ...joinedResult])
+      } else {
+        setJoinedChannels([...joinedResult])
+      }
+
+      lastQuery.current = searchQuery
     }
-  }, [loadingJoined])
+  }, [loadingJoined, joinedCursor])
 
   useEffect(() => {
     if (!loadingPublic && publicResult.length > 0) {
-      setPublicChannels((v) => [...v, ...publicResult])
+      if (publicCursor) {
+        setPublicChannels((v) => [...v, ...publicResult])
+      } else {
+        setPublicChannels([...publicResult])
+      }
+
+      lastQuery.current = searchQuery
     }
-  }, [loadingPublic])
+  }, [loadingPublic, publicCursor])
 
   useEffect(() => {
     setJoinedCursor(undefined)
     setPublicCursor(undefined)
-    setJoinedChannels([])
-    setPublicChannels([])
   }, [searchQuery])
 
-  if (isLoading && isEmpty) {
-    return <ChatSkeleton />
-  }
-
-  if (isLoading) {
+  if (isLoading && searchQuery !== lastQuery.current) {
     return <ChatSkeleton />
   }
 
   if (isEmpty) {
     return (
-      <div className="size-full pt-8 flex-col-center">
+      <div className="size-full pb-10 pt-8 flex-col-center">
         <p className="text-muted-foreground">No search found</p>
       </div>
     )
@@ -94,13 +102,13 @@ const SearchChannelResult = () => {
             )
           })}
 
-          {loadingJoined && joinedChannels.length > 0 && (
+          {loadingJoined && searchQuery === lastQuery.current && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {joinedCursorResult && (
+          {!loadingJoined && joinedCursorResult && (
             <Button
               variant="link"
               onClick={() => setJoinedCursor(joinedCursorResult)}
@@ -127,13 +135,13 @@ const SearchChannelResult = () => {
             )
           })}
 
-          {loadingPublic && publicChannels.length > 0 && (
+          {loadingPublic && searchQuery === lastQuery.current && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {publicCursorResult && (
+          {!loadingPublic && publicCursorResult && (
             <Button
               variant="link"
               onClick={() => setPublicCursor(publicCursorResult)}
