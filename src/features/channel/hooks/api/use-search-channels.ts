@@ -1,21 +1,19 @@
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
 const useSearchChannels = ({
   queryKey,
   limit,
-  cursor,
 }: {
   queryKey?: string
   limit?: string
-  cursor?: string
 }) => {
-  const query = useQuery({
-    queryKey: ["search-channels", queryKey, limit, cursor],
-    queryFn: async () => {
+  const query = useInfiniteQuery({
+    queryKey: ["search-channels", queryKey, limit],
+    queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await client.api.channels.search.$get({
-        query: { query: queryKey, limit, cursor },
+        query: { query: queryKey, limit, cursor: pageParam },
       })
 
       const result = await response.json()
@@ -25,13 +23,22 @@ const useSearchChannels = ({
 
       return result
     },
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
   })
+
+  const data = query.data
+    ? query.data.pages.reduce<ChannelSearch[]>(
+        (acc, curr) => [...acc, ...curr.data],
+        [],
+      )
+    : []
 
   return {
     ...query,
-    data: query.data?.data ?? [],
-    total: query.data?.total,
-    cursor: query.data?.cursor,
+    data,
+    pages: query.data ? query.data.pages : [],
+    pageParams: query.data ? query.data.pageParams : [],
   }
 }
 

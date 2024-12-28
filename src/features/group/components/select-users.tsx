@@ -26,7 +26,7 @@ const SelectUsers = ({
 }: SelectUsersProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const { data: users, total, isLoading } = useSearchUsers({ queryKey: "" })
+  const { data: users, isLoading } = useSearchUsers({ queryKey: "" })
 
   const selectedUsers = users.filter((v) => selectedIds.includes(v.id))
 
@@ -60,13 +60,13 @@ const SelectUsers = ({
               <Loading />
             </div>
           )}
-          {!isLoading && total === 0 && (
+          {!isLoading && users.length === 0 && (
             <div className="min-h-48 flex-center">
               <p className="text-muted-foreground">No user found</p>
             </div>
           )}
           {!isLoading &&
-            total > 0 &&
+            users.length > 0 &&
             users.map(({ id, name, lastSeenAt, imageUrl }) => {
               return (
                 <DropdownMenuItem

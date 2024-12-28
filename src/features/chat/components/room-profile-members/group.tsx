@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
-
 import Link from "next/link"
+
+import { LoaderIcon } from "lucide-react"
 
 import ChatAvatar from "@/components/chat-avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -15,26 +15,29 @@ const RoomProfileMembersGroup = () => {
 
   const { roomProfileOpen } = useRoomProfile()
 
-  const [members, setMembers] = useState<GroupMember[]>([])
-
   const { data: groupOption, isLoading: loadingOption } = useGetGroupOption({
     groupId: roomProfileOpen ? id : undefined,
   })
-  const { data: memberResult, isLoading: loadingMembers } = useGetGroupMembers({
-    groupId: roomProfileOpen ? id : undefined,
+  const { data: members, isLoading: loadingMembers } = useGetGroupMembers({
+    groupId: !!groupOption ? id : undefined,
   })
 
   const isLoading = loadingOption || loadingMembers
-  const isNoMemberView = isLoading || !groupOption || members.length === 0
 
-  useEffect(() => {
-    if (!isLoading && groupOption && memberResult) {
-      setMembers(memberResult)
-    }
-  }, [isLoading])
+  if (isLoading && members.length === 0) {
+    return (
+      <div className="h-24 flex-center">
+        <LoaderIcon className="size-4 animate-spin" />
+      </div>
+    )
+  }
 
-  if (isNoMemberView) {
-    return null
+  if (members.length === 0) {
+    return (
+      <div className="h-24 flex-center">
+        <p className="">No group members</p>
+      </div>
+    )
   }
 
   return (

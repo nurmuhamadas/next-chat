@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react"
-
 import Image from "next/image"
 
 import { LoaderIcon } from "lucide-react"
 
 import ChatSkeleton from "@/components/chat-skeleton"
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 
@@ -13,39 +12,15 @@ import useGetRooms from "../hooks/api/use-get-rooms"
 import RoomListItem from "./room-list-item"
 
 const RoomListView = () => {
-  const [cursor] = useState<string | undefined>(undefined)
-  const [rooms, setRooms] = useState<Room[]>([])
-
   const { data: settings, isLoading: settingLoading } = useGetSetting()
-  const { data: roomsResult, isFetching: loadingRooms } = useGetRooms({
-    cursor,
-  })
+  const {
+    data: rooms,
+    isFetching: loadingRooms,
+    hasNextPage,
+    fetchNextPage,
+  } = useGetRooms({})
 
   const isLoading = loadingRooms || settingLoading
-
-  useEffect(() => {
-    if (!loadingRooms && roomsResult.length > 0) {
-      setRooms((v) => {
-        const newRooms = [
-          ...v.filter((room) => !roomsResult.some((res) => res.id === room.id)),
-          ...roomsResult,
-        ].sort((a, b) => {
-          if (b.lastMessage && a.lastMessage) {
-            return b.lastMessage.id.localeCompare(a.lastMessage.id)
-          }
-          if (b.lastMessage) {
-            return b.lastMessage.id.localeCompare(a.id)
-          }
-          if (a.lastMessage) {
-            return b.id.localeCompare(a.lastMessage.id)
-          }
-          return b.id.localeCompare(a.id)
-        })
-
-        return newRooms
-      })
-    }
-  }, [loadingRooms])
 
   if (isLoading && rooms.length === 0) {
     return <ChatSkeleton rows={5} />
@@ -89,6 +64,12 @@ const RoomListView = () => {
           <div className="h-24 flex-center">
             <LoaderIcon className="size-5 animate-spin" />
           </div>
+        )}
+
+        {!loadingRooms && hasNextPage && (
+          <Button variant="link" onClick={() => fetchNextPage()}>
+            Show more
+          </Button>
         )}
       </ul>
     </ScrollArea>

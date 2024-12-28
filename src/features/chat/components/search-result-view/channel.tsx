@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 
 import { LoaderIcon } from "lucide-react"
 
@@ -16,61 +16,27 @@ const SearchChannelResult = () => {
 
   const lastQuery = useRef<string | undefined>(searchQuery)
 
-  const [joinedCursor, setJoinedCursor] = useState<string | undefined>()
-  const [publicCursor, setPublicCursor] = useState<string | undefined>()
-  const [joinedChannels, setJoinedChannels] = useState<ChannelSearch[]>([])
-  const [publicChannels, setPublicChannels] = useState<ChannelSearch[]>([])
-
   const {
-    data: joinedResult,
-    cursor: joinedCursorResult,
+    data: joinedChannels,
     isLoading: loadingJoined,
+    hasNextPage: hasNextJoined,
+    fetchNextPage: fetchNextJoined,
   } = useGetChannels({
     queryKey: searchQuery,
-    cursor: joinedCursor,
     limit: "5",
   })
   const {
-    data: publicResult,
-    cursor: publicCursorResult,
+    data: publicChannels,
     isLoading: loadingPublic,
+    hasNextPage: hasNextPublic,
+    fetchNextPage: fetchNextPublic,
   } = useSearchChannels({
     queryKey: searchQuery,
-    cursor: publicCursor,
     limit: "5",
   })
 
   const isLoading = loadingPublic || loadingJoined
   const isEmpty = joinedChannels.length === 0 && publicChannels.length === 0
-
-  useEffect(() => {
-    if (!loadingJoined && joinedResult.length > 0) {
-      if (joinedCursor) {
-        setJoinedChannels((v) => [...v, ...joinedResult])
-      } else {
-        setJoinedChannels([...joinedResult])
-      }
-
-      lastQuery.current = searchQuery
-    }
-  }, [loadingJoined, joinedCursor])
-
-  useEffect(() => {
-    if (!loadingPublic && publicResult.length > 0) {
-      if (publicCursor) {
-        setPublicChannels((v) => [...v, ...publicResult])
-      } else {
-        setPublicChannels([...publicResult])
-      }
-
-      lastQuery.current = searchQuery
-    }
-  }, [loadingPublic, publicCursor])
-
-  useEffect(() => {
-    setJoinedCursor(undefined)
-    setPublicCursor(undefined)
-  }, [searchQuery])
 
   if (isLoading && searchQuery !== lastQuery.current) {
     return <ChatSkeleton />
@@ -108,11 +74,8 @@ const SearchChannelResult = () => {
             </div>
           )}
 
-          {!loadingJoined && joinedCursorResult && (
-            <Button
-              variant="link"
-              onClick={() => setJoinedCursor(joinedCursorResult)}
-            >
+          {!loadingJoined && hasNextJoined && (
+            <Button variant="link" onClick={() => fetchNextJoined()}>
               Show more
             </Button>
           )}
@@ -141,11 +104,8 @@ const SearchChannelResult = () => {
             </div>
           )}
 
-          {!loadingPublic && publicCursorResult && (
-            <Button
-              variant="link"
-              onClick={() => setPublicCursor(publicCursorResult)}
-            >
+          {!loadingPublic && hasNextPublic && (
+            <Button variant="link" onClick={() => fetchNextPublic()}>
               Show more
             </Button>
           )}

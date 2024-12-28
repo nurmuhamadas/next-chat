@@ -43,7 +43,7 @@ const roomApp = new Hono()
           },
           orderBy: [
             { pinnedAt: { sort: "asc", nulls: "last" } },
-            { lastMessage: { createdAt: "desc" } },
+            { lastMessageId: { sort: "desc", nulls: "last" } },
             { createdAt: "desc" },
           ],
           take: limit,
@@ -119,7 +119,7 @@ const roomApp = new Hono()
           },
           orderBy: [
             { pinnedAt: { sort: "asc", nulls: "last" } },
-            { lastMessage: { createdAt: "desc" } },
+            { lastMessageId: { sort: "desc", nulls: "last" } },
             { createdAt: "desc" },
           ],
           take: limit,
@@ -162,7 +162,7 @@ const roomApp = new Hono()
           },
           include: { ...getRoomIncludeQuery({ userId }) },
           orderBy: [
-            { lastMessage: { createdAt: "desc" } },
+            { lastMessageId: { sort: "desc", nulls: "first" } },
             { createdAt: "desc" },
           ],
           take: limit,
@@ -290,7 +290,7 @@ const roomApp = new Hono()
           },
           include: { ...getRoomIncludeQuery({ userId }) },
           orderBy: [
-            { lastMessage: { createdAt: "desc" } },
+            { lastMessageId: { sort: "desc", nulls: "first" } },
             { createdAt: "desc" },
           ],
           take: limit,

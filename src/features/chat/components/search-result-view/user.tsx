@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 
 import { LoaderIcon } from "lucide-react"
 
@@ -15,67 +15,27 @@ const SearchUserResult = () => {
 
   const lastQuery = useRef<string | undefined>(searchQuery)
 
-  const [roomCursor, setRoomCursor] = useState<string | undefined>()
-  const [userCursor, setUserCursor] = useState<string | undefined>()
-  const [rooms, setRooms] = useState<UserSearch[]>([])
-  const [users, setUsers] = useState<UserSearch[]>([])
-
   const {
-    data: roomResult,
-    cursor: roomCursorResult,
+    data: rooms,
     isLoading: loadingRoom,
+    hasNextPage: hasNextRooms,
+    fetchNextPage: fetchNextRooms,
   } = useSearchPrivateRooms({
     queryKey: searchQuery,
-    cursor: roomCursor,
     limit: "5",
   })
   const {
-    data: usersResult,
-    cursor: usersCursorResult,
+    data: users,
     isLoading: loadingUsers,
+    hasNextPage: hasNextUsers,
+    fetchNextPage: fetchNextUsers,
   } = useSearchUsers({
     queryKey: searchQuery,
-    cursor: userCursor,
     limit: "5",
   })
 
   const isLoading = loadingUsers || loadingRoom
   const isEmpty = rooms.length === 0 && users.length === 0
-
-  useEffect(() => {
-    if (!loadingRoom && roomResult.length > 0) {
-      const result = roomResult.map((room) => ({
-        id: room.id,
-        name: room.name,
-        imageUrl: room.imageUrl,
-        lastSeenAt: null,
-      }))
-      if (roomCursor) {
-        setRooms((v) => [...v, ...result])
-      } else {
-        setRooms([...result])
-      }
-
-      lastQuery.current = searchQuery
-    }
-  }, [loadingRoom, roomCursor])
-
-  useEffect(() => {
-    if (!loadingUsers && usersResult.length > 0) {
-      if (userCursor) {
-        setUsers((v) => [...v, ...usersResult])
-      } else {
-        setUsers([...usersResult])
-      }
-
-      lastQuery.current = searchQuery
-    }
-  }, [loadingUsers, userCursor])
-
-  useEffect(() => {
-    setRoomCursor(undefined)
-    setUserCursor(undefined)
-  }, [searchQuery])
 
   if (isLoading && searchQuery !== lastQuery.current) {
     return <ChatSkeleton />
@@ -113,11 +73,8 @@ const SearchUserResult = () => {
             </div>
           )}
 
-          {!loadingRoom && roomCursorResult && (
-            <Button
-              variant="link"
-              onClick={() => setRoomCursor(roomCursorResult)}
-            >
+          {!loadingRoom && hasNextRooms && (
+            <Button variant="link" onClick={() => fetchNextRooms()}>
               Show more
             </Button>
           )}
@@ -146,11 +103,8 @@ const SearchUserResult = () => {
             </div>
           )}
 
-          {!loadingUsers && usersCursorResult && (
-            <Button
-              variant="link"
-              onClick={() => setUserCursor(usersCursorResult)}
-            >
+          {!loadingUsers && hasNextUsers && (
+            <Button variant="link" onClick={() => fetchNextUsers()}>
               Show more
             </Button>
           )}

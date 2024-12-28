@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 
 import { LoaderIcon } from "lucide-react"
 
@@ -16,61 +16,27 @@ const SearchGroupResult = () => {
 
   const lastQuery = useRef<string | undefined>(searchQuery)
 
-  const [joinedCursor, setJoinedCursor] = useState<string | undefined>()
-  const [publicCursor, setPublicCursor] = useState<string | undefined>()
-  const [joinedGroups, setJoinedGroups] = useState<GroupSearch[]>([])
-  const [publicGroups, setPublicGroups] = useState<GroupSearch[]>([])
-
   const {
-    data: joinedResult,
-    cursor: joinedCursorResult,
+    data: joinedGroups,
     isLoading: loadingJoined,
+    fetchNextPage: nextJoinedGroups,
+    hasNextPage: hasNextJoined,
   } = useGetGroups({
     queryKey: searchQuery,
-    cursor: joinedCursor,
     limit: "5",
   })
   const {
-    data: publicResult,
-    cursor: publicCursorResult,
+    data: publicGroups,
     isLoading: loadingPublic,
+    fetchNextPage: nextPublicGroups,
+    hasNextPage: hasNextPublic,
   } = useSearchGroups({
     queryKey: searchQuery,
-    cursor: publicCursor,
     limit: "5",
   })
 
   const isLoading = loadingPublic || loadingJoined
   const isEmpty = joinedGroups.length === 0 && publicGroups.length === 0
-
-  useEffect(() => {
-    if (!loadingJoined && joinedResult.length > 0) {
-      if (joinedCursor) {
-        setJoinedGroups((v) => [...v, ...joinedResult])
-      } else {
-        setJoinedGroups([...joinedResult])
-      }
-
-      lastQuery.current = searchQuery
-    }
-  }, [loadingJoined, joinedCursor])
-
-  useEffect(() => {
-    if (!loadingPublic && publicResult.length > 0) {
-      if (publicCursor) {
-        setPublicGroups((v) => [...v, ...publicResult])
-      } else {
-        setPublicGroups([...publicResult])
-      }
-
-      lastQuery.current = searchQuery
-    }
-  }, [loadingPublic, publicCursor])
-
-  useEffect(() => {
-    setJoinedCursor(undefined)
-    setPublicCursor(undefined)
-  }, [searchQuery])
 
   if (isLoading && searchQuery !== lastQuery.current) {
     return <ChatSkeleton />
@@ -89,15 +55,15 @@ const SearchGroupResult = () => {
       {joinedGroups.length > 0 && (
         <div className="flex flex-col gap-y-1">
           <h4 className="px-2 text-grey-2 subtitle-2">Groups you joined</h4>
-          {joinedGroups.map((user) => {
+          {joinedGroups.map((group) => {
             return (
               <SearchResultItem
-                key={user.id}
-                id={user.id}
+                key={group.id}
+                id={group.id}
                 type="group"
-                title={user.name}
-                imageUrl={user.imageUrl ?? undefined}
-                description={`${user.totalMembers} members`}
+                title={group.name}
+                imageUrl={group.imageUrl ?? undefined}
+                description={`${group.totalMembers} members`}
               />
             )
           })}
@@ -108,11 +74,8 @@ const SearchGroupResult = () => {
             </div>
           )}
 
-          {!loadingJoined && joinedCursorResult && (
-            <Button
-              variant="link"
-              onClick={() => setJoinedCursor(joinedCursorResult)}
-            >
+          {!loadingJoined && hasNextJoined && (
+            <Button variant="link" onClick={() => nextJoinedGroups()}>
               Show more
             </Button>
           )}
@@ -141,11 +104,8 @@ const SearchGroupResult = () => {
             </div>
           )}
 
-          {!loadingPublic && publicCursorResult && (
-            <Button
-              variant="link"
-              onClick={() => setPublicCursor(publicCursorResult)}
-            >
+          {!loadingPublic && hasNextPublic && (
+            <Button variant="link" onClick={() => nextPublicGroups()}>
               Show more
             </Button>
           )}

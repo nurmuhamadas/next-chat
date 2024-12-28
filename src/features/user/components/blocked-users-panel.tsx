@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react"
-
 import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
 
@@ -19,21 +17,13 @@ const BlockedUsersPanel = () => {
 
   const { mutate: unblockUser, isPending: isUnblocking } = useUnblockUser()
 
-  const [cursor, setCursor] = useState<string | undefined>(undefined)
-  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([])
-
   const {
-    data,
+    data: blockedUsers,
     isLoading,
-    cursor: cursorResult,
     refetch,
-  } = useGetBlockedUsers({ cursor, enabled: isBlockedUsersOpen })
-
-  useEffect(() => {
-    if (!isLoading) {
-      setBlockedUsers(data)
-    }
-  }, [isLoading, data.length])
+    hasNextPage,
+    fetchNextPage,
+  } = useGetBlockedUsers({ enabled: isBlockedUsersOpen })
 
   const handleUnblockUser = async (id: string) => {
     unblockUser(
@@ -96,8 +86,8 @@ const BlockedUsersPanel = () => {
         </div>
       )}
 
-      {!isLoading && cursorResult && (
-        <Button variant="link" onClick={() => setCursor(cursorResult)}>
+      {!isLoading && hasNextPage && (
+        <Button variant="link" onClick={() => fetchNextPage()}>
           Show more
         </Button>
       )}

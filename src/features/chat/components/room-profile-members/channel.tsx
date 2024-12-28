@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
-
 import Link from "next/link"
 
+import { LoaderIcon } from "lucide-react"
+
 import ChatAvatar from "@/components/chat-avatar"
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
 import useGetChannelSubscribers from "@/features/channel/hooks/api/use-get-channel-subscribers"
@@ -15,26 +16,32 @@ const RoomProfileMembersChannel = () => {
 
   const { roomProfileOpen } = useRoomProfile()
 
-  const [subscribers, setSubscribers] = useState<ChannelSubscriber[]>([])
-
   const { data: channelOption, isLoading: loadingOption } = useGetChannelOption(
     { channelId: roomProfileOpen ? id : undefined },
   )
-  const { data: subsResult, isLoading: loadingSubs } = useGetChannelSubscribers(
-    { channelId: roomProfileOpen ? id : undefined },
-  )
+  const {
+    data: subscribers,
+    isLoading: loadingSubs,
+    hasNextPage,
+    fetchNextPage,
+  } = useGetChannelSubscribers({ channelId: !!channelOption ? id : undefined })
 
   const isLoading = loadingOption || loadingSubs
-  const isNoSubsView = isLoading || !channelOption || subscribers.length === 0
 
-  useEffect(() => {
-    if (!isLoading && channelOption && subsResult) {
-      setSubscribers(subsResult)
-    }
-  }, [isLoading])
+  if (isLoading && subscribers.length === 0) {
+    return (
+      <div className="h-24 flex-center">
+        <LoaderIcon className="size-4 animate-spin" />
+      </div>
+    )
+  }
 
-  if (isNoSubsView) {
-    return null
+  if (subscribers.length === 0) {
+    return (
+      <div className="h-24 flex-center">
+        <p className="">No group members</p>
+      </div>
+    )
   }
 
   return (
@@ -61,6 +68,22 @@ const RoomProfileMembersChannel = () => {
                 )
               })}
             </ul>
+
+            {isLoading && subscribers.length > 0 && (
+              <div className="h-24 flex-center">
+                <LoaderIcon className="size-4 animate-spin" />
+              </div>
+            )}
+
+            {!isLoading && hasNextPage && (
+              <Button
+                variant="link"
+                className="mt-4"
+                onClick={() => fetchNextPage()}
+              >
+                Show more
+              </Button>
+            )}
           </ScrollArea>
         </div>
       )}

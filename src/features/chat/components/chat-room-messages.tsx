@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 
 import Image from "next/image"
 
@@ -43,23 +43,17 @@ const ChatRoomMessages = ({
   const { editedMessageId } = useEditedMessageId()
   const { deletedMessageId } = useDeletedMessageId()
 
-  const [cursor, setCursor] = useState<string | undefined>()
-  const [messages, setMessages] = useState<Message[]>([])
-
   const { mutate: joinGroup, isPending: isJoiningGroup } = useJoinGroup()
   const { mutate: joinChannel, isPending: isJoiningChannel } = useJoinChannel()
 
   const { data: setting } = useGetSetting()
   const {
-    data: messagesResult,
+    data: messages,
     isLoading: loadingMessage,
-    cursor: cursorResult,
-  } = useGetMessages({ id, roomType: type, cursor })
+    hasNextPage,
+    fetchNextPage,
+  } = useGetMessages({ id, roomType: type })
 
-  const messagesResultStr = useMemo(
-    () => JSON.stringify(messagesResult),
-    [messagesResult],
-  )
   const messagesStr = useMemo(() => JSON.stringify(messages), [messages])
 
   const isLoading = loadingMessage
@@ -99,21 +93,6 @@ const ChatRoomMessages = ({
   )
 
   const groupedMessages = groupingMessage(messages)
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (cursor) {
-        setMessages((prev) =>
-          [
-            ...prev.filter((m) => !messagesResult.some((r) => r.id === m.id)),
-            ...messagesResult,
-          ].sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-        )
-      } else {
-        setMessages([...messagesResult])
-      }
-    }
-  }, [type, isLoading, cursor, messagesResultStr])
 
   useEffect(() => {
     if (!isLoading) {
@@ -214,11 +193,11 @@ const ChatRoomMessages = ({
           isAdmin={group?.isAdmin || channel?.isAdmin || false}
           messages={groupedMessages}
           timeFormat={setting?.timeFormat ?? "12-HOUR"}
-          canLoadMore={!!cursorResult}
+          canLoadMore={hasNextPage}
           isLoading={isLoading}
           loadMore={() => {
-            if (cursorResult) {
-              setCursor(cursorResult)
+            if (hasNextPage) {
+              fetchNextPage()
             }
           }}
         />

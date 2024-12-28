@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useInfiniteQuery } from "@tanstack/react-query"
 
 import { client } from "@/lib/rpc"
 
@@ -6,24 +6,22 @@ const useGetMessages = ({
   id = "",
   roomType,
   limit,
-  cursor,
 }: {
   id: string
   roomType: RoomType
   limit?: string
-  cursor?: string
 }) => {
   const type =
     roomType === "chat" ? "private" : roomType === "group" ? "group" : "channel"
 
-  const query = useQuery({
-    queryKey: ["get-messages", id, type, limit, cursor],
-    queryFn: async () => {
+  const query = useInfiniteQuery({
+    queryKey: ["get-messages", id, type, limit],
+    queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await client.api.messages[":roomType"][
         ":receiverId"
       ].$get({
         param: { roomType: type, receiverId: id },
-        query: { limit, cursor },
+        query: { limit, cursor: pageParam },
       })
 
       const result = await response.json()
@@ -34,13 +32,22 @@ const useGetMessages = ({
       return result
     },
     enabled: !!id && !!type,
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
   })
+
+  const data = query.data
+    ? query.data.pages.reduce<Message[]>(
+        (acc, curr) => [...acc, ...curr.data],
+        [],
+      )
+    : []
 
   return {
     ...query,
-    data: query.data?.data ?? [],
-    total: query.data?.total ?? 0,
-    cursor: query.data?.cursor,
+    data,
+    pages: query.data ? query.data.pages : [],
+    pageParams: query.data ? query.data.pageParams : [],
   }
 }
 
