@@ -1,4 +1,7 @@
-import { XIcon } from "lucide-react"
+import { useState } from "react"
+
+import { useQueryClient } from "@tanstack/react-query"
+import { Loader2Icon, LoaderIcon, XIcon } from "lucide-react"
 
 import ChatAvatar from "@/components/chat-avatar"
 import SearchBar from "@/components/search-bar"
@@ -10,15 +13,94 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useRoomType } from "@/hooks/use-room-type"
+import useGetChannels from "@/features/channel/hooks/api/use-get-channels"
+import useGetGroups from "@/features/group/hooks/api/use-get-groups"
+import useForwardMessage from "@/features/messages/hooks/api/use-forward-message"
+import { debounce, roomTypeToRoomTypeModel } from "@/lib/utils"
 
-import { useForwardMessage } from "../hooks/use-forward-message"
+import useSearchPrivateRooms from "../hooks/api/use-search-private-rooms"
+import { useForwardMessageModal } from "../hooks/use-forward-message-modal"
 
 const ForwardMessageModal = () => {
-  const type = useRoomType()
-  const { isForwardModalOpen, cancelForwardMessage } = useForwardMessage()
+  const queryClient = useQueryClient()
 
-  const handleSelectUser = () => {}
+  const { forwardMessageId, isForwardModalOpen, cancelForwardMessage } =
+    useForwardMessageModal()
+  const { mutate: forwardMessage, isPending: isForwarding } =
+    useForwardMessage()
+
+  const [searchKey, setSearchKey] = useState("")
+  const [sendingId, setSendingId] = useState("")
+
+  const { data: userRooms, isLoading: loadingRoom } = useSearchPrivateRooms({
+    queryKey: searchKey,
+    limit: "5",
+    enabled: isForwardModalOpen,
+  })
+  const { data: groups, isLoading: loadingGroups } = useGetGroups({
+    queryKey: searchKey,
+    limit: "5",
+    enabled: isForwardModalOpen,
+  })
+  const { data: channels, isLoading: loadingChannels } = useGetChannels({
+    queryKey: searchKey,
+    limit: "5",
+    enabled: isForwardModalOpen,
+  })
+  const isLoading = loadingRoom || loadingGroups || loadingChannels
+
+  const debouncedSearchKey = debounce((value: string) => {
+    setSearchKey(value)
+  }, 500)
+
+  const handleSelectUser = (id: string, type: RoomType) => {
+    setSendingId(id)
+
+    forwardMessage(
+      {
+        param: { messageId: forwardMessageId },
+        json: {
+          roomType: roomTypeToRoomTypeModel(type),
+          receiverId: id,
+        },
+      },
+      {
+        onSuccess() {
+          setSendingId("")
+          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+        },
+      },
+    )
+  }
+
+  const list: {
+    id: string
+    type: RoomType
+    name: string
+    imageUrl: string | null
+    info?: string
+  }[] = [
+    ...userRooms.map((v) => ({
+      id: v.id,
+      type: "chat" as RoomType,
+      name: v.name,
+      imageUrl: v.imageUrl,
+    })),
+    ...groups.map((v) => ({
+      id: v.id,
+      type: "group" as RoomType,
+      name: v.name,
+      imageUrl: v.imageUrl,
+      info: `${v.totalMembers} members`,
+    })),
+    ...channels.map((v) => ({
+      id: v.id,
+      type: "channel" as RoomType,
+      name: v.name,
+      imageUrl: v.imageUrl,
+      info: `${v.totalSubscribers} subscribers`,
+    })),
+  ].sort((a, b) => b.id.localeCompare(a.id))
 
   return (
     <Dialog open={isForwardModalOpen} onOpenChange={cancelForwardMessage}>
@@ -27,40 +109,56 @@ const ForwardMessageModal = () => {
           <DialogTitle>Forward to</DialogTitle>
         </DialogHeader>
 
-        <div className="flex max-h-[500px] flex-col gap-y-6 p-3">
+        <div className="flex h-[400px] flex-col gap-y-6 p-3">
           <div className="flex items-center gap-x-2">
-            <SearchBar placeholder="Forward to..." className="flex-1" />
+            <SearchBar
+              placeholder="Forward to..."
+              className="flex-1"
+              onValueChange={debouncedSearchKey}
+            />
             <Button variant="icon" size="icon" onClick={cancelForwardMessage}>
               <XIcon />
             </Button>
           </div>
 
-          <ScrollArea className="chat-list-scroll-area">
-            <ul className="flex w-full flex-col">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((v) => {
-                const info =
-                  type === "chat"
-                    ? `Last seen at 12:00`
-                    : type === "channel"
-                      ? `2 subscribers`
-                      : "2 members"
+          {isLoading && (
+            <div className="h-40 w-full flex-center">
+              <LoaderIcon className="size-5 animate-spin" />
+            </div>
+          )}
 
-                return (
-                  <li
-                    key={v}
-                    className="flex cursor-pointer items-center gap-x-3 rounded-lg p-2 hover:bg-grey-4"
-                    onClick={() => handleSelectUser()}
-                  >
-                    <ChatAvatar />
-                    <div className="flex flex-1 flex-col gap-y-0.5">
-                      <p className="subtitle-2">User/Group/Channel Name</p>
-                      <p className="text-muted-foreground caption">{info}</p>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          </ScrollArea>
+          {!isLoading && list.length === 0 && (
+            <div className="h-40 flex-center">
+              <p className="">No search found</p>
+            </div>
+          )}
+
+          {!isLoading && list.length > 0 && (
+            <ScrollArea className="chat-list-scroll-area">
+              <ul className="flex w-full flex-col">
+                {list.map((v) => {
+                  return (
+                    <li
+                      key={v.id}
+                      className="flex cursor-pointer items-center gap-x-3 rounded-lg p-2 hover:bg-grey-4"
+                      onClick={() => handleSelectUser(v.id, v.type)}
+                    >
+                      <ChatAvatar name={v.name} src={v.imageUrl ?? ""} />
+                      <div className="flex flex-1 flex-col gap-y-0.5">
+                        <p className="subtitle-2">{v.name}</p>
+                        <p className="text-muted-foreground caption">
+                          {v.info}
+                        </p>
+                      </div>
+                      {isForwarding && v.id === sendingId && (
+                        <Loader2Icon className="mr-2 size-5 animate-spin" />
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </ScrollArea>
+          )}
         </div>
       </DialogContent>
     </Dialog>

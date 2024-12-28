@@ -18,13 +18,11 @@ export const validateMessage = async ({
   userId,
   receiverId,
   parentMessageId,
-  originalMessageId,
 }: {
   roomType: RoomType
   receiverId: string
   userId: string
   parentMessageId?: string
-  originalMessageId?: string
 }): Promise<
   | undefined
   | {
@@ -96,9 +94,9 @@ export const validateMessage = async ({
     }
   }
 
-  if (!parentMessageId && !originalMessageId) return undefined
-  const attMessages = await prisma.message.findMany({
-    where: { id: { in: [originalMessageId ?? "", parentMessageId ?? ""] } },
+  if (!parentMessageId) return undefined
+  const parentMessage = await prisma.message.findUnique({
+    where: { id: parentMessageId },
     select: {
       id: true,
       privateChat:
@@ -110,16 +108,6 @@ export const validateMessage = async ({
     },
   })
 
-  const originalMessage = attMessages.find((v) => v.id === originalMessageId)
-  if (originalMessageId && !originalMessage) {
-    return {
-      error: ERROR.MESSAGE_NOT_FOUND,
-      code: 400,
-      path: ["originalMessageId"],
-    }
-  }
-
-  const parentMessage = attMessages.find((v) => v.id === parentMessageId)
   if (parentMessageId) {
     if (!parentMessage) {
       return {
@@ -145,13 +133,16 @@ export const validateMessage = async ({
         code: 400,
         path: ["parentMessageId"],
       }
-    } else if (parentMessage.groupId !== receiverId) {
+    } else if (parentMessage.groupId && parentMessage.groupId !== receiverId) {
       return {
         error: ERROR.PARENT_MESSAGE_NOT_IN_ROOM,
         code: 400,
         path: ["parentMessageId"],
       }
-    } else if (parentMessage.channelId !== receiverId) {
+    } else if (
+      parentMessage.channelId &&
+      parentMessage.channelId !== receiverId
+    ) {
       return {
         error: ERROR.PARENT_MESSAGE_NOT_IN_ROOM,
         code: 400,

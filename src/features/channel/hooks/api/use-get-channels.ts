@@ -6,13 +6,16 @@ const useGetChannels = ({
   queryKey,
   limit,
   cursor,
+  enabled = true,
 }: {
   queryKey?: string
   limit?: string
   cursor?: string
+  enabled?: boolean
 }) => {
   const query = useQuery({
     queryKey: ["get-channels", queryKey, limit, cursor],
+    enabled,
     queryFn: async () => {
       const response = await client.api.channels.$get({
         query: { query: queryKey, limit, cursor },

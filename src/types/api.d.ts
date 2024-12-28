@@ -174,6 +174,8 @@ declare type CreateMessageResponse = ApiResponse<Message>
 
 declare type GetMessagesResponse = ApiCollectionResponse<Message>
 
+declare type ForwardMessageResponse = ApiResponse<Message>
+
 declare type UpdateMessageResponse = ApiResponse<Message>
 
 declare type ReactMessageResponse = ApiResponse<Reaction>

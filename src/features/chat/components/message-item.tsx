@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 import { DownloadIcon, EyeIcon } from "lucide-react"
 import { PhotoProvider, PhotoView } from "react-photo-view"
@@ -15,20 +16,20 @@ import MessageMenu from "./message-menu"
 import "react-photo-view/dist/react-photo-view.css"
 
 interface MessageItemProps {
+  isAdmin: boolean
   classNames?: string
   message: Message
-  type?: "private" | "group" | "channel"
-  isSender?: boolean
+  type?: RoomType
   isSelected?: boolean
   timeFormat?: TimeFormat
   onClickParentMessage?(id: string): void
 }
 
 const MessageItem = ({
+  isAdmin,
   classNames,
   message,
-  type = "private",
-  isSender = false,
+  type = "chat",
   isSelected = false,
   timeFormat = "12-HOUR",
   onClickParentMessage,
@@ -38,12 +39,16 @@ const MessageItem = ({
   const isEmojiOnly = message.isEmojiOnly
   const isForwarded = !!message.originalMessageId
 
+  const isDeleted =
+    message.status === "DELETED_BY_ADMIN" ||
+    message.status === "DELETED_FOR_ALL"
+
   return (
     <div
       id={message.id}
       className={cn(
         "flex w-full  rounded-md",
-        isSender ? "justify-end" : "justify-start",
+        message.isSender ? "justify-end" : "justify-start",
         isSelectMode && "hover:bg-black/10",
         classNames,
       )}
@@ -54,25 +59,36 @@ const MessageItem = ({
       }}
     >
       {isSelectMode && (
-        <div className={cn("pt-4 pl-2", isSender ? "mr-auto" : "mr-4")}>
+        <div className={cn("pt-4 pl-2", message.isSender ? "mr-auto" : "mr-4")}>
           <Checkbox checked={isSelected} />
         </div>
       )}
 
-      <div className="flex gap-x-2">
-        {type !== "private" && <ChatAvatar className="size-8" />}
+      <div className={cn("flex gap-x-2")}>
+        {type !== "chat" && !message.isSender && (
+          <Link href={`/chat/${message.sender.id}`}>
+            <ChatAvatar
+              src={message.sender.imageUrl ?? ""}
+              name={message.sender.name}
+              className="size-8 cursor-pointer"
+            />
+          </Link>
+        )}
         <div
           className={cn(
-            "pt-1 px-2.5 pb-1 rounded-lg w-full max-w-[475px]",
-            isSender ? "bg-bubble-2" : "bg-bubble-1",
+            "pt-1 px-2.5 pb-1 min-w-24 rounded-lg w-full max-w-[475px]",
+            message.isSender ? "bg-bubble-2" : "bg-bubble-1",
           )}
         >
           <div className="gap-x-8 flex-center-between">
             <div className="flex items-center gap-x-1">
-              {!isSender && type !== "private" && (
-                <span className="line-clamp-1 !font-medium text-primary caption">
+              {!message.isSender && type !== "chat" && (
+                <Link
+                  href={`/chat/${message.sender.id}`}
+                  className="line-clamp-1 !font-medium text-primary caption"
+                >
                   {message.sender.name}
-                </span>
+                </Link>
               )}
 
               {isForwarded && (
@@ -82,16 +98,18 @@ const MessageItem = ({
               )}
             </div>
 
-            <div className="gap-x-2 flex-center-end">
-              <MessageMenu isSender={isSender} message={message} />
-            </div>
+            {!isDeleted && (
+              <div className="gap-x-2 flex-center-end">
+                <MessageMenu message={message} isAdmin={isAdmin} />
+              </div>
+            )}
           </div>
 
           {message.parentMessageName && message.parentMessageText && (
             <div
               className={cn(
                 "flex flex-col rounded-sm border-l-4 px-2 py-1 mt-1 cursor-pointer",
-                isSender ? "bg-bubble-reply-2" : "bg-bubble-reply-1",
+                message.isSender ? "bg-bubble-reply-2" : "bg-bubble-reply-1",
               )}
               onClick={() => {
                 if (message.parentMessageId) {
@@ -204,14 +222,22 @@ const MessageItem = ({
 
           {/* <Image src="" /> */}
 
-          <p className={cn("mt-1", isEmojiOnly ? "text-[72px]" : "body-2")}>
+          <p
+            className={cn(
+              "mt-1",
+              isEmojiOnly ? "text-[72px]" : "body-2",
+              (message.status === "DELETED_BY_ADMIN" ||
+                message.status === "DELETED_FOR_ALL") &&
+                "italic opacity-75",
+            )}
+          >
             {message.message}
           </p>
 
           <div className="mt-1.5 flex items-center justify-end gap-x-2">
             <div className="">{/* Reaction here */}</div>
 
-            {message.updatedAt && (
+            {message.isUpdated && (
               <span className="italic text-muted-foreground caption">
                 Edited
               </span>

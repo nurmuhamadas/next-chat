@@ -18,6 +18,7 @@ import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 import ChatInput from "./chat-input"
 import ChatRoomHeader from "./chat-room-header"
 import ChatRoomMessages from "./chat-room-messages"
+import DeleteMessageModal from "./delete-message-modal"
 import ForwardMessageModal from "./forward-message-modal"
 import SelectedMessageMenu from "./selected-messages-menu"
 
@@ -32,6 +33,7 @@ const ChatRoom = () => {
 
   const [repliedMessage, setRepliedMessage] = useState<Message | undefined>()
   const [editedMessage, setEditedMessage] = useState<Message | undefined>()
+  const [deletedMessage, setDeletedMessage] = useState<Message | undefined>()
 
   const { isSelectMode } = useSelectedMessageIds()
 
@@ -47,6 +49,7 @@ const ChatRoom = () => {
 
   const isLoading = loadingGroup || loadingChannel || loadingRoom
   const isGroupMember = group?.isMember ?? false
+  const isGroupAdmin = group?.isAdmin ?? false
   const isChannelSubs = channel?.isSubscribers ?? false
   const isChannelAdmin = channel?.isAdmin ?? false
 
@@ -88,6 +91,7 @@ const ChatRoom = () => {
               channel={channel}
               onRepliedMessageChange={setRepliedMessage}
               onEditMessageChange={setEditedMessage}
+              onDeletedMessageChange={setDeletedMessage}
             />
 
             {!hideInput && (
@@ -109,6 +113,11 @@ const ChatRoom = () => {
       <RightPanel />
 
       <ForwardMessageModal />
+
+      <DeleteMessageModal
+        isAdmin={isGroupAdmin || isChannelAdmin}
+        message={deletedMessage}
+      />
     </div>
   )
 }

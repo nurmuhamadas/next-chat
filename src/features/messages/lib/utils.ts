@@ -3,7 +3,6 @@ import {
   Message as MessageModel,
   Profile as ProfileModel,
 } from "@prisma/client"
-import { isAfter } from "date-fns"
 
 export const getMessageInludeQuery = () => ({
   attachments: true,
@@ -54,6 +53,7 @@ export const getFileType = (mimeType: string): AttachmentType => {
 }
 
 export const mapMessageModelToMessage = (
+  userId: string,
   message: MessageModel & {
     attachments: AttachmentModel[]
     repliedMessage:
@@ -70,35 +70,53 @@ export const mapMessageModelToMessage = (
     }
   },
 ): Message => {
+  const isDeleted =
+    message.status === "DELETED_BY_ADMIN" ||
+    message.status === "DELETED_FOR_ALL"
+
+  let messageText = message.message
+  if (isDeleted) {
+    messageText = message.status
+  }
+
   return {
     id: message.id,
-    message: message.message,
+    message: messageText,
     sender: {
       id: message.sender.id,
       name: message.sender.profile?.name ?? "Unknown",
       imageUrl: message.sender.profile?.imageUrl ?? null,
     },
+    isSender: userId === message.sender.id,
     privateChatId: message.privateChatId,
     groupId: message.groupId,
     channelId: message.channelId,
-    isEmojiOnly: message.isEmojiOnly,
+    isEmojiOnly: isDeleted ? false : message.isEmojiOnly,
     originalMessageId: message.originalMessageId,
-    parentMessageId: message.repliedMessage?.id ?? null,
-    parentMessageName: message.repliedMessage?.sender.profile?.name ?? null,
-    parentMessageText: message.repliedMessage?.message ?? null,
+    parentMessageId: isDeleted ? null : (message.repliedMessage?.id ?? null),
+    parentMessageName: isDeleted
+      ? null
+      : (message.repliedMessage?.sender.profile?.name ?? null),
+    parentMessageText: isDeleted
+      ? null
+      : (message.repliedMessage?.message ?? null),
     status: message.status,
-    attachments: message.attachments.map((att) => {
-      return {
-        id: att.id,
-        name: att.name,
-        size: att.size,
-        type: att.type,
-        url: att.url,
-        downloadUrl: att.downloadUrl,
-        messageId: message.id,
-      }
-    }),
-    isUpdated: isAfter(message.updatedAt, message.createdAt),
+    attachments: isDeleted
+      ? []
+      : message.attachments.map((att) => {
+          return {
+            id: att.id,
+            name: att.name,
+            size: att.size,
+            type: att.type,
+            url: att.url,
+            downloadUrl: att.downloadUrl,
+            messageId: message.id,
+          }
+        }),
+    isUpdated: isDeleted
+      ? false
+      : message.updatedAt.toISOString() !== message.createdAt.toISOString(),
     createdAt: message.createdAt?.toISOString(),
     updatedAt: message.updatedAt?.toISOString() ?? null,
   }

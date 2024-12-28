@@ -2,6 +2,7 @@
 
 import { ChangeEventHandler, useEffect, useRef, useState } from "react"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import {
   ImageIcon,
@@ -35,6 +36,8 @@ interface ChatInputProps {
 }
 
 const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
+  const queryClient = useQueryClient()
+
   const type = useRoomType()
   const id = useRoomId()
 
@@ -77,6 +80,12 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             setIsEmojiOnly(false)
             setRecordedAudio(undefined)
             cancelEditMessage()
+            cancelReplyMessage()
+
+            queryClient.invalidateQueries({
+              queryKey: ["get-messages", id, type, undefined, undefined],
+            })
+            queryClient.invalidateQueries({ queryKey: ["rooms"] })
           },
         },
       )
@@ -103,6 +112,13 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             setAttachments([])
             setIsEmojiOnly(false)
             setRecordedAudio(undefined)
+            cancelEditMessage()
+            cancelReplyMessage()
+
+            queryClient.invalidateQueries({
+              queryKey: ["get-messages", id, type, undefined, undefined],
+            })
+            queryClient.invalidateQueries({ queryKey: ["rooms"] })
           },
         },
       )

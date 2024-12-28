@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useGetMyProfile } from "@/features/user/hooks/api/use-get-my-profile"
+import { useRoomType } from "@/hooks/use-room-type"
 
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
@@ -13,6 +13,7 @@ import MessageItem from "./message-item"
 
 export type GroupedMessage = { time: string; messages: Message[] }
 interface MessageListProps {
+  isAdmin: boolean
   messages: GroupedMessage[]
   timeFormat?: TimeFormat
   canLoadMore: boolean
@@ -20,17 +21,18 @@ interface MessageListProps {
   loadMore(): void
 }
 const MessageList = ({
+  isAdmin,
   messages: groupedMessages,
   timeFormat,
   canLoadMore,
   isLoading,
   loadMore,
 }: MessageListProps) => {
+  const type = useRoomType()
+
   const chatRef = useRef<HTMLDivElement>(null)
 
   const { selectedMessageIds } = useSelectedMessageIds()
-
-  const { data: myProfile } = useGetMyProfile()
 
   useEffect(() => {
     const chatContainer = chatRef.current
@@ -78,10 +80,10 @@ const MessageList = ({
                   return (
                     <MessageItem
                       key={message.id}
+                      isAdmin={isAdmin}
                       message={message}
-                      type="private"
+                      type={type}
                       isSelected={selectedMessageIds.includes(message.id)}
-                      isSender={myProfile?.id === message.sender.id}
                       timeFormat={timeFormat}
                       onClickParentMessage={(id) => {
                         const container = chatRef.current

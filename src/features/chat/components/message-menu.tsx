@@ -6,31 +6,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import useConfirm from "@/hooks/use-confirm-dialog"
 import { cn, copyMessage } from "@/lib/utils"
 
 import { messageItemMenu } from "../constants"
+import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
-import { useForwardMessage } from "../hooks/use-forward-message"
+import { useForwardMessageModal } from "../hooks/use-forward-message-modal"
 import { useRepliedMessageId } from "../hooks/use-replied-message-id"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
 interface MessageMenuProps {
-  isSender: boolean
+  isAdmin: boolean
   message: Message
 }
 
-const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
+const MessageMenu = ({ isAdmin, message }: MessageMenuProps) => {
   const { replyMessage, cancelReplyMessage } = useRepliedMessageId()
   const { editMessage, cancelEditMessage } = useEditedMessageId()
   const { toggleSelectMessage } = useSelectedMessageIds()
-  const { forwardMessage } = useForwardMessage()
-
-  const [Dialog, confirm] = useConfirm()
-
-  const handleDeleteAction = () => {
-    confirm("Delete this message?", "This action can not be undone")
-  }
+  const { deleteMessage } = useDeletedMessageId()
+  const { forwardMessage } = useForwardMessageModal()
 
   const handleMenuClick = (action: MessageItemMenuAction) => {
     switch (action) {
@@ -56,7 +51,7 @@ const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
         toggleSelectMessage(message.id)
         break
       case "delete":
-        handleDeleteAction()
+        deleteMessage(message.id)
         break
       default:
         break
@@ -64,16 +59,33 @@ const MessageMenu = ({ isSender, message }: MessageMenuProps) => {
   }
 
   const fixedMenu = messageItemMenu.filter((menu) => {
-    if (!isSender || !message.message) {
-      return menu.action !== "edit" && menu.action !== "copy-text"
+    if (message.isSender) {
+      if (!message.message) {
+        return menu.action !== "edit" && menu.action !== "copy-text"
+      }
+
+      return true
     }
 
-    return true
+    if (isAdmin) {
+      if (!message.message) {
+        return menu.action !== "edit" && menu.action !== "copy-text"
+      }
+      return menu.action !== "edit"
+    }
+
+    if (!message.message) {
+      return (
+        menu.action !== "edit" &&
+        menu.action !== "copy-text" &&
+        menu.action !== "delete"
+      )
+    }
+    return menu.action !== "edit" && menu.action !== "delete"
   })
 
   return (
     <>
-      <Dialog />
       <DropdownMenu>
         <DropdownMenuTrigger className="focus:outline-none">
           <ChevronDownIcon className="size-4" />

@@ -28,6 +28,7 @@ import {
 } from "../lib/utils"
 import {
   createMessageSchema,
+  forwardMessageSchema,
   getMessageParamSchema,
   updateMessageSchema,
 } from "../schema"
@@ -70,7 +71,6 @@ const messageApp = new Hono()
           receiverId,
           roomType,
           attachments: formAttachments,
-          originalMessageId,
           parentMessageId,
           message,
           isEmojiOnly,
@@ -81,7 +81,6 @@ const messageApp = new Hono()
         const invalid = await validateMessage({
           receiverId,
           roomType,
-          originalMessageId,
           parentMessageId,
           userId,
         })
@@ -108,7 +107,7 @@ const messageApp = new Hono()
             receiverId,
             senderId: userId,
             isEmojiOnly: isEmojiOnly ?? false,
-            originalMessageId: originalMessageId ?? null,
+            originalMessageId: null,
             parentMessageId: parentMessageId ?? null,
             attachments: files.map((att) => ({
               name: att.name,
@@ -120,7 +119,7 @@ const messageApp = new Hono()
           })
 
           const response: CreateMessageResponse = successResponse(
-            mapMessageModelToMessage(createdMessage),
+            mapMessageModelToMessage(userId, createdMessage),
           )
           return c.json(response)
         } catch {
@@ -261,7 +260,7 @@ const messageApp = new Hono()
           total > 0 && total === limit ? messages[total - 1].id : undefined
 
         const response: GetMessagesResponse = successCollectionResponse(
-          messages.map(mapMessageModelToMessage),
+          messages.map((v) => mapMessageModelToMessage(userId, v)),
           total,
           nextCursor,
         )
@@ -352,7 +351,7 @@ const messageApp = new Hono()
           include: { ...getMessageInludeQuery() },
         })
 
-        const message = mapMessageModelToMessage(result)
+        const message = mapMessageModelToMessage(userId, result)
 
         const response: UpdateMessageResponse = successResponse(message)
         return c.json(response)
@@ -523,6 +522,50 @@ const messageApp = new Hono()
         const response: DeleteMessageResponse = successResponse({
           id: messageId,
         })
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .post(
+    "/:messageId/forwarded",
+    zValidator("json", forwardMessageSchema, zodErrorHandler),
+    sessionMiddleware,
+    validateProfileMiddleware,
+    async (c) => {
+      try {
+        const { messageId } = c.req.param()
+        const { receiverId, roomType } = c.req.valid("json")
+
+        const { userId } = c.get("userProfile")
+
+        const originalMessage = await prisma.message.findUnique({
+          where: { id: messageId },
+          include: { ...getMessageInludeQuery() },
+        })
+        if (!originalMessage) {
+          return c.json(
+            createError(ERROR.MESSAGE_NOT_FOUND, ["originalMessageId"]),
+            400,
+          )
+        }
+
+        const message = await sendMessage({
+          receiverId,
+          roomType,
+          message: originalMessage.message,
+          isEmojiOnly: originalMessage.isEmojiOnly,
+          originalMessageId:
+            originalMessage.senderId === userId ? null : messageId,
+          senderId: userId,
+          parentMessageId: null,
+          attachments: originalMessage.attachments,
+        })
+
+        const response: ForwardMessageResponse = successResponse(
+          mapMessageModelToMessage(userId, message),
+        )
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)

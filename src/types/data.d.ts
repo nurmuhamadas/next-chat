@@ -92,6 +92,7 @@ declare interface Message {
   id: string
   message: string | null
   sender: MessageAuthor
+  isSender: boolean
   privateChatId: string | null
   groupId: string | null
   channelId: string | null

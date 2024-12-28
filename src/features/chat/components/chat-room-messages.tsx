@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import Image from "next/image"
 
@@ -14,6 +14,7 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { cn, formatChatTime } from "@/lib/utils"
 
+import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
 import { useRepliedMessageId } from "../hooks/use-replied-message-id"
 
@@ -25,6 +26,7 @@ interface ChatRoomMessagesProps {
   channel?: Channel
   onRepliedMessageChange(message: Message | undefined): void
   onEditMessageChange(message: Message | undefined): void
+  onDeletedMessageChange(message: Message | undefined): void
 }
 const ChatRoomMessages = ({
   hideMessage,
@@ -32,12 +34,14 @@ const ChatRoomMessages = ({
   channel,
   onRepliedMessageChange,
   onEditMessageChange,
+  onDeletedMessageChange,
 }: ChatRoomMessagesProps) => {
   const type = useRoomType()
   const id = useRoomId()
 
   const { repliedMessageId } = useRepliedMessageId()
   const { editedMessageId } = useEditedMessageId()
+  const { deletedMessageId } = useDeletedMessageId()
 
   const [cursor, setCursor] = useState<string | undefined>()
   const [messages, setMessages] = useState<Message[]>([])
@@ -51,6 +55,12 @@ const ChatRoomMessages = ({
     isLoading: loadingMessage,
     cursor: cursorResult,
   } = useGetMessages({ id, roomType: type, cursor })
+
+  const messagesResultStr = useMemo(
+    () => JSON.stringify(messagesResult),
+    [messagesResult],
+  )
+  const messagesStr = useMemo(() => JSON.stringify(messages), [messages])
 
   const isLoading = loadingMessage
   const isEmpty = messages.length === 0
@@ -103,19 +113,25 @@ const ChatRoomMessages = ({
         setMessages([...messagesResult])
       }
     }
-  }, [type, isLoading, cursor])
+  }, [type, isLoading, cursor, messagesResultStr])
 
   useEffect(() => {
     if (!isLoading) {
       onRepliedMessageChange(messages?.find((m) => m.id === repliedMessageId))
     }
-  }, [repliedMessageId, onRepliedMessageChange, isLoading])
+  }, [repliedMessageId, onRepliedMessageChange, isLoading, messagesStr])
 
   useEffect(() => {
     if (!isLoading) {
       onEditMessageChange(messages?.find((m) => m.id === editedMessageId))
     }
-  }, [editedMessageId, onEditMessageChange, isLoading])
+  }, [editedMessageId, onEditMessageChange, isLoading, messagesStr])
+
+  useEffect(() => {
+    if (!isLoading) {
+      onDeletedMessageChange(messages?.find((m) => m.id === deletedMessageId))
+    }
+  }, [deletedMessageId, onDeletedMessageChange, isLoading, messagesStr])
 
   const handleJoinGroup = () => {
     if (group) {
@@ -195,6 +211,7 @@ const ChatRoomMessages = ({
       )}
       {!isEmpty && (
         <MessageList
+          isAdmin={group?.isAdmin || channel?.isAdmin || false}
           messages={groupedMessages}
           timeFormat={setting?.timeFormat ?? "12-HOUR"}
           canLoadMore={!!cursorResult}

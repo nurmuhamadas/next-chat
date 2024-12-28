@@ -1,6 +1,6 @@
 import { parseAsString, useQueryState } from "nuqs"
 
-export const useForwardMessage = () => {
+export const useForwardMessageModal = () => {
   const [forwardMessageId, setForwardMessageId] = useQueryState<string>(
     "forward-message",
     parseAsString.withDefault("").withOptions({ clearOnDefault: true }),

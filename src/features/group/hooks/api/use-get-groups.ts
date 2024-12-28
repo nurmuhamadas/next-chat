@@ -6,13 +6,16 @@ const useGetGroups = ({
   queryKey,
   limit,
   cursor,
+  enabled = true,
 }: {
   queryKey?: string
   limit?: string
   cursor?: string
+  enabled?: boolean
 }) => {
   const query = useQuery({
     queryKey: ["get-groups", queryKey, limit, cursor],
+    enabled,
     queryFn: async () => {
       const response = await client.api.groups.$get({
         query: { query: queryKey, limit, cursor },

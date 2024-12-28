@@ -58,3 +58,8 @@ export const getMessageParamSchema = z.object({
     .transform((v) => v.toUpperCase() as RoomType),
   receiverId: z.string().min(1, ERROR.REQUIRED),
 })
+
+export const forwardMessageSchema = z.object({
+  roomType: z.nativeEnum(RoomType),
+  receiverId: z.string().min(1, ERROR.REQUIRED),
+})

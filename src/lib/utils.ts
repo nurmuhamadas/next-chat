@@ -1,3 +1,4 @@
+import { RoomType as RoomTypeModel } from "@prisma/client"
 import { type ClassValue, clsx } from "clsx"
 import {
   format,
@@ -98,4 +99,16 @@ export const formatChatTime = (time: string, timeFormat: TimeFormat) => {
   } else {
     return format(date, "MMM d, yyyy")
   }
+}
+
+export const roomTypeToRoomTypeModel = (type: RoomType): RoomTypeModel => {
+  if (type === "chat") return "PRIVATE"
+  if (type === "group") return "GROUP"
+  return "CHANNEL"
+}
+
+export const roomTypeModelToRoomType = (type: RoomTypeModel): RoomType => {
+  if (type === "PRIVATE") return "chat"
+  if (type === "GROUP") return "group"
+  return "channel"
 }

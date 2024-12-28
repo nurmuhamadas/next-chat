@@ -6,13 +6,16 @@ const useSearchPrivateRooms = ({
   queryKey,
   limit,
   cursor,
+  enabled = true,
 }: {
   queryKey?: string
   limit?: string
   cursor?: string
+  enabled?: boolean
 }) => {
   const query = useQuery({
     queryKey: ["rooms", cursor, limit, queryKey],
+    enabled,
     queryFn: async () => {
       const response = await client.api.rooms["search-private"].$get({
         query: { cursor, limit, query: queryKey },
