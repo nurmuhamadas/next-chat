@@ -51,6 +51,14 @@ declare interface UserSearch {
   lastSeenAt: string | null
 }
 
+declare interface UserSearchForMember {
+  id: string
+  name: string
+  imageUrl: string | null
+  lastSeenAt: string | null
+  allowAddToGroup: boolean
+}
+
 declare interface LastMessage {
   id: string
   sender: string

@@ -68,6 +68,9 @@ declare type GetMyProfileResponse = ApiResponse<Profile>
 
 declare type SearchUsersResponse = ApiCollectionResponse<UserSearch>
 
+declare type SearchUsersForMemberResponse =
+  ApiCollectionResponse<UserSearchForMember>
+
 declare type GetUserLastSeenResponse = ApiResponse<string | null>
 
 declare type UpdateUserLastSeenResponse = ApiResponse<string>

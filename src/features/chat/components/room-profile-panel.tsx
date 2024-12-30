@@ -9,6 +9,7 @@ import {
   MailIcon,
   PaperclipIcon,
   PencilIcon,
+  UserPlusIcon,
   XIcon,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -22,6 +23,7 @@ import useGetIsChannelAdmin from "@/features/channel/hooks/api/use-get-is-channe
 import { useEditChannelPanel } from "@/features/channel/hooks/use-edit-channel-panel"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
 import useGetIsGroupAdmin from "@/features/group/hooks/api/use-get-is-group-admin"
+import { useAddGroupMemberPanel } from "@/features/group/hooks/use-add-group-member-panel"
 import { useEditGroupPanel } from "@/features/group/hooks/use-edit-group-panel"
 import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
@@ -44,6 +46,7 @@ const RoomProfilePanel = () => {
   const { openEditGroup } = useEditGroupPanel()
   const { openEditChannel } = useEditChannelPanel()
 
+  const { openAddGroupMember } = useAddGroupMemberPanel()
   const { roomProfileOpen, closeRoomProfile } = useRoomProfile()
 
   const isOpen = roomProfileOpen
@@ -70,9 +73,14 @@ const RoomProfilePanel = () => {
     (type === "chat" ? "User" : type === "channel" ? "Channel" : "Group") +
     " Info"
   const action = (type === "channel" || type === "group") && (
-    <Button variant="icon" size="icon" onClick={handleEdit}>
-      <PencilIcon />
-    </Button>
+    <>
+      <Button variant="icon" size="icon" onClick={openAddGroupMember}>
+        <UserPlusIcon />
+      </Button>
+      <Button variant="icon" size="icon" onClick={handleEdit}>
+        <PencilIcon />
+      </Button>
+    </>
   )
 
   if (!isDesktop) {

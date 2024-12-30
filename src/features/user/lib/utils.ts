@@ -1,4 +1,8 @@
-import { Profile as ProfileModel, User } from "@prisma/client"
+import {
+  Profile as ProfileModel,
+  Setting as SettingModel,
+  User,
+} from "@prisma/client"
 
 export const mapProfileModelToProfile = (
   profile: ProfileModel & { user: Pick<User, "username" | "email"> },
@@ -16,12 +20,26 @@ export const mapProfileModelToProfile = (
 }
 
 export const mapSearchResult = (
-  user: Pick<ProfileModel, "name" | "userId" | "imageUrl" | "lastSeenAt">,
+  profile: Pick<ProfileModel, "name" | "userId" | "imageUrl" | "lastSeenAt">,
 ): UserSearch => {
   return {
-    id: user.userId,
-    name: user.name,
-    imageUrl: user.imageUrl,
-    lastSeenAt: user.lastSeenAt?.toISOString() ?? null,
+    id: profile.userId,
+    name: profile.name,
+    imageUrl: profile.imageUrl,
+    lastSeenAt: profile.lastSeenAt?.toISOString() ?? null,
+  }
+}
+
+export const mapSearchForMemberResult = (
+  profile: Pick<ProfileModel, "name" | "userId" | "imageUrl" | "lastSeenAt"> & {
+    user: { setting: Pick<SettingModel, "allowAddToGroup"> | null }
+  },
+): UserSearchForMember => {
+  return {
+    id: profile.userId,
+    name: profile.name,
+    imageUrl: profile.imageUrl,
+    lastSeenAt: profile.lastSeenAt?.toISOString() ?? null,
+    allowAddToGroup: profile.user.setting?.allowAddToGroup ?? false,
   }
 }

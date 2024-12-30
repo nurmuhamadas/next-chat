@@ -24,7 +24,11 @@ import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
 import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import { createUserProfile, updateUserProfile } from "../lib/queries"
-import { mapProfileModelToProfile, mapSearchResult } from "../lib/utils"
+import {
+  mapProfileModelToProfile,
+  mapSearchForMemberResult,
+  mapSearchResult,
+} from "../lib/utils"
 import { profileSchema } from "../schema"
 
 const userApp = new Hono()
@@ -193,12 +197,62 @@ const userApp = new Hono()
         const nextCursor =
           total > 0 && total === limit ? result[total - 1].userId : undefined
 
-        console.log(result)
         const response: SearchUsersResponse = successCollectionResponse(
           result.map(mapSearchResult),
           total,
           nextCursor,
         )
+        return c.json(response)
+      } catch {
+        return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
+      }
+    },
+  )
+  .get(
+    "/search-for-member/:groupId",
+    sessionMiddleware,
+    validateProfileMiddleware,
+    zValidator("query", searchQuerySchema),
+    async (c) => {
+      try {
+        const { groupId } = c.req.param()
+        const { query, limit, cursor } = c.req.valid("query")
+
+        const { userId } = c.get("userProfile")
+
+        const result = await prisma.profile.findMany({
+          where: {
+            userId: { not: userId },
+            OR: [
+              { name: { contains: query } },
+              { user: { username: { contains: query } } },
+            ],
+            user: { groups: { none: { groupId, leftAt: null } } },
+          },
+          select: {
+            name: true,
+            imageUrl: true,
+            lastSeenAt: true,
+            userId: true,
+            user: {
+              select: { setting: { select: { allowAddToGroup: true } } },
+            },
+          },
+          take: limit,
+          cursor: cursor ? { id: cursor } : undefined,
+          skip: cursor ? 1 : undefined,
+        })
+
+        const total = result.length
+        const nextCursor =
+          total > 0 && total === limit ? result[total - 1].userId : undefined
+
+        const response: SearchUsersForMemberResponse =
+          successCollectionResponse(
+            result.map(mapSearchForMemberResult),
+            total,
+            nextCursor,
+          )
         return c.json(response)
       } catch {
         return c.json(createError(ERROR.INTERNAL_SERVER_ERROR), 500)
