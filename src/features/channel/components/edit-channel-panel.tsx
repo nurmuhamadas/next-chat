@@ -32,7 +32,7 @@ const EditChannelPanel = () => {
     isLoading: isDataLoading,
     refetch,
   } = useGetChannelById({
-    id: type === "channel" ? id : undefined,
+    id: isEditChannelOpen && type === "channel" ? id : undefined,
   })
 
   const isChannelAdmin = channel?.isAdmin ?? false
@@ -40,7 +40,7 @@ const EditChannelPanel = () => {
 
   const { data: subscribers, isLoading: loadingSubs } =
     useGetChannelSubscribers({
-      channelId: id,
+      channelId: isEditChannelOpen && type === "channel" ? id : undefined,
     })
   const admins = subscribers.filter((member) => member.isAdmin)
 

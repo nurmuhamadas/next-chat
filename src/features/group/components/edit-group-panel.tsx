@@ -27,13 +27,15 @@ const EditGroupPanel = () => {
     data: group,
     isLoading: isDataLoading,
     refetch,
-  } = useGetGroupById({ id: type === "group" ? id : undefined })
+  } = useGetGroupById({
+    id: isEditGroupOpen && type === "group" ? id : undefined,
+  })
 
   const isGroupAdmin = group?.isAdmin ?? false
   const isLoading = isDataLoading
 
   const { data: members, isLoading: loadingMembers } = useGetGroupMembers({
-    groupId: id,
+    groupId: isEditGroupOpen && type === "group" ? id : undefined,
   })
   const admins = members.filter((member) => member.isAdmin)
 

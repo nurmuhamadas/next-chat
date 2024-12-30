@@ -19,10 +19,8 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
-import useGetIsChannelAdmin from "@/features/channel/hooks/api/use-get-is-channel-admin"
 import { useEditChannelPanel } from "@/features/channel/hooks/use-edit-channel-panel"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
-import useGetIsGroupAdmin from "@/features/group/hooks/api/use-get-is-group-admin"
 import { useAddGroupMemberPanel } from "@/features/group/hooks/use-add-group-member-panel"
 import { useEditGroupPanel } from "@/features/group/hooks/use-edit-group-panel"
 import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
@@ -51,13 +49,13 @@ const RoomProfilePanel = () => {
 
   const isOpen = roomProfileOpen
 
-  const { data: isGroupAdmin } = useGetIsGroupAdmin({
+  const { data: group } = useGetGroupById({
     id: isOpen && type === "group" ? id : undefined,
   })
-  const { data: isChannelAdmin } = useGetIsChannelAdmin({
+  const { data: channel } = useGetChannelById({
     id: isOpen && type === "channel" ? id : undefined,
   })
-  const isAdmin = isGroupAdmin || isChannelAdmin
+  const isAdmin = group?.isAdmin || channel?.isAdmin
 
   const handleEdit = () => {
     if (!isAdmin) return
@@ -101,7 +99,7 @@ const RoomProfilePanel = () => {
         onBack={closeRoomProfile}
         action={isAdmin ? action : undefined}
       >
-        <ProfileView />
+        <ProfileView group={group} channel={channel} />
       </RightPanelWrapper>
     )
   }
@@ -126,14 +124,18 @@ const RoomProfilePanel = () => {
         </div>
 
         <ScrollArea className="chat-list-scroll-area">
-          <ProfileView />
+          <ProfileView group={group} channel={channel} />
         </ScrollArea>
       </div>
     </div>
   )
 }
 
-const ProfileView = () => {
+interface ProfileViewProps {
+  group?: Group
+  channel?: Channel
+}
+const ProfileView = ({ group, channel }: ProfileViewProps) => {
   const type = useRoomType()
   const id = useRoomId()
 
@@ -142,14 +144,8 @@ const ProfileView = () => {
   const { data: user, isLoading: userLoading } = useGetUserProfileById({
     id: roomProfileOpen && type === "chat" ? id : undefined,
   })
-  const { data: group, isLoading: groupLoading } = useGetGroupById({
-    id: roomProfileOpen && type === "group" ? id : undefined,
-  })
-  const { data: channel, isLoading: channelLoading } = useGetChannelById({
-    id: roomProfileOpen && type === "channel" ? id : undefined,
-  })
 
-  const isLoading = userLoading || groupLoading || channelLoading
+  const isLoading = userLoading
   const isNoData = !isLoading && !group && !channel && !user
 
   const infoList: Record<
