@@ -29,7 +29,7 @@ const RoomListItem = ({
         )}
       >
         <ChatAvatar
-          className="size-[54px]"
+          className="size-12"
           src={data.imageUrl ?? ""}
           name={data.name}
         />
@@ -48,10 +48,15 @@ const RoomListItem = ({
           <div className="flex items-center gap-x-3">
             <p
               className={cn(
-                "flex-1 truncate text-muted-foreground body-1",
+                "flex-1 truncate text-muted-foreground body-2",
                 selected && "text-grey-4",
               )}
             >
+              {data.type !== "chat" && data.lastMessage && (
+                <span className="font-semibold text-white">
+                  {data.lastMessage?.sender}:{" "}
+                </span>
+              )}
               {data.lastMessage?.message}
             </p>
             {data.totalUnreadMessages > 0 && (

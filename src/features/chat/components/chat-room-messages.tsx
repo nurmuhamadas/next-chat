@@ -116,7 +116,7 @@ const ChatRoomMessages = ({
   useEffect(() => {
     const intervalId = setInterval(() => {
       refetch()
-    }, 1500)
+    }, 2500)
 
     return () => {
       clearInterval(intervalId)

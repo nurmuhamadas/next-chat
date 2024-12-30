@@ -14,6 +14,7 @@ export const getRoomIncludeQuery = ({ userId }: { userId: string }) => ({
     select: {
       id: true,
       message: true,
+      status: true,
       createdAt: true,
       sender: { select: { profile: { select: { name: true } } } },
     },
@@ -60,7 +61,7 @@ export const getRoomIncludeQuery = ({ userId }: { userId: string }) => ({
 export const mapRoomModelToRoom = (
   room: RoomModel & {
     lastMessage:
-      | (Pick<MessageModel, "id" | "message" | "createdAt"> & {
+      | (Pick<MessageModel, "id" | "message" | "status" | "createdAt"> & {
           sender: { profile: Pick<ProfileModel, "name"> | null }
         })
       | null
@@ -113,6 +114,10 @@ export const mapRoomModelToRoom = (
     imageUrl = room.channel?.imageUrl ?? null
   }
 
+  const isMessageDeleted =
+    room.lastMessage?.status === "DELETED_BY_ADMIN" ||
+    room.lastMessage?.status === "DELETED_FOR_ALL"
+
   return {
     id,
     name,
@@ -120,7 +125,9 @@ export const mapRoomModelToRoom = (
     lastMessage: room.lastMessage
       ? {
           id: room.lastMessage.id,
-          message: room.lastMessage.message,
+          message: isMessageDeleted
+            ? room.lastMessage.status
+            : room.lastMessage.message,
           sender: room.lastMessage.sender.profile?.name ?? "Unknown",
           time: room.lastMessage.createdAt?.toISOString(),
         }
