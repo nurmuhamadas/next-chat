@@ -86,6 +86,7 @@ export const mapGroupOptionModelToOption = (
 ): GroupOption => {
   return {
     id: groupOption.id,
+    userId: groupOption.userId,
     groupId: groupOption.groupId,
     notification: groupOption.notification,
   }

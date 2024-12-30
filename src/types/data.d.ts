@@ -169,6 +169,7 @@ declare interface GroupMember {
 
 declare interface GroupOption {
   id: string
+  userId: string
   groupId: string
   notification: boolean
 }
