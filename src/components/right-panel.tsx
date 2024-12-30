@@ -1,5 +1,7 @@
 "use client"
 
+import AddChannelAdminsPanel from "@/features/channel/components/add-channel-admins-panel"
+import ChannelAdminsPanel from "@/features/channel/components/channel-admins-panel"
 import EditChannelPanel from "@/features/channel/components/edit-channel-panel"
 import RoomProfilePanel from "@/features/chat/components/room-profile-panel"
 import AddGroupAdminsPanel from "@/features/group/components/add-group-admins-panel"
@@ -21,6 +23,10 @@ const RightPanel = () => {
       <AddGroupAdminsPanel />
 
       <EditChannelPanel />
+
+      <ChannelAdminsPanel />
+
+      <AddChannelAdminsPanel />
     </>
   )
 }

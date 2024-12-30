@@ -210,6 +210,7 @@ declare interface ChannelSubscriber {
 
 declare interface ChannelOption {
   id: string
+  userId: string
   channelId: string
   notification: boolean
 }

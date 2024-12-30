@@ -9,7 +9,6 @@ import { useRoomType } from "@/hooks/use-room-type"
 
 import useGetGroupById from "../hooks/api/use-get-group-by-id"
 import useGetGroupMembers from "../hooks/api/use-get-group-members"
-import useGetIsGroupAdmin from "../hooks/api/use-get-is-group-admin"
 import useUpdateGroup from "../hooks/api/use-update-group"
 import { useEditGroupPanel } from "../hooks/use-edit-group-panel"
 import { useGroupAdminsPanel } from "../hooks/use-group-admins-panel"
@@ -29,10 +28,9 @@ const EditGroupPanel = () => {
     isLoading: isDataLoading,
     refetch,
   } = useGetGroupById({ id: type === "group" ? id : undefined })
-  const { data: isGroupAdmin, isLoading: isAdminLoading } = useGetIsGroupAdmin({
-    id: type === "group" ? id : undefined,
-  })
-  const isLoading = isAdminLoading || isDataLoading
+
+  const isGroupAdmin = group?.isAdmin ?? false
+  const isLoading = isDataLoading
 
   const { data: members, isLoading: loadingMembers } = useGetGroupMembers({
     groupId: id,

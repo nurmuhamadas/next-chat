@@ -88,6 +88,7 @@ export const mapChannelOptionModelToOption = (
 ): ChannelOption => {
   return {
     id: channelOpt.id,
+    userId: channelOpt.userId,
     channelId: channelOpt.channelId,
     notification: channelOpt.notification,
   }

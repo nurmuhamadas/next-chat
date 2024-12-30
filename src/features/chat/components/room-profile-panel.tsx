@@ -69,14 +69,24 @@ const RoomProfilePanel = () => {
     }
   }
 
+  const handleAddMembers = () => {
+    if (!isAdmin) return
+
+    if (type === "group") {
+      openAddGroupMember()
+    }
+  }
+
   const title =
     (type === "chat" ? "User" : type === "channel" ? "Channel" : "Group") +
     " Info"
   const action = (type === "channel" || type === "group") && (
     <>
-      <Button variant="icon" size="icon" onClick={openAddGroupMember}>
-        <UserPlusIcon />
-      </Button>
+      {type === "group" && (
+        <Button variant="icon" size="icon" onClick={handleAddMembers}>
+          <UserPlusIcon />
+        </Button>
+      )}
       <Button variant="icon" size="icon" onClick={handleEdit}>
         <PencilIcon />
       </Button>
