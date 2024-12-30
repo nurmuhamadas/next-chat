@@ -107,6 +107,14 @@ export const roomTypeToRoomTypeModel = (type: RoomType): RoomTypeModel => {
   return "CHANNEL"
 }
 
+export const roomTypeToRoomTypeModelLower = (
+  type: RoomType,
+): RoomTypeModelLower => {
+  if (type === "chat") return "private"
+  if (type === "group") return "group"
+  return "channel"
+}
+
 export const roomTypeModelToRoomType = (type: RoomTypeModel): RoomType => {
   if (type === "PRIVATE") return "chat"
   if (type === "GROUP") return "group"

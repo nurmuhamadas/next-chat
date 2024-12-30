@@ -28,7 +28,7 @@ const RoomListView = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       refetch()
-    }, 2500)
+    }, 5000)
 
     return () => {
       clearInterval(intervalId)

@@ -64,7 +64,12 @@ export const deleteRoom = ({
 
     await tx.room.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: {
+        deletedAt: new Date(),
+        unreadMessage: {
+          update: { count: 0 },
+        },
+      },
     })
   })
 }

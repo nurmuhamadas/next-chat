@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import Image from "next/image"
 
@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button"
 import useJoinChannel from "@/features/channel/hooks/api/use-join-channel"
 import useJoinGroup from "@/features/group/hooks/api/use-join-group"
 import useGetMessages from "@/features/messages/hooks/api/use-get-messages"
+import useReadMessage from "@/features/messages/hooks/api/use-read-message"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
-import { cn, formatChatTime } from "@/lib/utils"
+import { cn, formatChatTime, roomTypeToRoomTypeModelLower } from "@/lib/utils"
 
 import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
@@ -39,12 +40,15 @@ const ChatRoomMessages = ({
   const type = useRoomType()
   const id = useRoomId()
 
+  const lastMessage = useRef<Message | null>(null)
+
   const { repliedMessageId } = useRepliedMessageId()
   const { editedMessageId } = useEditedMessageId()
   const { deletedMessageId } = useDeletedMessageId()
 
   const { mutate: joinGroup, isPending: isJoiningGroup } = useJoinGroup()
   const { mutate: joinChannel, isPending: isJoiningChannel } = useJoinChannel()
+  const { mutate: readMessage } = useReadMessage()
 
   const { data: setting } = useGetSetting()
   const {
@@ -96,19 +100,19 @@ const ChatRoomMessages = ({
   const groupedMessages = groupingMessage(messages)
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && repliedMessageId && messagesStr !== "[]") {
       onRepliedMessageChange(messages?.find((m) => m.id === repliedMessageId))
     }
   }, [repliedMessageId, onRepliedMessageChange, isLoading, messagesStr])
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && editedMessageId && messagesStr !== "[]") {
       onEditMessageChange(messages?.find((m) => m.id === editedMessageId))
     }
   }, [editedMessageId, onEditMessageChange, isLoading, messagesStr])
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && deletedMessageId && messagesStr !== "[]") {
       onDeletedMessageChange(messages?.find((m) => m.id === deletedMessageId))
     }
   }, [deletedMessageId, onDeletedMessageChange, isLoading, messagesStr])
@@ -116,12 +120,26 @@ const ChatRoomMessages = ({
   useEffect(() => {
     const intervalId = setInterval(() => {
       refetch()
-    }, 2500)
+    }, 5000)
 
     return () => {
       clearInterval(intervalId)
     }
   }, [refetch])
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      if (lastMessage.current && messages[0].id !== lastMessage.current?.id) {
+        readMessage({
+          param: {
+            roomType: roomTypeToRoomTypeModelLower(type),
+            receiverId: id,
+          },
+        })
+      }
+      lastMessage.current = messages[0]
+    }
+  }, [messages.length])
 
   const handleJoinGroup = () => {
     if (group) {

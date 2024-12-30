@@ -101,7 +101,8 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
   const isMenuShown: Record<ChatRoomListMenuAction, boolean> = {
     pin: !room.pinned,
     unpin: room.pinned,
-    archive: !room.archived,
+    archive: false,
+    // archive: !room.archived,
     delete:
       room.type === "chat" ||
       (room.type === "group" && room.isActive) ||

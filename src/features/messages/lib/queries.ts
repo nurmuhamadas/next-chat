@@ -400,6 +400,7 @@ export const sendMessage = async (
             userId: senderId,
             privateChatId: privateChat.id,
             notification: true,
+            createdAt: createdMessage.createdAt,
           },
           update: {},
         })
@@ -414,6 +415,7 @@ export const sendMessage = async (
               userId: receiverId,
               privateChatId: privateChat.id,
               notification: true,
+              createdAt: createdMessage.createdAt,
             },
             update: {},
           })

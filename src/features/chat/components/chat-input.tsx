@@ -239,6 +239,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             <TextEditor
               value={message}
               disabled={isLoading}
+              onPressEnter={handleSend}
               onValueChange={(value) => {
                 setMessage(value)
                 if (isEmojiOnly) {
