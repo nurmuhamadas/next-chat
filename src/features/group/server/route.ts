@@ -460,6 +460,7 @@ const groupApp = new Hono()
               take: limit,
               cursor: cursor ? { id: cursor } : undefined,
               skip: cursor ? 1 : 0,
+              orderBy: [{ isAdmin: "desc" }],
             },
           },
         })

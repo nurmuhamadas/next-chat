@@ -5,11 +5,11 @@ import { client } from "@/lib/rpc"
 const useSearchUsersForMember = ({
   queryKey,
   limit,
-  groupId,
+  groupId = "",
 }: {
   queryKey?: string
   limit?: string
-  groupId: string
+  groupId?: string
 }) => {
   const query = useInfiniteQuery({
     queryKey: ["search-users-for-member", queryKey, limit],

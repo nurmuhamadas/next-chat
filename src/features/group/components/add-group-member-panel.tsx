@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useSearchUsersForMember from "@/features/user/hooks/api/use-search-users-for-member"
 import { useRoomId } from "@/hooks/use-room-id"
-import { useRoomType } from "@/hooks/use-room-type"
 import { cn, debounce } from "@/lib/utils"
 
 import useAddGroupMember from "../hooks/api/use-add-group-member"
@@ -21,7 +20,6 @@ import { useAddGroupMemberPanel } from "../hooks/use-add-group-member-panel"
 const AddGroupMemberPanel = () => {
   const queryClient = useQueryClient()
 
-  const type = useRoomType()
   const id = useRoomId()
 
   const addingUserId = useRef<string | null>(null)
@@ -38,10 +36,10 @@ const AddGroupMemberPanel = () => {
     refetch: refetchUsers,
   } = useSearchUsersForMember({
     queryKey: searchKey,
-    groupId: id,
+    groupId: isAddGroupMemberOpen ? id : undefined,
   })
   const { data: group, isLoading: loadingGroup } = useGetGroupById({
-    id: type === "group" ? id : undefined,
+    id: isAddGroupMemberOpen ? id : undefined,
   })
 
   const debouncedSearchKey = debounce((value: string) => {
@@ -59,7 +57,6 @@ const AddGroupMemberPanel = () => {
         },
         {
           onSuccess() {
-            closeAddGroupMember()
             refetchUsers()
             queryClient.invalidateQueries({
               queryKey: ["get-group-members", id],

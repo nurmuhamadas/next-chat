@@ -2,6 +2,7 @@ import { useRef } from "react"
 
 import Link from "next/link"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon } from "lucide-react"
 
 import ChatAvatar from "@/components/chat-avatar"
@@ -16,6 +17,8 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileMembersGroup = () => {
+  const queryClient = useQueryClient()
+
   const removedId = useRef<string | null>(null)
 
   const id = useRoomId()
@@ -51,6 +54,9 @@ const RoomProfileMembersGroup = () => {
         },
         onSuccess() {
           refetchMembers()
+          queryClient.invalidateQueries({
+            queryKey: ["search-users-for-member"],
+          })
         },
       },
     )
