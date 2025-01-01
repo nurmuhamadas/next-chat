@@ -17,7 +17,7 @@ const RoomListView = () => {
   const { data: settings, isLoading: settingLoading } = useGetSetting()
   const {
     data: rooms,
-    isFetching: loadingRooms,
+    isLoading: loadingRooms,
     refetch,
     hasNextPage,
     fetchNextPage,

@@ -6,7 +6,6 @@ import {
   RoomType,
 } from "@prisma/client"
 import { DefaultArgs } from "@prisma/client/runtime/library"
-import { StatusCode } from "hono/utils/http-status"
 
 import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
@@ -28,7 +27,7 @@ export const validateMessage = async ({
   | {
       error: string
       path?: (string | number)[]
-      code: StatusCode
+      code: 400 | 403
     }
 > => {
   if (roomType === "PRIVATE") {
