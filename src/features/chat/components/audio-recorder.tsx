@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 
 import { MicIcon, PauseIcon, PlayIcon, StopCircleIcon } from "lucide-react"
 
+import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 
 interface AudioRecorderProps {
@@ -94,48 +95,58 @@ const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
   return (
     <div className="flex items-center gap-x-1">
       {recordingState === "idle" && (
-        <Button
-          className="size-11 bg-surface hover:bg-primary"
-          variant="secondary"
-          onClick={startRecording}
-        >
-          <MicIcon />
-        </Button>
+        <SimpleTooltip content="Start recording">
+          <Button
+            className="size-11 bg-surface hover:bg-primary"
+            variant="secondary"
+            onClick={startRecording}
+          >
+            <MicIcon />
+          </Button>
+        </SimpleTooltip>
       )}
       {recordingState === "recording" && (
         <>
-          <Button
-            className="size-11 bg-surface hover:bg-primary"
-            variant="secondary"
-            onClick={pauseRecording}
-          >
-            <PauseIcon />
-          </Button>
-          <Button
-            className="size-11 bg-surface hover:bg-primary"
-            variant="secondary"
-            onClick={stopRecording}
-          >
-            <div className="size-3 max-h-5 bg-secondary-foreground" />
-          </Button>
+          <SimpleTooltip content="Pause recording">
+            <Button
+              className="size-11 bg-surface hover:bg-primary"
+              variant="secondary"
+              onClick={pauseRecording}
+            >
+              <PauseIcon />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content="Stop recording">
+            <Button
+              className="size-11 bg-surface hover:bg-primary"
+              variant="secondary"
+              onClick={stopRecording}
+            >
+              <div className="size-3 max-h-5 bg-secondary-foreground" />
+            </Button>
+          </SimpleTooltip>
         </>
       )}
       {recordingState === "paused" && (
         <>
-          <Button
-            className="size-11 bg-surface hover:bg-primary"
-            variant="secondary"
-            onClick={resumeRecording}
-          >
-            <PlayIcon />
-          </Button>
-          <Button
-            className="size-11 bg-surface hover:bg-primary"
-            variant="secondary"
-            onClick={stopRecording}
-          >
-            <StopCircleIcon />
-          </Button>
+          <SimpleTooltip content="Resume recording">
+            <Button
+              className="size-11 bg-surface hover:bg-primary"
+              variant="secondary"
+              onClick={resumeRecording}
+            >
+              <PlayIcon />
+            </Button>
+          </SimpleTooltip>
+          <SimpleTooltip content="Stop recording">
+            <Button
+              className="size-11 bg-surface hover:bg-primary"
+              variant="secondary"
+              onClick={stopRecording}
+            >
+              <StopCircleIcon />
+            </Button>
+          </SimpleTooltip>
         </>
       )}
       {recordingState !== "idle" && (

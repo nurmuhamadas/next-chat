@@ -10,6 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import useLogout from "@/features/auth/hooks/use-logout"
 import { useBlockedUsersPanel } from "@/features/user/hooks/use-blocked-users-panel"
 import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
@@ -76,11 +82,18 @@ const MainMenu = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="focus:outline-none">
-        <Button size="icon" variant="icon" className="shrink-0">
-          <MenuIcon />
-        </Button>
-      </DropdownMenuTrigger>
+      <TooltipProvider>
+        <Tooltip disableHoverableContent>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild className="focus:outline-none">
+              <Button size="icon" variant="icon" className="shrink-0">
+                <MenuIcon />
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Main menu</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <DropdownMenuContent side="top" align="start" className="min-w-52">
         {fixedMenu.map((menu) => {
           return (

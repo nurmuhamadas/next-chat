@@ -4,6 +4,7 @@ import { LoaderIcon, UserPlusIcon } from "lucide-react"
 
 import ChatAvatar from "@/components/chat-avatar"
 import RightPanelWrapper from "@/components/right-panel-wrapper"
+import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRoomId } from "@/hooks/use-room-id"
@@ -70,9 +71,11 @@ const ChannelAdminsPanel = () => {
       isOpen={isChannelAdminsOpen}
       onBack={closeChannelAdmins}
       action={
-        <Button variant="icon" size="icon" onClick={openAddChannelAdmin}>
-          <UserPlusIcon />
-        </Button>
+        <SimpleTooltip content="Add admin">
+          <Button variant="icon" size="icon" onClick={openAddChannelAdmin}>
+            <UserPlusIcon />
+          </Button>
+        </SimpleTooltip>
       }
     >
       <div className="flex flex-col gap-y-6 px-4 pb-8 pt-4">

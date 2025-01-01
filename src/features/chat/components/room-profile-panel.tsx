@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner"
 
 import RightPanelWrapper from "@/components/right-panel-wrapper"
+import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -81,13 +82,17 @@ const RoomProfilePanel = () => {
   const action = (type === "channel" || type === "group") && (
     <>
       {type === "group" && (
-        <Button variant="icon" size="icon" onClick={handleAddMembers}>
-          <UserPlusIcon />
-        </Button>
+        <SimpleTooltip content="Add members">
+          <Button variant="icon" size="icon" onClick={handleAddMembers}>
+            <UserPlusIcon />
+          </Button>
+        </SimpleTooltip>
       )}
-      <Button variant="icon" size="icon" onClick={handleEdit}>
-        <PencilIcon />
-      </Button>
+      <SimpleTooltip content="Edit group">
+        <Button variant="icon" size="icon" onClick={handleEdit}>
+          <PencilIcon />
+        </Button>
+      </SimpleTooltip>
     </>
   )
 
@@ -114,9 +119,11 @@ const RoomProfilePanel = () => {
       <div className="relative flex size-full flex-col bg-surface pt-14">
         <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
           <div className="flex items-center gap-x-4">
-            <Button variant="icon" size="icon" onClick={closeRoomProfile}>
-              <XIcon />
-            </Button>
+            <SimpleTooltip content="Close">
+              <Button variant="icon" size="icon" onClick={closeRoomProfile}>
+                <XIcon />
+              </Button>
+            </SimpleTooltip>
             <h3 className="line-clamp-1 h3">{title}</h3>
           </div>
 

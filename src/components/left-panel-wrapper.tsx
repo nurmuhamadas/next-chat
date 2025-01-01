@@ -11,6 +11,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 
+import SimpleTooltip from "./simple-tooltip"
+
 interface LeftPanelWrapperProps extends PropsWithChildren {
   title: string
   isOpen: boolean
@@ -39,9 +41,11 @@ const LeftPanelWrapper = ({
         <div className="relative flex size-full flex-col bg-surface pt-14">
           <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
             <div className="flex items-center gap-x-4">
-              <Button variant="icon" size="icon" onClick={onBack}>
-                <ArrowLeftIcon />
-              </Button>
+              <SimpleTooltip content="Back">
+                <Button variant="icon" size="icon" onClick={onBack}>
+                  <ArrowLeftIcon />
+                </Button>
+              </SimpleTooltip>
               <h3 className="line-clamp-1 h3">{title}</h3>
             </div>
 

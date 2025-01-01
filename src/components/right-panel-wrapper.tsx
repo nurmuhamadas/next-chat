@@ -13,6 +13,7 @@ import {
 
 import { Button } from "./ui/button"
 import { ScrollArea } from "./ui/scroll-area"
+import SimpleTooltip from "./simple-tooltip"
 
 interface RightPanelWrapperProps extends PropsWithChildren {
   title: string
@@ -44,9 +45,11 @@ const RightPanelWrapper = ({
         <div className="relative flex size-full flex-col bg-surface pt-14">
           <div className="absolute left-0 top-0 h-14 w-full gap-x-4 p-2 flex-center-between">
             <div className="flex items-center gap-x-4">
-              <Button variant="icon" size="icon" onClick={onBack}>
-                {arrowBack ? <ArrowLeftIcon /> : <XIcon />}
-              </Button>
+              <SimpleTooltip content="Close">
+                <Button variant="icon" size="icon" onClick={onBack}>
+                  {arrowBack ? <ArrowLeftIcon /> : <XIcon />}
+                </Button>
+              </SimpleTooltip>
               <h3 className="line-clamp-1 h3">{title}</h3>
             </div>
 

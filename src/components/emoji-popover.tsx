@@ -9,6 +9,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const EmojiPicker = dynamic(
   () => {
@@ -24,7 +30,14 @@ interface EmojiPopoverProps extends PropsWithChildren {
 const EmojiPopover = ({ children, onSelectEmoji }: EmojiPopoverProps) => {
   return (
     <Popover>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <PopoverTrigger asChild>
+            <TooltipTrigger asChild>{children}</TooltipTrigger>
+          </PopoverTrigger>
+          <TooltipContent>Select emoji</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <PopoverContent className="mb-4 w-max p-0">
         <EmojiPicker onEmojiClick={onSelectEmoji} />
       </PopoverContent>

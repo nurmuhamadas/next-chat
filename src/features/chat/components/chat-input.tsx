@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 
 import EmojiPopover from "@/components/emoji-popover"
+import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import useSendMessage from "@/features/messages/hooks/api/use-send-message"
 import useUpdateMessage from "@/features/messages/hooks/api/use-update-message"
@@ -259,15 +260,17 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   onChange={handleFileChange}
                   multiple
                 />
-                <Button
-                  variant="icon"
-                  size="icon"
-                  className="size-5 p-0 hover:text-primary"
-                  disabled={isLoading}
-                  onClick={() => inputImageRef.current?.click()}
-                >
-                  <ImageIcon />
-                </Button>
+                <SimpleTooltip content="Upload image">
+                  <Button
+                    variant="icon"
+                    size="icon"
+                    className="size-5 p-0 hover:text-primary"
+                    disabled={isLoading}
+                    onClick={() => inputImageRef.current?.click()}
+                  >
+                    <ImageIcon />
+                  </Button>
+                </SimpleTooltip>
                 <input
                   type="file"
                   hidden
@@ -277,32 +280,36 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   multiple
                   onChange={handleFileChange}
                 />
-                <Button
-                  variant="icon"
-                  size="icon"
-                  className="size-5 p-0 hover:text-primary"
-                  disabled={isLoading}
-                  onClick={() => inputFileRef.current?.click()}
-                >
-                  <PaperclipIcon />
-                </Button>
+                <SimpleTooltip content="Upload attachment">
+                  <Button
+                    variant="icon"
+                    size="icon"
+                    className="size-5 p-0 hover:text-primary"
+                    disabled={isLoading}
+                    onClick={() => inputFileRef.current?.click()}
+                  >
+                    <PaperclipIcon />
+                  </Button>
+                </SimpleTooltip>
               </div>
             )}
           </div>
         </div>
         {message.length > 0 || audioUrl || attachments.length > 0 ? (
-          <Button
-            className="size-11 bg-surface hover:bg-primary"
-            variant="secondary"
-            disabled={isLoading}
-            onClick={handleSend}
-          >
-            {isLoading ? (
-              <Loader2Icon className="animate-spin" />
-            ) : (
-              <SendHorizonalIcon />
-            )}
-          </Button>
+          <SimpleTooltip content="Send message">
+            <Button
+              className="size-11 bg-surface hover:bg-primary"
+              variant="secondary"
+              disabled={isLoading}
+              onClick={handleSend}
+            >
+              {isLoading ? (
+                <Loader2Icon className="animate-spin" />
+              ) : (
+                <SendHorizonalIcon />
+              )}
+            </Button>
+          </SimpleTooltip>
         ) : (
           <AudioRecorder onStop={setRecordedAudio} />
         )}
