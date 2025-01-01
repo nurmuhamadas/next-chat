@@ -1,5 +1,7 @@
 import { ChangeEventHandler, KeyboardEventHandler, useRef } from "react"
 
+import useWindowSize from "@/hooks/use-window-size"
+
 interface TextEditorProps {
   value?: string
   placeholder?: string
@@ -17,6 +19,8 @@ const TextEditor = ({
 }: TextEditorProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  const { isDesktop } = useWindowSize()
+
   const handleInputChange: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
     const textarea = textareaRef.current
     if (textarea) {
@@ -27,7 +31,7 @@ const TextEditor = ({
   }
 
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
-    if (event.key === "Enter") {
+    if (isDesktop && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       onPressEnter()
     }
