@@ -81,22 +81,22 @@ export const chatRoomListMenu: {
   action: ChatRoomListMenuAction
 }[] = [
   {
-    label: "Pin to top",
+    label: "pin",
     icon: PinIcon,
     action: "pin",
   },
   {
-    label: "Unpin from top",
+    label: "unpin",
     icon: PinOffIcon,
     action: "unpin",
   },
   {
-    label: "Archive",
+    label: "archive",
     icon: ArchiveIcon,
     action: "archive",
   },
   {
-    label: "Delete",
+    label: "delete",
     icon: TrashIcon,
     danger: true,
     action: "delete",

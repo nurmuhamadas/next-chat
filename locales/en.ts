@@ -295,6 +295,12 @@ export default {
     },
   },
   room_menu: {
+    list: {
+      pin: "Pin to top",
+      unpin: "Unpin from top",
+      archive: "Archive",
+      delete: "Delete",
+    },
     private: {
       mute: "Mute",
       unmute: "Unmute",

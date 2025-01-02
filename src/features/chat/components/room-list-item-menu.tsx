@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQueryClient } from "@tanstack/react-query"
 import { ChevronDownIcon, LoaderIcon } from "lucide-react"
 
@@ -8,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { chatRoomListMenu } from "../constants"
@@ -21,6 +23,8 @@ interface RoomListItemMenuProps {
 }
 
 const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
+  const t = useScopedI18n("room_menu.list")
+
   const queryClient = useQueryClient()
 
   const { mutate: pinRoom, isPending: isPinning } = usePinRoom()
@@ -139,7 +143,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
               ) : (
                 <menu.icon className="!size-4" />
               )}{" "}
-              {menu.label}
+              {t(menu.label as any)}
             </DropdownMenuItem>
           )
         })}

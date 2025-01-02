@@ -295,6 +295,12 @@ export default {
     },
   },
   room_menu: {
+    list: {
+      pin: "Sematkan ke atas",
+      unpin: "Lepaskan dari atas",
+      archive: "Arsipkan",
+      delete: "Hapus",
+    },
     private: {
       mute: "Bisukan",
       unmute: "Bunyikan",
