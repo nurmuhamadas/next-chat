@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useSearchUsersForMember from "@/features/user/hooks/api/use-search-users-for-member"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn, debounce } from "@/lib/utils"
 
 import useAddGroupMember from "../hooks/api/use-add-group-member"
@@ -18,6 +19,8 @@ import useGetGroupById from "../hooks/api/use-get-group-by-id"
 import { useAddGroupMemberPanel } from "../hooks/use-add-group-member-panel"
 
 const AddGroupMemberPanel = () => {
+  const t = useScopedI18n("group")
+
   const queryClient = useQueryClient()
 
   const id = useRoomId()
@@ -74,7 +77,7 @@ const AddGroupMemberPanel = () => {
 
   return (
     <RightPanelWrapper
-      title="Add Members"
+      title={t("add_members.title")}
       isOpen={isAddGroupMemberOpen}
       onBack={closeAddGroupMember}
     >
@@ -89,7 +92,10 @@ const AddGroupMemberPanel = () => {
 
         {!loadingGroup && group?.isAdmin && (
           <>
-            <SearchBar onValueChange={debouncedSearchKey} />
+            <SearchBar
+              placeholder={t("add_members.search")}
+              onValueChange={debouncedSearchKey}
+            />
             <ScrollArea className="chat-list-scroll-area">
               {loadingUser && (
                 <div className="h-24 flex-center">
@@ -98,7 +104,7 @@ const AddGroupMemberPanel = () => {
               )}
               {!loadingUser && users.length === 0 && (
                 <div className="h-24 flex-center">
-                  <p className="">No user found</p>
+                  <p className="">{t("add_members.search.empty")}</p>
                 </div>
               )}
               {!loadingUser && users.length > 0 && (
@@ -132,7 +138,7 @@ const AddGroupMemberPanel = () => {
                           {isPending && addingUserId.current === user.id && (
                             <LoaderIcon className="size-4 animate-spin" />
                           )}
-                          Add
+                          {t("add_members.action")}
                         </Button>
                       </li>
                     )

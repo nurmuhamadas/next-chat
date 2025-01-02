@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
@@ -19,6 +20,8 @@ import ChatRoomMenuGroup from "../chat-room-menu/group"
 
 const ChatRoomHeaderGroup = () => {
   const router = useRouter()
+
+  const t = useScopedI18n("group")
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
@@ -69,7 +72,7 @@ const ChatRoomHeaderGroup = () => {
             <>
               <h2 className="line-clamp-1 h5">{group?.name}</h2>
               <p className="line-clamp-1 text-muted-foreground caption">
-                {group?.totalMembers} members
+                {t("info.total_members", { count: group?.totalMembers })}
               </p>
             </>
           ) : null}

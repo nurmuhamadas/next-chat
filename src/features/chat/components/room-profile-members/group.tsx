@@ -13,10 +13,13 @@ import useGetGroupMembers from "@/features/group/hooks/api/use-get-group-members
 import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import useRemoveGroupMember from "@/features/group/hooks/api/use-remove-group-member"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileMembersGroup = () => {
+  const t = useScopedI18n("group.info")
+
   const queryClient = useQueryClient()
 
   const removedId = useRef<string | null>(null)
@@ -73,14 +76,14 @@ const RoomProfileMembersGroup = () => {
   if (members.length === 0) {
     return (
       <div className="h-24 flex-center">
-        <p className="">No group members</p>
+        <p className="">{t("members.empty")}</p>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-y-1 p-2">
-      <h3 className="px-2 text-grey-2 subtitle-2">Members</h3>
+      <h3 className="px-2 text-grey-2 subtitle-2">{t("members")}</h3>
       {members.length > 0 && (
         <div className="max-h-56">
           <ScrollArea className="chat-list-scroll-area">
@@ -96,7 +99,7 @@ const RoomProfileMembersGroup = () => {
                     </Link>
                     <p className="line-clamp-1 flex-1 subtitle-2">{v.name}</p>
                     {v.isAdmin && (
-                      <span className="text-grey-3 body-2">Admin</span>
+                      <span className="text-grey-3 body-2">{t("admin")}</span>
                     )}
                     {group?.isAdmin && groupOption?.userId !== v.id && (
                       <Button
@@ -111,7 +114,7 @@ const RoomProfileMembersGroup = () => {
                         {isRemoving && removedId.current === v.id && (
                           <LoaderIcon className="size-4 animate-spin" />
                         )}
-                        Remove
+                        {t("remove")}
                       </Button>
                     )}
                   </li>

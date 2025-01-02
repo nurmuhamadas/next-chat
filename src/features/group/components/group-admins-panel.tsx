@@ -8,6 +8,7 @@ import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import useGetGroupById from "../hooks/api/use-get-group-by-id"
@@ -18,6 +19,8 @@ import { useAddGroupAdminPanel } from "../hooks/use-add-group-admin-panel"
 import { useGroupAdminsPanel } from "../hooks/use-group-admins-panel"
 
 const GroupAdminsPanel = () => {
+  const t = useScopedI18n("group")
+
   const id = useRoomId()
 
   const removeUserId = useRef<string | null>(null)
@@ -65,11 +68,11 @@ const GroupAdminsPanel = () => {
 
   return (
     <RightPanelWrapper
-      title="Administrators"
+      title={t("admin.title")}
       isOpen={isGroupAdminsOpen}
       onBack={closeGroupAdmins}
       action={
-        <SimpleTooltip content="Add admin">
+        <SimpleTooltip content={t("tooltip.add_admins")}>
           <Button variant="icon" size="icon" onClick={openAddGroupAdmin}>
             <UserPlusIcon />
           </Button>
@@ -77,9 +80,7 @@ const GroupAdminsPanel = () => {
       }
     >
       <div className="flex flex-col gap-y-6 px-4 pb-8 pt-4">
-        <p className="text-muted-foreground body-2">
-          You can add admins to help you manage your group.
-        </p>
+        <p className="text-muted-foreground body-2">{t("admin.info")}</p>
         {isLoading ? (
           <div className="h-24 flex-center">
             <LoaderIcon className="size-5 animate-spin" />
@@ -111,7 +112,7 @@ const GroupAdminsPanel = () => {
                         {isPending && removeUserId.current === user.id && (
                           <LoaderIcon className="size-4 animate-spin" />
                         )}
-                        Remove
+                        {t("admin.remove")}
                       </Button>
                     )}
                   </li>

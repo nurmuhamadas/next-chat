@@ -6,10 +6,13 @@ import { Switch } from "@/components/ui/switch"
 import useGetGroupOption from "@/features/group/hooks/api/use-get-group-option"
 import useUpdateGroupOption from "@/features/group/hooks/api/use-update-group-option"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileOptionsGroup = () => {
+  const t = useScopedI18n("group.info")
+
   const id = useRoomId()
 
   const { roomProfileOpen } = useRoomProfile()
@@ -61,7 +64,7 @@ const RoomProfileOptionsGroup = () => {
       >
         <BellIcon className="size-5 text-grey-3" />
         <div className="flex-1 flex-center-between">
-          <p className="subtitle-2">Notifications</p>
+          <p className="subtitle-2">{t("notifications")}</p>
 
           <Switch
             disabled={isUpdating}

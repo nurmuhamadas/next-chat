@@ -89,7 +89,7 @@ const EditGroupPanel = () => {
                       </>
                     ) : (
                       <>
-                        <div className="subtitle-1">Administrator</div>
+                        <div className="subtitle-1">{t("admin.title")}</div>
                         <p className="text-muted-foreground body-2">
                           {admins.length}
                         </p>

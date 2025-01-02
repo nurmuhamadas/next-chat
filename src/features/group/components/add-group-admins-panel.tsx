@@ -7,6 +7,7 @@ import RightPanelWrapper from "@/components/right-panel-wrapper"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import useAddGroupAdmin from "../hooks/api/use-add-group-admin"
@@ -16,6 +17,8 @@ import useGetGroupOption from "../hooks/api/use-get-group-option"
 import { useAddGroupAdminPanel } from "../hooks/use-add-group-admin-panel"
 
 const AddGroupAdminsPanel = () => {
+  const t = useScopedI18n("group.admin.add")
+
   const id = useRoomId()
 
   const addedUserId = useRef<string | null>(null)
@@ -62,7 +65,7 @@ const AddGroupAdminsPanel = () => {
 
   return (
     <RightPanelWrapper
-      title="Add Administrators"
+      title={t("title")}
       isOpen={isAddGroupAdminOpen}
       onBack={closeAddGroupAdmin}
     >
@@ -100,7 +103,7 @@ const AddGroupAdminsPanel = () => {
                         {isPending && addedUserId.current === user.id && (
                           <LoaderIcon className="size-4 animate-spin" />
                         )}
-                        Add
+                        {t("action")}
                       </Button>
                     )}
                   </li>
@@ -110,7 +113,7 @@ const AddGroupAdminsPanel = () => {
           </ScrollArea>
         ) : (
           <div className="h-24 flex-center">
-            <p className="">No users available</p>
+            <p className="">{t("empty")}</p>
           </div>
         )}
       </div>

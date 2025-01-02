@@ -28,6 +28,7 @@ import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import useWindowSize from "@/hooks/use-window-size"
+import { useI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import ChatAvatar from "../../../components/chat-avatar"
@@ -37,6 +38,8 @@ import RoomProfileMembers from "./room-profile-members"
 import RoomProfileOptions from "./room-profile-options"
 
 const RoomProfilePanel = () => {
+  const t = useI18n()
+
   const { isDesktop } = useWindowSize()
 
   const type = useRoomType()
@@ -76,19 +79,21 @@ const RoomProfilePanel = () => {
     }
   }
 
-  const title =
-    (type === "chat" ? "User" : type === "channel" ? "Channel" : "Group") +
-    " Info"
+  const title = {
+    chat: "User Info",
+    group: t("group.info.title"),
+    channel: "Channel Info",
+  }
   const action = (type === "channel" || type === "group") && (
     <>
       {type === "group" && (
-        <SimpleTooltip content="Add members">
+        <SimpleTooltip content={t("group.tooltip.add_members")}>
           <Button variant="icon" size="icon" onClick={handleAddMembers}>
             <UserPlusIcon />
           </Button>
         </SimpleTooltip>
       )}
-      <SimpleTooltip content="Edit group">
+      <SimpleTooltip content={t("group.tooltip.edit")}>
         <Button variant="icon" size="icon" onClick={handleEdit}>
           <PencilIcon />
         </Button>
@@ -99,7 +104,7 @@ const RoomProfilePanel = () => {
   if (!isDesktop) {
     return (
       <RightPanelWrapper
-        title={title}
+        title={title[type]}
         isOpen={roomProfileOpen}
         onBack={closeRoomProfile}
         action={isAdmin ? action : undefined}
@@ -124,7 +129,7 @@ const RoomProfilePanel = () => {
                 <XIcon />
               </Button>
             </SimpleTooltip>
-            <h3 className="line-clamp-1 h3">{title}</h3>
+            <h3 className="line-clamp-1 h3">{title[type]}</h3>
           </div>
 
           {isAdmin && <div className="gap-x-1 flex-center-end">{action}</div>}
@@ -143,6 +148,8 @@ interface ProfileViewProps {
   channel?: Channel
 }
 const ProfileView = ({ group, channel }: ProfileViewProps) => {
+  const t = useI18n()
+
   const type = useRoomType()
   const id = useRoomId()
 
@@ -207,13 +214,13 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
     ],
     group: [
       {
-        label: "Description",
+        label: t("group.info.description"),
         value: group?.description,
         copyText: group?.description ?? "",
         icon: InfoIcon,
       },
       {
-        label: "Link",
+        label: t("group.info.link"),
         value: `${window.location.origin}/invite/group/${group?.id}?inviteCode=${group?.inviteCode}`,
         copyText: `${window.location.origin}/invite/group/${group?.id}?inviteCode=${group?.inviteCode}`,
         icon: PaperclipIcon,
@@ -228,7 +235,9 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
   }
   const info = {
     chat: undefined,
-    group: group ? `${group?.totalMembers} members` : undefined,
+    group: group
+      ? t("group.info.total_members", { count: group?.totalMembers })
+      : undefined,
     channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
   }
   const avatar = {
