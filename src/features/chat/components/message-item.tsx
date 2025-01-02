@@ -1,12 +1,13 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { DownloadIcon, EyeIcon } from "lucide-react"
+import { CircleSlash2Icon, DownloadIcon, EyeIcon } from "lucide-react"
 import { PhotoProvider, PhotoView } from "react-photo-view"
 
 import ChatAvatar from "@/components/chat-avatar"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn, formatMessageTime } from "@/lib/utils"
 
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
@@ -34,6 +35,8 @@ const MessageItem = ({
   timeFormat = "12-HOUR",
   onClickParentMessage,
 }: MessageItemProps) => {
+  const t = useScopedI18n("messages")
+
   const { isSelectMode, toggleSelectMessage } = useSelectedMessageIds()
 
   const isEmojiOnly = message.isEmojiOnly
@@ -42,6 +45,13 @@ const MessageItem = ({
   const isDeleted =
     message.status === "DELETED_BY_ADMIN" ||
     message.status === "DELETED_FOR_ALL"
+
+  const messageText = {
+    DEFAULT: message.message,
+    DELETED_FOR_ME: message.message,
+    DELETED_FOR_ALL: t("deleted_for_all"),
+    DELETED_BY_ADMIN: t("deleted_by_admin"),
+  }
 
   return (
     <div
@@ -93,7 +103,7 @@ const MessageItem = ({
 
               {isForwarded && (
                 <div className="italic text-foreground/50 caption">
-                  forwarded
+                  {t("forwarded")}
                 </div>
               )}
             </div>
@@ -231,7 +241,10 @@ const MessageItem = ({
                 "italic opacity-75",
             )}
           >
-            {message.message}
+            {isDeleted && (
+              <CircleSlash2Icon className="mr-1 inline-block size-4" />
+            )}
+            {messageText[message.status]}
           </p>
 
           <div className="mt-1.5 flex items-center justify-end gap-x-2">
@@ -239,7 +252,7 @@ const MessageItem = ({
 
             {message.isUpdated && (
               <span className="italic text-muted-foreground caption">
-                Edited
+                {t("edited")}
               </span>
             )}
             <span className="text-foreground/50 caption">

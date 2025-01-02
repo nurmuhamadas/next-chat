@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import Image from "next/image"
 
-import { isToday, parseISO } from "date-fns"
+import { isToday, isYesterday, parseISO } from "date-fns"
 import { LoaderIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,7 @@ import useReadMessage from "@/features/messages/hooks/api/use-read-message"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn, formatChatTime, roomTypeToRoomTypeModelLower } from "@/lib/utils"
 
 import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
@@ -37,6 +38,8 @@ const ChatRoomMessages = ({
   onEditMessageChange,
   onDeletedMessageChange,
 }: ChatRoomMessagesProps) => {
+  const t = useScopedI18n("messages")
+
   const type = useRoomType()
   const id = useRoomId()
 
@@ -73,8 +76,13 @@ const ChatRoomMessages = ({
         const date = parseISO(message.createdAt)
 
         const time = isToday(date)
-          ? "Today"
-          : formatChatTime(message.createdAt, setting?.timeFormat ?? "12-HOUR")
+          ? t("time.today")
+          : isYesterday(date)
+            ? t("time.yestedey")
+            : formatChatTime(
+                message.createdAt,
+                setting?.timeFormat ?? "12-HOUR",
+              )
 
         if (!times.includes(time)) {
           times.push(time)
@@ -164,25 +172,21 @@ const ChatRoomMessages = ({
       <div className="w-full flex-1 flex-center">
         {type === "group" && (
           <div className="w-56 gap-y-6 rounded-lg bg-surface p-6 flex-col-center">
-            <p className="text-center body-2">
-              Only group members can view the messages.
-            </p>
+            <p className="text-center body-2">{t("group.only_member")}</p>
             <Button onClick={handleJoinGroup} disabled={isJoiningGroup}>
               {isJoiningGroup && <LoaderIcon className="size-4 animate-spin" />}
-              Join Group
+              {t("group.join")}
             </Button>
           </div>
         )}
         {type === "channel" && (
           <div className="w-56 gap-y-6 rounded-lg bg-surface p-6 flex-col-center">
-            <p className="text-center body-2">
-              Only channel subscribers can view the messages.
-            </p>
+            <p className="text-center body-2">{t("channel.only_member")}</p>
             <Button onClick={handleJoinChannel} disabled={isJoiningChannel}>
               {isJoiningChannel && (
                 <LoaderIcon className="size-4 animate-spin" />
               )}
-              Subscribe Channel
+              {t("channel.only_member")}
             </Button>
           </div>
         )}
@@ -208,7 +212,7 @@ const ChatRoomMessages = ({
             className="h-auto w-28 lg:w-32"
           />
           <div className="gap-y-2 flex-col-center">
-            <h4 className="h4">No Messages</h4>
+            <h4 className="h4">{t("empty")}</h4>
           </div>
         </div>
       )}

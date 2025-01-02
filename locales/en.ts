@@ -401,4 +401,26 @@ export default {
       },
     },
   },
+  messages: {
+    "input.placeholder": "Type message here...",
+    empty: "No Messages",
+    edit: "Edit Message",
+    attatchment: "Attachment",
+    forwarded: "Forwarded",
+    edited: "Edited",
+    deleted_for_all: "This message was deleted",
+    deleted_by_admin: "This message was deleted by admin",
+    group: {
+      only_member: "Only group members can view the messages.",
+      join: "Join Group",
+    },
+    channel: {
+      only_member: "Only channel subscribers can view the messages.",
+      subscribe: "Subscribe Channel",
+    },
+    time: {
+      today: "Today",
+      yestedey: "Yesterday",
+    },
+  },
 } as const

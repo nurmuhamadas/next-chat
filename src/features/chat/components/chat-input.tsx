@@ -22,6 +22,7 @@ import useSendMessage from "@/features/messages/hooks/api/use-send-message"
 import useUpdateMessage from "@/features/messages/hooks/api/use-update-message"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
@@ -37,6 +38,8 @@ interface ChatInputProps {
 }
 
 const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
+  const t = useScopedI18n("messages")
+
   const queryClient = useQueryClient()
 
   const type = useRoomType()
@@ -181,7 +184,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
               <PencilIcon className="mr-2 size-6 text-muted-foreground" />
               <div className="flex flex-1 flex-col rounded-sm border-l-4 bg-bubble-reply-1 py-1 pl-2 pr-1">
                 <p className="line-clamp-1 font-semibold caption">
-                  Edit message
+                  {t("edit")}
                 </p>
                 <p className={cn("line-clamp-1 text-foreground/50 caption")}>
                   {editedMessage.message}
@@ -203,7 +206,9 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                 <p className={cn("line-clamp-1 text-foreground/50 caption")}>
                   {repliedMessage.message}
                   {!repliedMessage.message && attachments && (
-                    <span className="text-muted-foreground">Attachments</span>
+                    <span className="text-muted-foreground">
+                      {t("attatchment")}
+                    </span>
                   )}
                 </p>
               </div>
@@ -240,6 +245,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             <TextEditor
               value={message}
               disabled={isLoading}
+              placeholder={t("input.placeholder")}
               onPressEnter={handleSend}
               onValueChange={(value) => {
                 setMessage(value)

@@ -401,4 +401,26 @@ export default {
       },
     },
   },
+  messages: {
+    "input.placeholder": "Tulis pesan di sini...",
+    empty: "Tidak ada Pesan",
+    edit: "Edit Pesan",
+    attatchment: "Lampiran",
+    forwarded: "Dialihkan",
+    edited: "Diedit",
+    deleted_for_all: "Pesan ini telah dihapus",
+    deleted_by_admin: "Pesan ini telah dihapus oleh admin",
+    group: {
+      only_member: "Hanya anggota grup yang dapat melihat pesan.",
+      join: "Bergabung ke Grup",
+    },
+    channel: {
+      only_member: "Hanya pelanggan saluran yang dapat melihat pesan.",
+      subscribe: "Langganan Saluran",
+    },
+    time: {
+      today: "Hari ini",
+      yestedey: "Kemarin",
+    },
+  },
 } as const

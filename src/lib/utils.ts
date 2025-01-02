@@ -89,6 +89,7 @@ export const formatChatTime = (time: string, timeFormat: TimeFormat) => {
   const date = parseISO(time)
 
   if (isToday(date)) {
+    // TODO: locale
     return format(date, timeFormat === "12-HOUR" ? "hh:mm a" : "HH:mm")
   } else if (isYesterday(date)) {
     return "Yesterday"
