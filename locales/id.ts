@@ -164,6 +164,7 @@ export default {
     },
     messages: {
       notification_updated: "Notifikasi berhasil diperbarui.",
+      message_deleted: "Pesan berhasil dihapus.",
     },
   },
   group: {
@@ -231,6 +232,8 @@ export default {
       added_admins: "Admin berhasil ditambahkan.",
       removed_admins: "Admin berhasil dihapus.",
       notification_updated: "Notifikasi berhasil diperbarui.",
+      left_group: "Anda telah meninggalkan grup.",
+      delete_message: "Pesan berhasil dihapus.",
     },
   },
   channel: {
@@ -287,6 +290,8 @@ export default {
       added_admins: "Admin berhasil ditambahkan.",
       removed_admins: "Admin berhasil dihapus.",
       notification_updated: "Notifikasi berhasil diperbarui.",
+      left_channel: "Anda telah meninggalkan saluran.",
+      delete_message: "Pesan berhasil dihapus.",
     },
   },
   room_menu: {

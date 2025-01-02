@@ -164,6 +164,7 @@ export default {
     },
     messages: {
       notification_updated: "Notification updated successfully.",
+      message_deleted: "Message deleted successfully.",
     },
   },
   group: {
@@ -231,6 +232,8 @@ export default {
       added_admins: "Admins added successfully.",
       removed_admins: "Admins removed successfully.",
       notification_updated: "Notification updated successfully.",
+      left_group: "You have left the group.",
+      delete_message: "Message deleted successfully.",
     },
   },
   channel: {
@@ -287,6 +290,8 @@ export default {
       added_admins: "Admins added successfully.",
       removed_admins: "Admins removed successfully.",
       notification_updated: "Notification updated successfully.",
+      left_channel: "You have left the channel.",
+      delete_message: "Message deleted successfully.",
     },
   },
   room_menu: {
