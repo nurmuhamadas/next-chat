@@ -98,4 +98,12 @@ export default {
       profile_updated: "Profile updated successfully.",
     },
   },
+  blocked_user: {
+    title: "Blocked Users",
+    no_data: "No blocked users found.",
+    messages: {
+      block_success: "User blocked successfully.",
+      unblock_success: "User unblocked successfully.",
+    },
+  },
 } as const

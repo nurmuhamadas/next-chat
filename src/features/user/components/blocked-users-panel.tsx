@@ -7,11 +7,14 @@ import LeftPanelWrapper from "@/components/left-panel-wrapper"
 import { Button } from "@/components/ui/button"
 import useGetBlockedUsers from "@/features/blocked-users/hooks/api/use-get-blocked-users"
 import useUnblockUser from "@/features/blocked-users/hooks/api/use-unblock-user"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useBlockedUsersPanel } from "../hooks/use-blocked-users-panel"
 
 const BlockedUsersPanel = () => {
   const queryClient = useQueryClient()
+
+  const t = useScopedI18n("blocked_user")
 
   const { isBlockedUsersOpen, closeBlockedUsers } = useBlockedUsersPanel()
 
@@ -42,14 +45,14 @@ const BlockedUsersPanel = () => {
   return (
     <LeftPanelWrapper
       isOpen={isBlockedUsersOpen}
-      title="Blocked users"
+      title={t("title")}
       onBack={closeBlockedUsers}
     >
       {isLoading && blockedUsers.length === 0 && <ChatSkeleton />}
 
       {!isLoading && blockedUsers.length === 0 && (
         <div className="size-full pt-8 flex-col-center">
-          <p className="text-muted-foreground">No blocked users</p>
+          <p className="text-muted-foreground">{t("no_data")}</p>
         </div>
       )}
 

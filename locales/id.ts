@@ -97,4 +97,12 @@ export default {
       profile_updated: "Profil berhasil diperbarui.",
     },
   },
+  blocked_user: {
+    title: "Pengguna Diblokir",
+    no_data: "Tidak ada pengguna diblokir ditemukan.",
+    messages: {
+      block_success: "Pengguna berhasil diblokir.",
+      unblock_success: "Pengguna berhasil dibuka blokir.",
+    },
+  },
 } as const
