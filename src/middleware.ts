@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server"
 
+import { createI18nMiddleware } from "next-international/middleware"
+
 import { validateAuth } from "./features/auth/lib/queries"
 import {
   apiPrefix,
@@ -7,6 +9,12 @@ import {
   DEFAULT_LOGIN_REDIRECT,
   publicRoutes,
 } from "./routes"
+
+const I18nMiddleware = createI18nMiddleware({
+  locales: ["en", "id"],
+  defaultLocale: "en",
+  urlMappingStrategy: "rewrite",
+})
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request
@@ -27,7 +35,7 @@ export async function middleware(request: NextRequest) {
       )
     }
 
-    return
+    return I18nMiddleware(request)
   }
 
   if (!isPublicRoute) {
@@ -46,7 +54,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return
+  return I18nMiddleware(request)
 }
 
 export const config = {
