@@ -13,7 +13,7 @@ import useReadMessage from "@/features/messages/hooks/api/use-read-message"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
-import { useScopedI18n } from "@/lib/locale/client"
+import { useCurrentLocale, useScopedI18n } from "@/lib/locale/client"
 import { cn, formatChatTime, roomTypeToRoomTypeModelLower } from "@/lib/utils"
 
 import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
@@ -38,6 +38,7 @@ const ChatRoomMessages = ({
   onEditMessageChange,
   onDeletedMessageChange,
 }: ChatRoomMessagesProps) => {
+  const currentLocal = useCurrentLocale()
   const t = useScopedI18n("messages")
 
   const type = useRoomType()
@@ -82,6 +83,7 @@ const ChatRoomMessages = ({
             : formatChatTime(
                 message.createdAt,
                 setting?.timeFormat ?? "12-HOUR",
+                currentLocal,
               )
 
         if (!times.includes(time)) {

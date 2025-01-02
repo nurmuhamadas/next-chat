@@ -13,12 +13,14 @@ interface RoomListItemProps {
   selected?: boolean
   timeFormat?: TimeFormat
   data: Room
+  locale: "en" | "id"
 }
 
 const RoomListItem = ({
   selected = false,
   data,
   timeFormat = "12-HOUR",
+  locale,
 }: RoomListItemProps) => {
   return (
     <Link href={`/${data.type}/${data.id}`}>
@@ -40,7 +42,7 @@ const RoomListItem = ({
             <div className="gap-x-1.5 flex-center-end">
               {data.lastMessage?.time && (
                 <span className="caption">
-                  {formatChatTime(data.lastMessage?.time, timeFormat)}
+                  {formatChatTime(data.lastMessage?.time, timeFormat, locale)}
                 </span>
               )}
             </div>

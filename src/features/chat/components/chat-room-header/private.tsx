@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useCurrentLocale } from "@/lib/locale/client"
 import { cn, formatChatTime } from "@/lib/utils"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
@@ -20,6 +21,8 @@ import ChatRoomMenuPrivate from "../chat-room-menu/private"
 
 const ChatRoomHeaderPrivate = () => {
   const router = useRouter()
+
+  const currentLocal = useCurrentLocale()
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
@@ -76,6 +79,7 @@ const ChatRoomHeaderPrivate = () => {
                   {formatChatTime(
                     user.lastSeenAt,
                     setting?.timeFormat ?? "12-HOUR",
+                    currentLocal,
                   )}
                 </p>
               )}

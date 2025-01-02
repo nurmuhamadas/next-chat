@@ -85,20 +85,28 @@ export const formatMessageTime = (time: string, timeFormat: TimeFormat) => {
   return format(date, timeFormat === "12-HOUR" ? "hh:mm a" : "HH:mm")
 }
 
-export const formatChatTime = (time: string, timeFormat: TimeFormat) => {
+import { enUS, id } from "date-fns/locale"
+
+export const formatChatTime = (
+  time: string,
+  timeFormat: TimeFormat,
+  locale: "en" | "id" = "en",
+) => {
   const date = parseISO(time)
+  const localeObj = locale === "en" ? enUS : id
 
   if (isToday(date)) {
-    // TODO: locale
-    return format(date, timeFormat === "12-HOUR" ? "hh:mm a" : "HH:mm")
+    return format(date, timeFormat === "12-HOUR" ? "hh:mm a" : "HH:mm", {
+      locale: localeObj,
+    })
   } else if (isYesterday(date)) {
-    return "Yesterday"
+    return locale === "en" ? "Yesterday" : "Kemarin"
   } else if (isThisWeek(date)) {
-    return format(date, "EEE")
+    return format(date, "EEE", { locale: localeObj })
   } else if (isThisYear(date)) {
-    return format(date, "MMM d")
+    return format(date, "MMM d", { locale: localeObj })
   } else {
-    return format(date, "MMM d, yyyy")
+    return format(date, "MMM d, yyyy", { locale: localeObj })
   }
 }
 

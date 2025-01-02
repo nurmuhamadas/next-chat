@@ -7,7 +7,11 @@ import {
   THEME_OPT,
   TIME_FORMAT_OPT,
 } from "@/features/user/constants"
-import { useScopedI18n } from "@/lib/locale/client"
+import {
+  useChangeLocale,
+  useCurrentLocale,
+  useScopedI18n,
+} from "@/lib/locale/client"
 
 import useGetSetting from "../../hooks/api/use-get-setting"
 import useUpdateSetting from "../../hooks/api/use-update-setting"
@@ -18,10 +22,23 @@ import SettingItem from "./item"
 const ThemeAndAppereanceSettings = () => {
   const t = useScopedI18n("settings.appearance")
 
+  const currentLocale = useCurrentLocale()
+  const currentLang = currentLocale === "en" ? "en_US" : "id_ID"
+
+  const changeLocale = useChangeLocale()
+
   const { setTheme, theme, systemTheme } = useTheme()
 
   const { data, isLoading, refetch } = useGetSetting()
   const { mutate: updateSetting, isPending } = useUpdateSetting()
+
+  const handleLanguageChange = (value: Language) => {
+    if (value === "en_US") {
+      changeLocale("en")
+    } else {
+      changeLocale("id")
+    }
+  }
 
   const handleThemeChange = (value: Theme) => {
     if (value === "SYSTEM") {
@@ -73,18 +90,9 @@ const ThemeAndAppereanceSettings = () => {
           ...opt,
           label: t(opt.label as any),
         }))}
-        value={data?.language}
+        value={currentLang}
         isLoading={isLoading || isPending}
-        onValueChange={(value) => {
-          updateSetting(
-            { json: { language: value as Language } },
-            {
-              onSuccess() {
-                refetch()
-              },
-            },
-          )
-        }}
+        onValueChange={handleLanguageChange}
       />
     </SettingsContainer>
   )

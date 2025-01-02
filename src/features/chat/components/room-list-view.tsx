@@ -8,7 +8,7 @@ import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
-import { useScopedI18n } from "@/lib/locale/client"
+import { useCurrentLocale, useScopedI18n } from "@/lib/locale/client"
 
 import useGetRooms from "../hooks/api/use-get-rooms"
 
@@ -16,6 +16,7 @@ import RoomListItem from "./room-list-item"
 
 const RoomListView = () => {
   const t = useScopedI18n("room")
+  const currentLocal = useCurrentLocale()
 
   const { data: settings, isLoading: settingLoading } = useGetSetting()
   const {
@@ -70,6 +71,7 @@ const RoomListView = () => {
               key={room.id}
               timeFormat={settings?.timeFormat ?? "12-HOUR"}
               data={room}
+              locale={currentLocal}
             />
           )
         })}
