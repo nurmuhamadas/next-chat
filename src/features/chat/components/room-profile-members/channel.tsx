@@ -8,10 +8,13 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
 import useGetChannelSubscribers from "@/features/channel/hooks/api/use-get-channel-subscribers"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileMembersChannel = () => {
+  const t = useScopedI18n("channel.info")
+
   const id = useRoomId()
 
   const { roomProfileOpen } = useRoomProfile()
@@ -39,14 +42,14 @@ const RoomProfileMembersChannel = () => {
   if (subscribers.length === 0) {
     return (
       <div className="h-24 flex-center">
-        <p className="">No group members</p>
+        <p className="">{t("subscribers.empty")}</p>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-y-1 p-2">
-      <h3 className="px-2 text-grey-2 subtitle-2">Subscribers</h3>
+      <h3 className="px-2 text-grey-2 subtitle-2">{t("subscribers")}</h3>
       {subscribers.length > 0 && (
         <div className="max-h-56">
           <ScrollArea className="chat-list-scroll-area">
@@ -62,7 +65,7 @@ const RoomProfileMembersChannel = () => {
                     </Link>
                     <p className="line-clamp-1 flex-1 subtitle-2">{v.name}</p>
                     {v.isAdmin && (
-                      <span className="text-grey-3 body-2">Admin</span>
+                      <span className="text-grey-3 body-2">{t("admin")}</span>
                     )}
                   </li>
                 )
@@ -81,7 +84,7 @@ const RoomProfileMembersChannel = () => {
                 className="mt-4"
                 onClick={() => fetchNextPage()}
               >
-                Show more
+                {t("show_more")}
               </Button>
             )}
           </ScrollArea>

@@ -82,7 +82,7 @@ const RoomProfilePanel = () => {
   const title = {
     chat: "User Info",
     group: t("group.info.title"),
-    channel: "Channel Info",
+    channel: t("channel.info.title"),
   }
   const action = (type === "channel" || type === "group") && (
     <>
@@ -93,7 +93,13 @@ const RoomProfilePanel = () => {
           </Button>
         </SimpleTooltip>
       )}
-      <SimpleTooltip content={t("group.tooltip.edit")}>
+      <SimpleTooltip
+        content={
+          type === "channel"
+            ? t("channel.tooltip.edit")
+            : t("group.tooltip.edit")
+        }
+      >
         <Button variant="icon" size="icon" onClick={handleEdit}>
           <PencilIcon />
         </Button>
@@ -200,13 +206,13 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
     ],
     channel: [
       {
-        label: "Description",
+        label: t("channel.info.description"),
         value: channel?.description,
         copyText: channel?.description ?? "",
         icon: InfoIcon,
       },
       {
-        label: "Link",
+        label: t("channel.info.link"),
         value: `${window.location.origin}/invite/channel/${channel?.id}?inviteCode=${channel?.inviteCode}`,
         copyText: `${window.location.origin}/invite/channel/${channel?.id}?inviteCode=${channel?.inviteCode}`,
         icon: PaperclipIcon,
@@ -238,7 +244,11 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
     group: group
       ? t("group.info.total_members", { count: group?.totalMembers })
       : undefined,
-    channel: channel ? `${channel?.totalSubscribers} subscribers` : undefined,
+    channel: channel
+      ? t("channel.info.total_subscribers", {
+          count: channel?.totalSubscribers,
+        })
+      : undefined,
   }
   const avatar = {
     chat: user ? (user?.imageUrl ?? "") : undefined,

@@ -6,10 +6,13 @@ import { Switch } from "@/components/ui/switch"
 import useGetChannelOption from "@/features/channel/hooks/api/use-get-channel-option"
 import useUpdateChannelOption from "@/features/channel/hooks/api/use-update-channel-option"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileOptionsChannel = () => {
+  const t = useScopedI18n("channel")
+
   const id = useRoomId()
 
   const { roomProfileOpen } = useRoomProfile()
@@ -62,7 +65,7 @@ const RoomProfileOptionsChannel = () => {
       >
         <BellIcon className="size-5 text-grey-3" />
         <div className="flex-1 flex-center-between">
-          <p className="subtitle-2">Notifications</p>
+          <p className="subtitle-2">{t("info.notifications")}</p>
 
           <Switch
             disabled={isUpdating}

@@ -8,6 +8,7 @@ import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import useGetChannelById from "../hooks/api/use-get-channel-by-id"
@@ -18,6 +19,8 @@ import { useAddChannelAdminPanel } from "../hooks/use-add-channel-admin-panel"
 import { useChannelAdminsPanel } from "../hooks/use-channel-admins-panel"
 
 const ChannelAdminsPanel = () => {
+  const t = useScopedI18n("channel")
+
   const id = useRoomId()
 
   const removeUserId = useRef<string | null>(null)
@@ -67,11 +70,11 @@ const ChannelAdminsPanel = () => {
 
   return (
     <RightPanelWrapper
-      title="Administrators"
+      title={t("admin.title")}
       isOpen={isChannelAdminsOpen}
       onBack={closeChannelAdmins}
       action={
-        <SimpleTooltip content="Add admin">
+        <SimpleTooltip content={t("tooltip.add_admins")}>
           <Button variant="icon" size="icon" onClick={openAddChannelAdmin}>
             <UserPlusIcon />
           </Button>
@@ -79,9 +82,7 @@ const ChannelAdminsPanel = () => {
       }
     >
       <div className="flex flex-col gap-y-6 px-4 pb-8 pt-4">
-        <p className="text-muted-foreground body-2">
-          You can add admins to help you manage your channel.
-        </p>
+        <p className="text-muted-foreground body-2">{t("admin.info")}</p>
         {isLoading ? (
           <div className="h-24 flex-center">
             <LoaderIcon className="size-5 animate-spin" />
@@ -113,7 +114,7 @@ const ChannelAdminsPanel = () => {
                         {isPending && removeUserId.current === user.id && (
                           <LoaderIcon className="size-4 animate-spin" />
                         )}
-                        Remove
+                        {t("admin.remove")}
                       </Button>
                     )}
                   </li>

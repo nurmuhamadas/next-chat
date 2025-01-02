@@ -7,6 +7,7 @@ import RightPanelWrapper from "@/components/right-panel-wrapper"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import useAddChannelAdmin from "../hooks/api/use-add-channel-admin"
@@ -16,6 +17,8 @@ import useGetChannelSubscribers from "../hooks/api/use-get-channel-subscribers"
 import { useAddChannelAdminPanel } from "../hooks/use-add-channel-admin-panel"
 
 const AddChannelAdminsPanel = () => {
+  const t = useScopedI18n("channel.admin")
+
   const id = useRoomId()
 
   const addedUserId = useRef<string | null>(null)
@@ -103,7 +106,7 @@ const AddChannelAdminsPanel = () => {
                         {isPending && addedUserId.current === user.id && (
                           <LoaderIcon className="size-4 animate-spin" />
                         )}
-                        Add
+                        {t("add.action")}
                       </Button>
                     )}
                   </li>
@@ -113,7 +116,7 @@ const AddChannelAdminsPanel = () => {
           </ScrollArea>
         ) : (
           <div className="h-24 flex-center">
-            <p className="">No users available</p>
+            <p className="">{t("add.empty")}</p>
           </div>
         )}
       </div>
