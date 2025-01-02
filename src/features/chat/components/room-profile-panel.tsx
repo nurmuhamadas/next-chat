@@ -200,8 +200,8 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
       },
       {
         label: "Link",
-        value: `${process.env.NEXT_PUBLIC_APP_URL}/channel/${channel?.id}`,
-        copyText: `${process.env.NEXT_PUBLIC_APP_URL}/channel/${channel?.id}`,
+        value: `${window.location.origin}/invite/channel/${channel?.id}?inviteCode=${channel?.inviteCode}`,
+        copyText: `${window.location.origin}/invite/channel/${channel?.id}?inviteCode=${channel?.inviteCode}`,
         icon: PaperclipIcon,
       },
     ],
@@ -214,8 +214,8 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
       },
       {
         label: "Link",
-        value: `${process.env.NEXT_PUBLIC_APP_URL}/group/${group?.id}`,
-        copyText: `${process.env.NEXT_PUBLIC_APP_URL}/group/${group?.id}`,
+        value: `${window.location.origin}/invite/group/${group?.id}?inviteCode=${group?.inviteCode}`,
+        copyText: `${window.location.origin}/invite/group/${group?.id}?inviteCode=${group?.inviteCode}`,
         icon: PaperclipIcon,
       },
     ],
