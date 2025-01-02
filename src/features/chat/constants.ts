@@ -202,17 +202,17 @@ export const messageItemMenu: {
   action: MessageItemMenuAction
 }[] = [
   {
-    label: "Reply",
+    label: "reply",
     icon: ReplyIcon,
     action: "reply",
   },
   {
-    label: "Edit",
+    label: "edit",
     icon: PencilIcon,
     action: "edit",
   },
   {
-    label: "Copy Text",
+    label: "copy",
     icon: CopyIcon,
     action: "copy-text",
   },
@@ -222,17 +222,17 @@ export const messageItemMenu: {
   //   action: "pin",
   // },
   {
-    label: "Forward",
+    label: "forward",
     icon: ForwardIcon,
     action: "forward",
   },
   {
-    label: "Select",
+    label: "select",
     icon: CircleCheckIcon,
     action: "select",
   },
   {
-    label: "Delete",
+    label: "delete",
     icon: TrashIcon,
     action: "delete",
     danger: true,

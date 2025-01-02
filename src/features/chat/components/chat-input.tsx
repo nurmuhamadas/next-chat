@@ -266,7 +266,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   onChange={handleFileChange}
                   multiple
                 />
-                <SimpleTooltip content="Upload image">
+                <SimpleTooltip content={t("tooltip.upload_image")}>
                   <Button
                     variant="icon"
                     size="icon"
@@ -286,7 +286,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   multiple
                   onChange={handleFileChange}
                 />
-                <SimpleTooltip content="Upload attachment">
+                <SimpleTooltip content={t("tooltip.upload_attachment")}>
                   <Button
                     variant="icon"
                     size="icon"
@@ -302,7 +302,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
           </div>
         </div>
         {message.length > 0 || audioUrl || attachments.length > 0 ? (
-          <SimpleTooltip content="Send message">
+          <SimpleTooltip content={t("tooltip.send")}>
             <Button
               className="size-11 bg-surface hover:bg-primary"
               variant="secondary"

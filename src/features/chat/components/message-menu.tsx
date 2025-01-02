@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChevronDownIcon } from "lucide-react"
 
 import {
@@ -6,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn, copyMessage } from "@/lib/utils"
 
 import { messageItemMenu } from "../constants"
@@ -21,6 +23,9 @@ interface MessageMenuProps {
 }
 
 const MessageMenu = ({ isAdmin, message }: MessageMenuProps) => {
+  const t = useScopedI18n("messages.menu")
+  const tG = useScopedI18n("messages")
+
   const { replyMessage, cancelReplyMessage } = useRepliedMessageId()
   const { editMessage, cancelEditMessage } = useEditedMessageId()
   const { toggleSelectMessage } = useSelectedMessageIds()
@@ -39,7 +44,7 @@ const MessageMenu = ({ isAdmin, message }: MessageMenuProps) => {
         break
       case "copy-text":
         if (message.message) {
-          copyMessage(message.message)
+          copyMessage(message.message, tG("messages.text_copied"))
         }
         break
       case "pin":
@@ -101,7 +106,7 @@ const MessageMenu = ({ isAdmin, message }: MessageMenuProps) => {
                 )}
                 onClick={() => handleMenuClick(menu.action)}
               >
-                <menu.icon /> {menu.label}
+                <menu.icon /> {t(menu.label as any)}
               </DropdownMenuItem>
             )
           })}

@@ -422,5 +422,50 @@ export default {
       today: "Today",
       yestedey: "Yesterday",
     },
+    menu: {
+      reply: "Reply",
+      edit: "Edit",
+      copy: "Copy Text",
+      forward: "Forward",
+      select: "Select",
+      delete: "Delete",
+    },
+    forward: {
+      placeholder: "Forward to",
+      empty: "No search found",
+    },
+    select: {
+      "count#zero": "No messages selected",
+      "count#one": "1 message selected",
+      "count#many": "{count} messages selected",
+      tooltip: {
+        cancel: "Cancel",
+        forward: "Forward",
+        copy: "Copy",
+        delete: "Delete",
+      },
+    },
+    delete: {
+      confirm_title: "Delete Messages",
+      confirm_body:
+        "Are you sure you want to delete these messages? This action cannot be undone.",
+      default: "Delete",
+      for_me: "Delete just for me",
+      for_all: "Delete for everyone",
+      cancel: "Cancel",
+    },
+    tooltip: {
+      emoji: "Select emoji",
+      send: "Send message",
+      start_record: "Start recording",
+      pause_record: "Pause recording",
+      resume_record: "Resume recording",
+      stop_record: "Stop recording",
+      upload_image: "Upload image",
+      upload_attachment: "Upload attachment",
+    },
+    messages: {
+      text_copied: "Text copied to clipboard",
+    },
   },
 } as const

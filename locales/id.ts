@@ -422,5 +422,50 @@ export default {
       today: "Hari ini",
       yestedey: "Kemarin",
     },
+    menu: {
+      reply: "Balas",
+      edit: "Edit",
+      copy: "Salin Teks",
+      forward: "Teruskan",
+      select: "Pilih",
+      delete: "Hapus",
+    },
+    forward: {
+      placeholder: "Teruskan ke",
+      empty: "Pencarian tidak ditemukan",
+    },
+    select: {
+      "count#zero": "Tidak ada pesan yang dipilih",
+      "count#one": "1 pesan dipilih",
+      "count#many": "{count} pesan dipilih",
+      tooltip: {
+        cancel: "Batal",
+        forward: "Teruskan",
+        copy: "Salin",
+        delete: "Hapus",
+      },
+    },
+    delete: {
+      confirm_title: "Hapus Pesan",
+      confirm_body:
+        "Apakah Anda yakin ingin menghapus pesan ini? Tindakan ini tidak dapat dibatalkan.",
+      default: "Hapus",
+      for_me: "Hapus hanya untuk saya",
+      for_all: "Hapus untuk semua orang",
+      cancel: "Batal",
+    },
+    tooltip: {
+      emoji: "Pilih emoji",
+      send: "Kirim pesan",
+      start_record: "Mulai merekam",
+      pause_record: "Jeda rekaman",
+      resume_record: "Lanjutkan rekaman",
+      stop_record: "Hentikan rekaman",
+      upload_image: "Unggah gambar",
+      upload_attachment: "Unggah lampiran",
+    },
+    messages: {
+      text_copied: "Teks disalin ke papan klip",
+    },
   },
 } as const

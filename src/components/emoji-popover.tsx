@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useScopedI18n } from "@/lib/locale/client"
 
 const EmojiPicker = dynamic(
   () => {
@@ -28,6 +29,8 @@ interface EmojiPopoverProps extends PropsWithChildren {
 }
 
 const EmojiPopover = ({ children, onSelectEmoji }: EmojiPopoverProps) => {
+  const t = useScopedI18n("messages.tooltip")
+
   return (
     <Popover>
       <TooltipProvider>
@@ -35,7 +38,7 @@ const EmojiPopover = ({ children, onSelectEmoji }: EmojiPopoverProps) => {
           <PopoverTrigger asChild>
             <TooltipTrigger asChild>{children}</TooltipTrigger>
           </PopoverTrigger>
-          <TooltipContent>Select emoji</TooltipContent>
+          <TooltipContent>{t("emoji")}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <PopoverContent className="mb-4 w-max p-0">

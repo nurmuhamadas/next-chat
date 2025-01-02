@@ -14,6 +14,7 @@ import useDeleteMessageForAll from "@/features/messages/hooks/api/use-delete-mes
 import useDeleteMessageForMe from "@/features/messages/hooks/api/use-delete-message-for-me"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
 
@@ -22,6 +23,8 @@ interface DeleteMessageModalProps {
   isAdmin: boolean
 }
 const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
+  const t = useScopedI18n("messages.delete")
+
   const queryClient = useQueryClient()
 
   const id = useRoomId()
@@ -86,9 +89,9 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
     <Dialog open={!!deletedMessageId} onOpenChange={cancelDeleteMessage}>
       <DialogContent hideCloseButton className="max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>DELETE_MESSAGE_TITLE</DialogTitle>
+          <DialogTitle>{t("confirm_title")}</DialogTitle>
         </DialogHeader>
-        <DialogDescription>DELETE_MESSAGE_BODY</DialogDescription>
+        <DialogDescription>{t("confirm_body")}</DialogDescription>
         <DialogFooter>
           {message.isSender && (
             <div className="flex flex-col items-end">
@@ -98,8 +101,7 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
                 onClick={handleDeleteForAll}
                 disabled={isDeletingForAll}
               >
-                {isDeletingForAll ? "Deleting " : "Delete "}
-                for everyone
+                {t("for_all")}
               </Button>
               <Button
                 variant="ghost"
@@ -107,11 +109,10 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
                 onClick={handleDeleteForMe}
                 disabled={isDeletingForMe}
               >
-                {isDeletingForMe ? "Deleting " : "Delete "}
-                just for me
+                {t("for_me")}
               </Button>
               <Button variant="ghost" onClick={cancelDeleteMessage}>
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           )}
@@ -123,10 +124,10 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
                 onClick={handleDeleteByAdmin}
                 disabled={isDeletingByAdmin}
               >
-                {isDeletingByAdmin ? "Deleting" : "Delete"}
+                {t("default")}
               </Button>
               <Button variant="ghost" onClick={cancelDeleteMessage}>
-                Cancel
+                {t("for_all")}
               </Button>
             </div>
           )}

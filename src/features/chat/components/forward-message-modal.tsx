@@ -16,12 +16,15 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetChannels from "@/features/channel/hooks/api/use-get-channels"
 import useGetGroups from "@/features/group/hooks/api/use-get-groups"
 import useForwardMessage from "@/features/messages/hooks/api/use-forward-message"
+import { useScopedI18n } from "@/lib/locale/client"
 import { debounce, roomTypeToRoomTypeModel } from "@/lib/utils"
 
 import useSearchPrivateRooms from "../hooks/api/use-search-private-rooms"
 import { useForwardMessageModal } from "../hooks/use-forward-message-modal"
 
 const ForwardMessageModal = () => {
+  const t = useScopedI18n("messages.forward")
+
   const queryClient = useQueryClient()
 
   const { forwardMessageId, isForwardModalOpen, cancelForwardMessage } =
@@ -106,13 +109,13 @@ const ForwardMessageModal = () => {
     <Dialog open={isForwardModalOpen} onOpenChange={cancelForwardMessage}>
       <DialogContent hideCloseButton className="max-w-[450px] p-0">
         <DialogHeader className="hidden">
-          <DialogTitle>Forward to</DialogTitle>
+          <DialogTitle>{t("placeholder")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex h-[400px] flex-col gap-y-6 p-3">
           <div className="flex items-center gap-x-2">
             <SearchBar
-              placeholder="Forward to..."
+              placeholder={t("placeholder")}
               className="flex-1"
               onValueChange={debouncedSearchKey}
             />
@@ -129,7 +132,7 @@ const ForwardMessageModal = () => {
 
           {!isLoading && list.length === 0 && (
             <div className="h-40 flex-center">
-              <p className="">No search found</p>
+              <p className="">{t("empty")}</p>
             </div>
           )}
 

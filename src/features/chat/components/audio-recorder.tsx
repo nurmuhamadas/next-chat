@@ -4,11 +4,14 @@ import { MicIcon, PauseIcon, PlayIcon, StopCircleIcon } from "lucide-react"
 
 import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
+import { useScopedI18n } from "@/lib/locale/client"
 
 interface AudioRecorderProps {
   onStop(audioBlob: Blob): void
 }
 const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
+  const t = useScopedI18n("messages.tooltip")
+
   const [recordingState, setRecordingState] = useState<
     "idle" | "recording" | "paused"
   >("idle")
@@ -95,7 +98,7 @@ const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
   return (
     <div className="flex items-center gap-x-1">
       {recordingState === "idle" && (
-        <SimpleTooltip content="Start recording">
+        <SimpleTooltip content={t("start_record")}>
           <Button
             className="size-11 bg-surface hover:bg-primary"
             variant="secondary"
@@ -107,7 +110,7 @@ const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
       )}
       {recordingState === "recording" && (
         <>
-          <SimpleTooltip content="Pause recording">
+          <SimpleTooltip content={t("pause_record")}>
             <Button
               className="size-11 bg-surface hover:bg-primary"
               variant="secondary"
@@ -116,7 +119,7 @@ const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
               <PauseIcon />
             </Button>
           </SimpleTooltip>
-          <SimpleTooltip content="Stop recording">
+          <SimpleTooltip content={t("stop_record")}>
             <Button
               className="size-11 bg-surface hover:bg-primary"
               variant="secondary"
@@ -129,7 +132,7 @@ const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
       )}
       {recordingState === "paused" && (
         <>
-          <SimpleTooltip content="Resume recording">
+          <SimpleTooltip content={t("resume_record")}>
             <Button
               className="size-11 bg-surface hover:bg-primary"
               variant="secondary"
@@ -138,7 +141,7 @@ const AudioRecorder = ({ onStop }: AudioRecorderProps) => {
               <PlayIcon />
             </Button>
           </SimpleTooltip>
-          <SimpleTooltip content="Stop recording">
+          <SimpleTooltip content={t("stop_record")}>
             <Button
               className="size-11 bg-surface hover:bg-primary"
               variant="secondary"
