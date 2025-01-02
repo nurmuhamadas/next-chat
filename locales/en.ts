@@ -106,4 +106,45 @@ export default {
       unblock_success: "User unblocked successfully.",
     },
   },
+  settings: {
+    title: "Settings",
+    appearance: {
+      title: "Themes and Appearance",
+      theme_mode: "Theme Mode",
+      theme_opt: {
+        light: "Light",
+        dark: "Dark",
+        system: "System",
+      },
+      language: "Language",
+      language_opt: {
+        en: "English",
+        id: "Bahasa Indoenesia",
+      },
+      time_format: "Time Format",
+      time_format_opt: {
+        "12-hour": "12-Hour",
+        "24-hour": "24-Hour",
+      },
+    },
+    notifications: {
+      title: "Notifications",
+      allow_notifications: "Allow Notifications",
+      privat_chat: "Private Chat",
+      group: "Group",
+      channel: "Channel",
+    },
+    security: {
+      title: "Privacy and Security",
+      allow_add_group: "Allow people to add me to the group",
+      allow: "Allow",
+      dont_allow: "Don't Allow",
+      enable_2fa: "Two Factor Authentication (2FA)",
+      enable: "Enable",
+      disable: "Disable",
+    },
+    messages: {
+      settings_updated: "Settings updated successfully.",
+    },
+  },
 } as const

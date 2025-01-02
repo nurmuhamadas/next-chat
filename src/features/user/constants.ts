@@ -22,15 +22,15 @@ export const THEME_OPT: {
   value: Theme
 }[] = [
   {
-    label: "Light",
+    label: "theme_opt.light",
     value: "LIGHT",
   },
   {
-    label: "Dark",
+    label: "theme_opt.dark",
     value: "DARK",
   },
   {
-    label: "System",
+    label: "theme_opt.system",
     value: "SYSTEM",
   },
 ]
@@ -44,11 +44,11 @@ export const TIME_FORMAT_OPT: {
   value: TimeFormat
 }[] = [
   {
-    label: "12 Hour",
+    label: "time_format_opt.12-hour",
     value: "12-HOUR",
   },
   {
-    label: "24 Hour",
+    label: "time_format_opt.24-hour",
     value: "24-HOUR",
   },
 ]
@@ -62,11 +62,11 @@ export const LANGUAGE_OPT: {
   value: Language
 }[] = [
   {
-    label: "English",
+    label: "language_opt.en",
     value: "en_US",
   },
   {
-    label: "Bahasa Indonesia",
+    label: "language_opt.id",
     value: "id_ID",
   },
 ]

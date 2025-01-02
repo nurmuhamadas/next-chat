@@ -105,4 +105,45 @@ export default {
       unblock_success: "Pengguna berhasil dibuka blokir.",
     },
   },
+  settings: {
+    title: "Pengaturan",
+    appearance: {
+      title: "Tema dan Tampilan",
+      theme_mode: "Mode Tema",
+      theme_opt: {
+        light: "Terang",
+        dark: "Gelap",
+        system: "Sistem",
+      },
+      language: "Bahasa",
+      language_opt: {
+        en: "English",
+        id: "Bahasa Indoenesia",
+      },
+      time_format: "Format Waktu",
+      time_format_opt: {
+        "12-hour": "12 Jam",
+        "24-hour": "24 Jam",
+      },
+    },
+    notifications: {
+      title: "Notifikasi",
+      allow_notifications: "Izinkan Notifikasi",
+      privat_chat: "Obrolan Pribadi",
+      group: "Grup",
+      channel: "Saluran",
+    },
+    security: {
+      title: "Privasi dan Keamanan",
+      allow_add_group: "Izinkan orang lain menambahkan saya ke grup",
+      allow: "Izinkan",
+      dont_allow: "Tidak Izinkan",
+      enable_2fa: "Autentikasi Dua Faktor (2FA)",
+      enable: "Aktifkan",
+      disable: "Nonaktifkan",
+    },
+    messages: {
+      settings_updated: "Pengaturan berhasil diperbarui.",
+    },
+  },
 } as const
