@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 
 import LeftPanelWrapper from "@/components/left-panel-wrapper"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useCreateChannel from "../hooks/api/use-create-channel"
 import { useCreateChannelPanel } from "../hooks/use-create-channel-modal"
@@ -12,6 +13,8 @@ import ChannelForm from "./channel-form"
 const CreateChannelPanel = () => {
   const queryClient = useQueryClient()
 
+  const t = useScopedI18n("channel")
+
   const { isCreateChannelOpen, closeCreateChannel } = useCreateChannelPanel()
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -20,7 +23,7 @@ const CreateChannelPanel = () => {
 
   return (
     <LeftPanelWrapper
-      title="New Channel"
+      title={t("new.title")}
       isOpen={isCreateChannelOpen}
       onBack={closeCreateChannel}
     >

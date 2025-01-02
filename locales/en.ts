@@ -179,4 +179,29 @@ export default {
       updated: "Group updated successfully.",
     },
   },
+  channel: {
+    new: {
+      title: "New Channel",
+      submit: "Create Channel",
+    },
+    edit: {
+      title: "Edit Channel",
+      submit: "Update Channel",
+    },
+    form: {
+      name: "Name",
+      "name.placeholder": "Enter your channel name",
+      description: "Description (Optional)",
+      "description.placeholder": "Describe your channel",
+      type: "Type",
+      type_opt: {
+        public: "Public",
+        private: "Private",
+      },
+    },
+    messages: {
+      created: "Channel created successfully.",
+      updated: "Channel updated successfully.",
+    },
+  },
 } as const

@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useEditChannelPanel } from "@/features/channel/hooks/use-edit-channel-panel"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useGetChannelById from "../hooks/api/use-get-channel-by-id"
 import useGetChannelSubscribers from "../hooks/api/use-get-channel-subscribers"
@@ -18,6 +19,8 @@ import ChannelForm from "./channel-form"
 
 const EditChannelPanel = () => {
   const queryClient = useQueryClient()
+
+  const t = useScopedI18n("channel")
 
   const type = useRoomType()
   const id = useRoomId()
@@ -46,7 +49,7 @@ const EditChannelPanel = () => {
 
   return (
     <RightPanelWrapper
-      title="Edit Channel"
+      title={t("edit.title")}
       isOpen={isEditChannelOpen}
       onBack={closeEditChannel}
     >

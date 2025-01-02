@@ -178,4 +178,24 @@ export default {
       updated: "Grup berhasil diperbarui.",
     },
   },
+  channel: {
+    new: {
+      title: "Saluran Baru",
+      submit: "Buat Saluran",
+    },
+    edit: {
+      title: "Edit Saluran",
+      submit: "Perbarui Saluran",
+    },
+    form: {
+      name: "Nama",
+      "name.placeholder": "Masukkan nama saluran Anda",
+      description: "Deskripsi (Opsional)",
+      "description.placeholder": "Deskripsikan saluran Anda",
+    },
+    messages: {
+      created: "Saluran berhasil dibuat.",
+      updated: "Saluran berhasil diperbarui.",
+    },
+  },
 } as const

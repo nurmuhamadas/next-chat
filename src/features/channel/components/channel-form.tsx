@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { ChangeEventHandler, useEffect, useRef, useState } from "react"
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ERROR } from "@/constants/error"
+import { useScopedI18n } from "@/lib/locale/client"
 import { debounce } from "@/lib/utils"
 
 import { CHANNEL_TYPE_OPT } from "../constants"
@@ -49,6 +51,8 @@ const ChannelForm = ({
   errorMessage,
   onSubmit,
 }: ChannelFormProps) => {
+  const t = useScopedI18n("channel")
+
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [channelName, setChannelName] = useState(initialValues?.name ?? "")
@@ -138,11 +142,11 @@ const ChannelForm = ({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t("form.name")}</FormLabel>
               <div className="relative flex">
                 <FormControl>
                   <Input
-                    placeholder="Enter your group name"
+                    placeholder={t("form.name.placeholder")}
                     {...field}
                     onChange={(e) => {
                       form.setValue("name", e.target.value)
@@ -170,10 +174,10 @@ const ChannelForm = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description (Optional)</FormLabel>
+              <FormLabel>{t("form.description")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe your channel"
+                  placeholder={t("form.description.placeholder")}
                   maxLength={2048}
                   {...field}
                 />
@@ -188,7 +192,7 @@ const ChannelForm = ({
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>{t("form.type")}</FormLabel>
               <Select
                 value={field.value}
                 onValueChange={(value) =>
@@ -211,7 +215,7 @@ const ChannelForm = ({
                       value={value}
                       className="flex items-center gap-x-2"
                     >
-                      {label}
+                      {t(label as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>
