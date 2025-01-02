@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { LoaderIcon, MoreVerticalIcon } from "lucide-react"
@@ -15,12 +16,15 @@ import useLeaveChannel from "@/features/channel/hooks/api/use-leave-channel"
 import useUpdateChannelOption from "@/features/channel/hooks/api/use-update-channel-option"
 import useConfirm from "@/hooks/use-confirm-dialog"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { chatRoomChannelMenu } from "../../constants"
 import useGetRoom from "../../hooks/api/use-get-room"
 
 const ChatRoomMenuChannel = () => {
+  const t = useScopedI18n("room_menu.channel")
+
   const id = useRoomId()
 
   const [Dialog, confirm] = useConfirm()
@@ -163,7 +167,7 @@ const ChatRoomMenuChannel = () => {
                 ) : (
                   <menu.icon />
                 )}{" "}
-                {menu.label}
+                {t(menu.label as any)}
               </DropdownMenuItem>
             )
           })}

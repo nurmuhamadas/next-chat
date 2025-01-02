@@ -173,22 +173,22 @@ export const chatRoomChannelMenu: {
   action: ChatRoomChannelMenuAction
 }[] = [
   {
-    label: "Mute",
+    label: "mute",
     icon: BellOffIcon,
     action: "mute-channel",
   },
   {
-    label: "Unmute",
+    label: "unmute",
     icon: BellIcon,
     action: "unmute-channel",
   },
   {
-    label: "Leave Channel",
+    label: "leave",
     icon: LogOutIcon,
     action: "leave-channel",
   },
   {
-    label: "Delete Chat",
+    label: "delete",
     icon: TrashIcon,
     danger: true,
     action: "delete-chat",

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import useGetChannelById from "@/features/channel/hooks/api/use-get-channel-by-id"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { useRoomProfile } from "../../hooks/use-room-profile"
@@ -19,6 +20,8 @@ import ChatRoomMenuChannel from "../chat-room-menu/channel"
 
 const ChatRoomHeaderChannel = () => {
   const router = useRouter()
+
+  const t = useScopedI18n("channel.info")
 
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
@@ -69,7 +72,7 @@ const ChatRoomHeaderChannel = () => {
             <>
               <h2 className="line-clamp-1 h5">{channel.name}</h2>
               <p className="line-clamp-1 text-muted-foreground caption">
-                {channel?.totalSubscribers} subscribers
+                {t("total_subscribers", { count: channel.totalSubscribers })}
               </p>
             </>
           ) : null}

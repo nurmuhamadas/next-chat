@@ -274,4 +274,30 @@ export default {
       notification_updated: "Notifikasi berhasil diperbarui.",
     },
   },
+  room_menu: {
+    channel: {
+      mute: "Bisukan",
+      unmute: "Aktifkan",
+      leave: "Keluar dari Saluran",
+      delete: "Hapus Pesan",
+      confirm_mute: {
+        title: "Bisukan Saluran",
+        message: "Apakah Anda yakin ingin membisukan saluran ini?",
+      },
+      confirm_unmute: {
+        title: "Aktifkan Saluran",
+        message: "Apakah Anda yakin ingin mengaktifkan saluran ini?",
+      },
+      confirm_leave: {
+        title: "Keluar dari Saluran",
+        message:
+          "Apakah Anda yakin ingin keluar dari saluran ini? Anda tidak akan lagi menerima pesan dari saluran ini.",
+      },
+      confirm_delete: {
+        title: "Hapus Pesan",
+        message:
+          "Apakah Anda yakin ingin menghapus pesan dari saluran ini? Tindakan ini tidak dapat dibatalkan.",
+      },
+    },
+  },
 } as const

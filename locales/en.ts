@@ -274,4 +274,30 @@ export default {
       notification_updated: "Notification updated successfully.",
     },
   },
+  room_menu: {
+    channel: {
+      mute: "Mute",
+      unmute: "Unmute",
+      leave: "Leave Channel",
+      delete: "Delete Messages",
+      confirm_mute: {
+        title: "Mute Channel",
+        message: "Are you sure you want to mute this channel?",
+      },
+      confirm_unmute: {
+        title: "Unmute Channel",
+        message: "Are you sure you want to unmute this channel?",
+      },
+      confirm_leave: {
+        title: "Leave Channel",
+        message:
+          "Are you sure you want to leave this channel? You will no longer receive messages from this channel.",
+      },
+      confirm_delete: {
+        title: "Delete Messages",
+        message:
+          "Are you sure you want to delete messages from this channel? This action cannot be undone.",
+      },
+    },
+  },
 } as const
