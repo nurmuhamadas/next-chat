@@ -4,6 +4,7 @@ import { XIcon } from "lucide-react"
 
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
+import { useScopedI18n } from "@/lib/locale/client"
 import { debounce } from "@/lib/utils"
 
 import { useSearchQuery } from "../hooks/use-search-query"
@@ -14,6 +15,8 @@ import RoomListView from "./room-list-view"
 import SearchResultView from "./search-result-view"
 
 const RoomListPanel = () => {
+  const t = useScopedI18n("room.search")
+
   const { setSearchQuery } = useSearchQuery()
 
   const [isSearching, setIsSearching] = useState(false)
@@ -25,6 +28,7 @@ const RoomListPanel = () => {
 
         <div className="flex flex-1 items-center gap-x-2">
           <SearchBar
+            placeholder={t("placeholder")}
             onValueChange={debounce(setSearchQuery, 300)}
             onClick={() => setIsSearching(true)}
           />

@@ -372,4 +372,33 @@ export default {
       },
     },
   },
+  room: {
+    empty_title: "No Conversation found",
+    empty_body: "Search and select user to start the conversation",
+    more: "Show more",
+    search: {
+      placeholder: "Search",
+      users: {
+        title: "Users",
+        recent: "Recent users",
+        available: "Available users",
+        empty: "No users found.",
+        more: "Show more",
+      },
+      groups: {
+        title: "Groups",
+        joined: "Groups you joined",
+        public: "Public groups",
+        empty: "No groups found.",
+        more: "Show more",
+      },
+      channels: {
+        title: "Channels",
+        joined: "Channels you joined",
+        public: "Public channels",
+        empty: "No channels found.",
+        more: "Show more",
+      },
+    },
+  },
 } as const

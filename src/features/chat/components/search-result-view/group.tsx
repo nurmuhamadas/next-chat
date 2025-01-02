@@ -6,12 +6,15 @@ import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import useGetGroups from "@/features/group/hooks/api/use-get-groups"
 import useSearchGroups from "@/features/group/hooks/api/use-search-groups"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useSearchQuery } from "../../hooks/use-search-query"
 
 import SearchResultItem from "./item"
 
 const SearchGroupResult = () => {
+  const t = useScopedI18n("room.search.groups")
+
   const { searchQuery } = useSearchQuery()
 
   const lastQuery = useRef<string | undefined>(searchQuery)
@@ -45,7 +48,7 @@ const SearchGroupResult = () => {
   if (isEmpty) {
     return (
       <div className="size-full pt-8 flex-col-center">
-        <p className="text-muted-foreground">No search found</p>
+        <p className="text-muted-foreground">{t("empty")}</p>
       </div>
     )
   }
@@ -54,7 +57,7 @@ const SearchGroupResult = () => {
     <div className="flex flex-col gap-y-6 px-2 pb-10">
       {joinedGroups.length > 0 && (
         <div className="flex flex-col gap-y-1">
-          <h4 className="px-2 text-grey-2 subtitle-2">Groups you joined</h4>
+          <h4 className="px-2 text-grey-2 subtitle-2">{t("joined")}</h4>
           {joinedGroups.map((group) => {
             return (
               <SearchResultItem
@@ -76,7 +79,7 @@ const SearchGroupResult = () => {
 
           {!loadingJoined && hasNextJoined && (
             <Button variant="link" onClick={() => nextJoinedGroups()}>
-              Show more
+              {t("more")}
             </Button>
           )}
         </div>
@@ -84,7 +87,7 @@ const SearchGroupResult = () => {
 
       {publicGroups.length > 0 && (
         <div className="flex flex-col gap-y-1">
-          <h4 className="px-2 text-grey-2 subtitle-2">Public Groups</h4>
+          <h4 className="px-2 text-grey-2 subtitle-2">{t("public")}</h4>
           {publicGroups.map((user) => {
             return (
               <SearchResultItem
@@ -106,7 +109,7 @@ const SearchGroupResult = () => {
 
           {!loadingPublic && hasNextPublic && (
             <Button variant="link" onClick={() => nextPublicGroups()}>
-              Show more
+              {t("more")}
             </Button>
           )}
         </div>

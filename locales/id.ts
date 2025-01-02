@@ -372,4 +372,33 @@ export default {
       },
     },
   },
+  room: {
+    empty_title: "Tidak ada percakapan yang ditemukan",
+    empty_body: "Cari dan pilih pengguna untuk memulai percakapan",
+    more: "Tampilkan lebih banyak",
+    search: {
+      placeholder: "Cari",
+      users: {
+        title: "Pengguna",
+        recent: "Pengguna Terbaru",
+        available: "Pengguna yang tersedia",
+        empty: "Tidak ada pengguna yang ditemukan.",
+        more: "Tampilkan lebih banyak",
+      },
+      groups: {
+        title: "Grup",
+        joined: "Grup yang Anda bergabung",
+        public: "Grup Publik",
+        empty: "Tidak ada grup yang ditemukan.",
+        more: "Tampilkan lebih banyak",
+      },
+      channels: {
+        title: "Saluran",
+        joined: "Saluran yang Anda bergabung",
+        public: "Saluran Publik",
+        empty: "Tidak ada saluran yang ditemukan.",
+        more: "Tampilkan lebih banyak",
+      },
+    },
+  },
 } as const

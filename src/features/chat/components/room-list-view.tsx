@@ -8,12 +8,15 @@ import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetSetting from "@/features/user/hooks/api/use-get-setting"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useGetRooms from "../hooks/api/use-get-rooms"
 
 import RoomListItem from "./room-list-item"
 
 const RoomListView = () => {
+  const t = useScopedI18n("room")
+
   const { data: settings, isLoading: settingLoading } = useGetSetting()
   const {
     data: rooms,
@@ -50,10 +53,8 @@ const RoomListView = () => {
             height={127}
           />
           <div className="gap-y-2 flex-col-center">
-            <h4 className="h4">No Conversation found</h4>
-            <p className="body-2">
-              Search and select user to start the conversation
-            </p>
+            <h4 className="h4">{t("empty_title")}</h4>
+            <p className="body-2">{t("empty_body")}</p>
           </div>
         </div>
       </div>

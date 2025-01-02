@@ -6,12 +6,15 @@ import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import useGetChannels from "@/features/channel/hooks/api/use-get-channels"
 import useSearchChannels from "@/features/channel/hooks/api/use-search-channels"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { useSearchQuery } from "../../hooks/use-search-query"
 
 import SearchResultItem from "./item"
 
 const SearchChannelResult = () => {
+  const t = useScopedI18n("room.search.channels")
+
   const { searchQuery } = useSearchQuery()
 
   const lastQuery = useRef<string | undefined>(searchQuery)
@@ -45,7 +48,7 @@ const SearchChannelResult = () => {
   if (isEmpty) {
     return (
       <div className="size-full pb-10 pt-8 flex-col-center">
-        <p className="text-muted-foreground">No search found</p>
+        <p className="text-muted-foreground">{t("empty")}</p>
       </div>
     )
   }
@@ -54,7 +57,7 @@ const SearchChannelResult = () => {
     <div className="flex flex-col gap-y-6 px-2">
       {joinedChannels.length > 0 && (
         <div className="flex flex-col gap-y-1">
-          <h4 className="px-2 text-grey-2 subtitle-2">Channels you joined</h4>
+          <h4 className="px-2 text-grey-2 subtitle-2">{t("joined")}</h4>
           {joinedChannels.map((user) => {
             return (
               <SearchResultItem
@@ -76,7 +79,7 @@ const SearchChannelResult = () => {
 
           {!loadingJoined && hasNextJoined && (
             <Button variant="link" onClick={() => fetchNextJoined()}>
-              Show more
+              {t("more")}
             </Button>
           )}
         </div>
@@ -84,7 +87,7 @@ const SearchChannelResult = () => {
 
       {publicChannels.length > 0 && (
         <div className="flex flex-col gap-y-1">
-          <h4 className="px-2 text-grey-2 subtitle-2">Public Channels</h4>
+          <h4 className="px-2 text-grey-2 subtitle-2">{t("public")}</h4>
           {publicChannels.map((user) => {
             return (
               <SearchResultItem
@@ -106,7 +109,7 @@ const SearchChannelResult = () => {
 
           {!loadingPublic && hasNextPublic && (
             <Button variant="link" onClick={() => fetchNextPublic()}>
-              Show more
+              {t("more")}
             </Button>
           )}
         </div>
