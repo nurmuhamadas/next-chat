@@ -73,4 +73,15 @@ export default {
       password_reset_success: "Reset kata sandi berhasil.",
     },
   },
+  main_menu: {
+    my_profile: "Profil Saya",
+    saved_messages: "Pesan Tersimpan",
+    light_mode: "Mode Terang",
+    dark_mode: "Mode Gelap",
+    bloked_users: "Pengguna Diblokir",
+    settings: "Pengaturan",
+    report_bug: "Laporkan Bug",
+    about_us: "Tentang NextChat",
+    logout: "Keluar",
+  },
 } as const

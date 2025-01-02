@@ -21,11 +21,14 @@ import { useBlockedUsersPanel } from "@/features/user/hooks/use-blocked-users-pa
 import { useMyProfilePanel } from "@/features/user/hooks/use-my-profile-panel"
 import { useSettingsPanel } from "@/features/user/hooks/use-settings-panel"
 import { useComingSoonFeature } from "@/hooks/use-coming-soon-feature"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { MAIN_MENU } from "../constants"
 
 const MainMenu = () => {
+  const t = useScopedI18n("main_menu")
+
   const { theme, setTheme } = useTheme()
   const isDarkMode = theme === "dark"
 
@@ -78,7 +81,11 @@ const MainMenu = () => {
     }
 
     return true
-  })
+  }).map((menu) => ({
+    ...menu,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    label: t(menu.label as any),
+  }))
 
   return (
     <DropdownMenu>

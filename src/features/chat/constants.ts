@@ -28,47 +28,47 @@ export const MAIN_MENU: {
   action: MainMenuAction
 }[] = [
   {
-    label: "My Profile",
+    label: "my_profile" as const,
     icon: UserIcon,
     action: "open-profile",
   },
   {
-    label: "Saved Message",
+    label: "saved_messages" as const,
     icon: BookmarkIcon,
     action: "open-saved-message",
   },
   {
-    label: "Light Mode",
+    label: "light_mode" as const,
     icon: SunIcon,
     action: "switch-to-light",
   },
   {
-    label: "Dark Mode",
+    label: "dark_mode" as const,
     icon: MoonStarIcon,
     action: "switch-to-dark",
   },
   {
-    label: "Blocked Users",
+    label: "bloked_users" as const,
     icon: UserXIcon,
     action: "open-blocked-user",
   },
   {
-    label: "Settings",
+    label: "settings" as const,
     icon: SettingsIcon,
     action: "open-settings",
   },
   {
-    label: "Report a Bug",
+    label: "report_bug" as const,
     icon: BugIcon,
     action: "report-bug",
   },
   {
-    label: "About Next Chat",
+    label: "about_us" as const,
     icon: InfoIcon,
     action: "open-about",
   },
   {
-    label: "Logout",
+    label: "logout" as const,
     icon: LogOutIcon,
     action: "logout",
   },

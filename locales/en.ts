@@ -73,4 +73,15 @@ export default {
       password_reset_success: "Password reset successful.",
     },
   },
+  main_menu: {
+    my_profile: "My Profile",
+    saved_messages: "Saved Messages",
+    light_mode: "Light Mode",
+    dark_mode: "Dark Mode",
+    bloked_users: "Blocked Users",
+    settings: "Settings",
+    report_bug: "Report Bug",
+    about_us: "About NextChat",
+    logout: "Logout",
+  },
 } as const
