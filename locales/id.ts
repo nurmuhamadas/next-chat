@@ -290,6 +290,34 @@ export default {
     },
   },
   room_menu: {
+    private: {
+      mute: "Bisukan",
+      unmute: "Bunyikan",
+      block: "Blokir Pengguna",
+      unblock: "Buka Blokir Pengguna",
+      delete: "Hapus Pesan",
+      confirm_mute: {
+        title: "Bisukan Percakapan",
+        message: "Apakah Anda yakin ingin membisukan percakapan ini?",
+      },
+      confirm_unmute: {
+        title: "Bunyikan Percakapan",
+        message: "Apakah Anda yakin ingin membunyikan percakapan ini?",
+      },
+      confirm_block: {
+        title: "Blokir Pengguna",
+        message: "Apakah Anda yakin ingin memblokir pengguna ini?",
+      },
+      confirm_unblock: {
+        title: "Buka Blokir Pengguna",
+        message: "Apakah Anda yakin ingin membuka blokir pengguna ini?",
+      },
+      confirm_delete: {
+        title: "Hapus Pesan",
+        message:
+          "Apakah Anda yakin ingin menghapus pesan dari percakapan ini? Tindakan ini tidak dapat dibatalkan.",
+      },
+    },
     group: {
       mute: "Bisukan",
       unmute: "Aktifkan",

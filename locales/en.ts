@@ -290,6 +290,34 @@ export default {
     },
   },
   room_menu: {
+    private: {
+      mute: "Mute",
+      unmute: "Unmute",
+      block: "Block User",
+      unblock: "Unblock User",
+      delete: "Delete Messages",
+      confirm_mute: {
+        title: "Mute Room",
+        message: "Are you sure you want to mute this room?",
+      },
+      confirm_unmute: {
+        title: "Unmute Room",
+        message: "Are you sure you want to unmute this room?",
+      },
+      confirm_block: {
+        title: "Block User",
+        message: "Are you sure you want to block this user?",
+      },
+      confirm_unblock: {
+        title: "Unblock User",
+        message: "Are you sure you want to unblock this user?",
+      },
+      confirm_delete: {
+        title: "Delete Messages",
+        message:
+          "Are you sure you want to delete messages from this room? This action cannot be undone.",
+      },
+    },
     group: {
       mute: "Mute",
       unmute: "Unmute",

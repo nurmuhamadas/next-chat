@@ -110,27 +110,27 @@ export const chatRoomPrivateMenu: {
   action: ChatRoomPrivateMenuAction
 }[] = [
   {
-    label: "Mute",
+    label: "mute",
     icon: BellOffIcon,
     action: "mute-chat",
   },
   {
-    label: "Unmute",
+    label: "unmute",
     icon: BellIcon,
     action: "unmute-chat",
   },
   {
-    label: "Block User",
+    label: "block",
     icon: UserXIcon,
     action: "block-user",
   },
   {
-    label: "Unblock User",
+    label: "unblock",
     icon: UserIcon,
     action: "unblock-user",
   },
   {
-    label: "Delete Chat",
+    label: "delete",
     icon: TrashIcon,
     danger: true,
     action: "delete-chat",
@@ -144,22 +144,22 @@ export const chatRoomGroupMenu: {
   action: ChatRoomGroupMenuAction
 }[] = [
   {
-    label: "Mute",
+    label: "mute",
     icon: BellOffIcon,
     action: "mute-group",
   },
   {
-    label: "Unmute",
+    label: "unmute",
     icon: BellIcon,
     action: "unmute-group",
   },
   {
-    label: "Leave Group",
+    label: "leave",
     icon: LogOutIcon,
     action: "leave-group",
   },
   {
-    label: "Delete Chat",
+    label: "delete",
     icon: TrashIcon,
     danger: true,
     action: "delete-chat",

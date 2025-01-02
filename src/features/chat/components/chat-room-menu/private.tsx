@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useQueryClient } from "@tanstack/react-query"
@@ -18,12 +19,15 @@ import useGetPrivateChatOption from "@/features/private-chat/hooks/api/use-get-p
 import useUpdatePrivateChatOption from "@/features/private-chat/hooks/api/use-update-private-chat-option"
 import useConfirm from "@/hooks/use-confirm-dialog"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { chatRoomPrivateMenu } from "../../constants"
 
 const ChatRoomMenuPrivate = () => {
   const queryClient = useQueryClient()
+
+  const t = useScopedI18n("room_menu.private")
 
   const id = useRoomId()
 
@@ -53,8 +57,8 @@ const ChatRoomMenuPrivate = () => {
 
   const handleToggleMute = async (muted: boolean) => {
     const isOK = await confirm(
-      muted ? "MUTE_CONFIRM_TITLE" : "UNMUTE_CONFIRM_TITLE",
-      muted ? "MUTE_CONFIRM_MESSAGE" : "UNMUTE_CONFIRM_MESSAGE",
+      muted ? t("confirm_mute.title") : t("confirm_unmute.title"),
+      muted ? t("confirm_mute.message") : t("confirm_unmute.message"),
     )
     if (!isOK) return
 
@@ -70,8 +74,8 @@ const ChatRoomMenuPrivate = () => {
 
   const handleBlockUser = async () => {
     const isOK = await confirm(
-      "BLOCK_USER_CONFIRM_TITLE",
-      "BLOCK_USER_CONFIRM_MESSAGE",
+      t("confirm_block.title"),
+      t("confirm_block.message"),
     )
     if (!isOK) return
 
@@ -88,8 +92,8 @@ const ChatRoomMenuPrivate = () => {
 
   const handleUnblockUser = async () => {
     const isOK = await confirm(
-      "UNBLOCK_USER_CONFIRM_TITLE",
-      "UNBLOCK_USER_CONFIRM_MESSAGE",
+      t("confirm_unblock.title"),
+      t("confirm_unblock.message"),
     )
     if (!isOK) return
 
@@ -106,8 +110,8 @@ const ChatRoomMenuPrivate = () => {
 
   const handleDeleteChat = async () => {
     const isOK = await confirm(
-      "DELETE_CHAT_CONFIRM_TITLE",
-      "DELETE_CHAT_CONFIRM_MESSAGE",
+      t("confirm_delete.title"),
+      t("confirm_delete.message"),
     )
     if (!isOK) return
 
@@ -192,7 +196,7 @@ const ChatRoomMenuPrivate = () => {
                 ) : (
                   <menu.icon />
                 )}{" "}
-                {menu.label}
+                {t(menu.label as any)}
               </DropdownMenuItem>
             )
           })}
