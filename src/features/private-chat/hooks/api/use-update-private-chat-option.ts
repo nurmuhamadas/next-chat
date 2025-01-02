@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { useScopedI18n } from "@/lib/locale/client"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
@@ -13,6 +14,8 @@ type RequestType = InferRequestType<
 >
 
 const useUpdatePrivateChatOption = () => {
+  const t = useScopedI18n("private_chat.messages")
+
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json, param }) => {
       const response = await client.api["private-chat"][":userId"]["options"][
@@ -27,7 +30,7 @@ const useUpdatePrivateChatOption = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("SETTING_UPDATED")
+      toast.success(t("notification_updated"))
     },
     onError({ message }) {
       toast.error(message)

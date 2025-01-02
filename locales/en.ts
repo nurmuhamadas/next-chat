@@ -151,6 +151,21 @@ export default {
     new_group: "New Group",
     new_channel: "New Channel",
   },
+  private_chat: {
+    info: {
+      title: "User Info",
+      bio: "Bio",
+      username: "Username",
+      male: "(He/Him)",
+      female: "(She/Her)",
+      email: "Email",
+      notifications: "Notifications",
+      last_seent: "Last seen at {time}",
+    },
+    messages: {
+      notification_updated: "Notification updated successfully.",
+    },
+  },
   group: {
     new: {
       title: "New Group",

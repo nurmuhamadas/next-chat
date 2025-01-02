@@ -4,12 +4,15 @@ import { BellIcon } from "lucide-react"
 
 import { Switch } from "@/components/ui/switch"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useGetPrivateChatOption from "../../../private-chat/hooks/api/use-get-private-chat-option"
 import useUpdatePrivateChatOption from "../../../private-chat/hooks/api/use-update-private-chat-option"
 import { useRoomProfile } from "../../hooks/use-room-profile"
 
 const RoomProfileOptionsPrivate = () => {
+  const t = useScopedI18n("private_chat.info")
+
   const id = useRoomId()
 
   const { roomProfileOpen } = useRoomProfile()
@@ -62,7 +65,7 @@ const RoomProfileOptionsPrivate = () => {
       >
         <BellIcon className="size-5 text-grey-3" />
         <div className="flex-1 flex-center-between">
-          <p className="subtitle-2">Notifications</p>
+          <p className="subtitle-2">{t("notifications")}</p>
 
           <Switch
             disabled={isUpdating}

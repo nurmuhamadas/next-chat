@@ -151,6 +151,21 @@ export default {
     new_group: "Group Baru",
     new_channel: "Saluran Baru",
   },
+  private_chat: {
+    info: {
+      title: "Informasi Pengguna",
+      bio: "Bio",
+      username: "Nama Pengguna",
+      male: "(Dia/Laki-laki)",
+      female: "(Dia/Perempuan)",
+      email: "Email",
+      notifications: "Notifikasi",
+      last_seent: "Terakhir dilihat {time}",
+    },
+    messages: {
+      notification_updated: "Notifikasi berhasil diperbarui.",
+    },
+  },
   group: {
     new: {
       title: "Grup Baru",

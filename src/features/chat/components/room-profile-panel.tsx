@@ -80,7 +80,7 @@ const RoomProfilePanel = () => {
   }
 
   const title = {
-    chat: "User Info",
+    chat: t("private_chat.info.title"),
     group: t("group.info.title"),
     channel: t("channel.info.title"),
   }
@@ -179,18 +179,20 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
   > = {
     chat: [
       {
-        label: "Bio",
+        label: t("private_chat.info.bio"),
         value: user?.bio,
         copyText: user?.bio ?? "",
         icon: InfoIcon,
       },
       {
-        label: "Username",
+        label: t("private_chat.info.username"),
         value: (
           <div className="flex gap-x-2">
             <span className="truncate">@{user?.username}</span>
             <span className="text-grey-2">
-              {user?.gender === "MALE" ? "(He/Him)" : "(She/Her)"}
+              {user?.gender === "MALE"
+                ? t("private_chat.info.male")
+                : t("private_chat.info.female")}
             </span>
           </div>
         ),
@@ -198,7 +200,7 @@ const ProfileView = ({ group, channel }: ProfileViewProps) => {
         icon: AtSignIcon,
       },
       {
-        label: "Email",
+        label: t("private_chat.info.email"),
         value: user?.email,
         copyText: user?.email ?? "",
         icon: MailIcon,
