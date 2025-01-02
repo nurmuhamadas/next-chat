@@ -13,6 +13,7 @@ import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useRequestPasswordReset from "../hooks/use-request-password-reset"
 import { emailPasswordResetSchema } from "../schema"
@@ -27,6 +28,9 @@ const ForgotPasswordForm = ({
   showEmailSent,
   onSuccess,
 }: ForgotPasswordFormProps) => {
+  const t = useScopedI18n("auth.forgot_password")
+  const tAuth = useScopedI18n("auth")
+
   const [errorMessage, setErrorMessage] = useState("")
   const [count, setCount] = useState(60)
 
@@ -76,13 +80,10 @@ const ForgotPasswordForm = ({
           width={244}
           height={192}
         />
-        <h2 className="!font-semibold h3">Password Reset Link Sent</h2>
-        <p className="max-w-72 text-center body-2">
-          We&apos;ve sent you an email that contain reset link. Open the link to
-          reset your password
-        </p>
+        <h2 className="!font-semibold h3">{t("success.title")}</h2>
+        <p className="max-w-72 text-center body-2">{t("success.desc")}</p>
         <p className="mt-2 text-center body-2">
-          Don&apos;t receive an email?
+          {t("success.question")}
           <Button
             variant="link"
             className="ml-2 px-0"
@@ -93,8 +94,8 @@ const ForgotPasswordForm = ({
               })
             }
           >
-            {isPending && <LoaderIcon className="size-4 animate-spin" />} Resend{" "}
-            {count > 0 && `(${count}s)`}
+            {isPending && <LoaderIcon className="size-4 animate-spin" />}{" "}
+            {t("success.action")} {count > 0 && t("success.count", { count })}
           </Button>
         </p>
       </Card>
@@ -111,14 +112,14 @@ const ForgotPasswordForm = ({
           name="email"
           render={({ field }) => (
             <AuthFormInput
-              label="Email"
-              placeholder="john@example.com"
+              label={tAuth("form.email")}
+              placeholder={tAuth("form.email.placeholder")}
               {...field}
             />
           )}
         />
         <Button type="submit" size="xl" className="w-full">
-          Send Reset Link
+          {t("submit")}
         </Button>
       </form>
     </Form>

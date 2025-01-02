@@ -29,6 +29,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import useLogout from "@/features/auth/hooks/use-logout"
 import { profileSchema } from "@/features/user/schema"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import { GENDER_OPT } from "../constants"
 
@@ -52,6 +53,7 @@ const ProfileForm = ({
   onSubmit,
 }: ProfileFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
+  const t = useScopedI18n("auth")
 
   const [imagePreview, setImagePreview] = useState(initialImageUrl)
 
@@ -122,9 +124,9 @@ const ProfileForm = ({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t("form.name")}</FormLabel>
               <FormControl>
-                <Input placeholder="John" {...field} />
+                <Input placeholder={t("form.name.placeholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -136,7 +138,7 @@ const ProfileForm = ({
           name="gender"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Gender</FormLabel>
+              <FormLabel>{t("form.gender")}</FormLabel>
               <Select
                 value={field.value}
                 onValueChange={(value) =>
@@ -147,7 +149,7 @@ const ProfileForm = ({
                   <SelectTrigger className="">
                     <SelectValue
                       className="placeholder:text-grey-2"
-                      placeholder="Choose your gender"
+                      placeholder={t("form.gender.placeholder")}
                     />
                   </SelectTrigger>
                 </FormControl>
@@ -169,10 +171,10 @@ const ProfileForm = ({
           name="bio"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio (Optional)</FormLabel>
+              <FormLabel>{t("form.bio")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe yourself"
+                  placeholder={t("form.bio.placeholder")}
                   maxLength={2048}
                   {...field}
                 />
@@ -188,7 +190,7 @@ const ProfileForm = ({
         <div className="flex-center">
           {showLogout && (
             <Button type="button" variant="link" onClick={() => logout()}>
-              Logout
+              {t("logout")}
             </Button>
           )}
         </div>

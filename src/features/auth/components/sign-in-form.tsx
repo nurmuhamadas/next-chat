@@ -14,6 +14,7 @@ import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useResendVerificationEmail from "../hooks/use-resend-verification-email"
 import useSignIn from "../hooks/use-sign-in"
@@ -26,6 +27,8 @@ interface SignInFormProps {
   onSuccess(): void
 }
 const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
+  const t = useScopedI18n("auth")
+
   const [errorMessage, setErrorMessage] = useState("")
   const [count, setCount] = useState(60)
   const [verifyType, setVerifyType] = useState<"2fa" | "unverified">(
@@ -111,7 +114,7 @@ const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
           {MESSAGES[verifyType].body}
         </p>
         <p className="mt-2 text-center body-2">
-          Don&apos;t receive an email?
+          {t("forgot_password.success.question")}
           <Button
             variant="link"
             className="ml-2 px-0"
@@ -119,7 +122,8 @@ const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
             onClick={onResend}
           >
             {isResending && <LoaderIcon className="size-4 animate-spin" />}{" "}
-            Resend {count > 0 && `(${count}s)`}
+            {t("forgot_password.success.action")}{" "}
+            {count > 0 && t("forgot_password.success.count", { count })}
           </Button>
         </p>
       </Card>

@@ -13,6 +13,7 @@ import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useResendVerificationEmail from "../hooks/use-resend-verification-email"
 import useSignUp from "../hooks/use-sign-up"
@@ -26,6 +27,8 @@ interface SignUpFormProps {
   onSuccess(): void
 }
 const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
+  const t = useScopedI18n("auth")
+
   const [errorMessage, setErrorMessage] = useState("")
   const [count, setCount] = useState(60)
 
@@ -123,8 +126,8 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
           name="email"
           render={({ field }) => (
             <AuthFormInput
-              label="Email"
-              placeholder="john@example.com"
+              label={t("form.email")}
+              placeholder={t("form.email.placeholder")}
               {...field}
             />
           )}
@@ -134,9 +137,9 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
           name="password"
           render={({ field }) => (
             <AuthFormInput
-              label="Password"
+              label={t("form.password")}
               type="password"
-              placeholder="Enter your password"
+              placeholder={t("form.password.placeholder")}
               {...field}
             />
           )}
@@ -146,16 +149,16 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
           name="confirmPassword"
           render={({ field }) => (
             <AuthFormInput
-              label="Confirm Password"
+              label={t("form.confirm_password")}
               type="password"
-              placeholder="Re-enter your password"
+              placeholder={t("form.confirm_password.placeholder")}
               {...field}
             />
           )}
         />
         <Button type="submit" size="xl" className="w-full" disabled={isPending}>
           {isPending && <LoaderIcon className="size-6 animate-spin" />}
-          Create Account
+          {t("sign_up.submit")}
         </Button>
       </form>
     </Form>

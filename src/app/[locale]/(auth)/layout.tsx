@@ -2,7 +2,16 @@ import { PropsWithChildren } from "react"
 
 import Image from "next/image"
 
-const AuthLayout = ({ children }: PropsWithChildren) => {
+import { I18nProviderClient } from "@/lib/locale/client"
+import { getScopedI18n } from "@/lib/locale/server"
+
+const AuthLayout = async ({
+  children,
+  params,
+}: PropsWithChildren & { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params
+  const t = await getScopedI18n("auth")
+
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="hidden w-full max-w-[600px] bg-primary px-16 pt-16 lg:flex-col-center">
@@ -14,11 +23,8 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
             height={57}
           />
           <div className="mt-8">
-            <h1 className="h1">Next-Level Conversations, Anytime, Anywhere.</h1>
-            <p className="mt-4 body-1">
-              NextChat is a secure, easy-to-use messaging app for seamless
-              conversations and media sharing.
-            </p>
+            <h1 className="h1">{t("info.title")}</h1>
+            <p className="mt-4 body-1">{t("info.desc")}</p>
           </div>
           <Image
             src="/images/message-illustration.svg"
@@ -37,7 +43,9 @@ const AuthLayout = ({ children }: PropsWithChildren) => {
           width={96}
           height={96}
         />
-        <main className="w-full max-w-[500px] lg:my-auto">{children}</main>
+        <I18nProviderClient locale={locale}>
+          <main className="w-full max-w-[500px] lg:my-auto">{children}</main>
+        </I18nProviderClient>
       </div>
     </div>
   )

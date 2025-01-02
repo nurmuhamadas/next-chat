@@ -12,6 +12,7 @@ import { z } from "zod"
 import ErrorAlert from "@/components/error-alert"
 import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useResetPassword from "../hooks/use-reset-password"
 import { passwordResetSchema } from "../schema"
@@ -22,6 +23,8 @@ const ResetPasswordForm = () => {
   const params = useSearchParams()
   const token = params.get("token")
   const email = params.get("email")
+
+  const t = useScopedI18n("auth")
 
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -62,9 +65,9 @@ const ResetPasswordForm = () => {
           name="password"
           render={({ field }) => (
             <AuthFormInput
-              label="Password"
+              label={t("form.password")}
               type="password"
-              placeholder="Enter your password"
+              placeholder={t("form.password.placeholder")}
               {...field}
             />
           )}
@@ -74,16 +77,16 @@ const ResetPasswordForm = () => {
           name="confirmPassword"
           render={({ field }) => (
             <AuthFormInput
-              label="Confirm Password"
+              label={t("form.confirm_password")}
               type="password"
-              placeholder="Re-enter your password"
+              placeholder={t("form.confirm_password.placeholder")}
               {...field}
             />
           )}
         />
         <Button type="submit" size="xl" className="w-full" disabled={isPending}>
           {isPending && <LoaderIcon className="size-6 animate-spin" />}
-          Reset Password
+          {t("reset_password.submit")}
         </Button>
       </form>
     </Form>
