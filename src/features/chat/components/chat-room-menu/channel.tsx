@@ -52,8 +52,8 @@ const ChatRoomMenuChannel = () => {
 
   const handleToggleMute = async (muted: boolean) => {
     const isOK = await confirm(
-      muted ? "MUTE_CHANNEL_CONFIRM_TITLE" : "UNMUTE_CHANNEL_CONFIRM_TITLE",
-      muted ? "MUTE_CHANNEL_CONFIRM_MESSAGE" : "UNMUTE_CHANNEL_CONFIRM_MESSAGE",
+      muted ? t("confirm_mute.title") : t("confirm_unmute.title"),
+      muted ? t("confirm_mute.message") : t("confirm_unmute.message"),
     )
     if (!isOK) return
 
@@ -69,8 +69,8 @@ const ChatRoomMenuChannel = () => {
 
   const handleLeaveChannel = async () => {
     const isOK = await confirm(
-      "LEAVE_CHANNEL_CONFIRM_TITLE",
-      "LEAVE_CHANNEL_CONFIRM_MESSAGE",
+      t("confirm_leave.title"),
+      t("confirm_leave.message"),
     )
     if (!isOK) return
 
@@ -86,8 +86,8 @@ const ChatRoomMenuChannel = () => {
 
   const handleClearChat = async () => {
     const isOK = await confirm(
-      "CLEAR_CHANNEL_CHAT_CONFIRM_TITLE",
-      "CLEAR_CHANNEL_CHAT_CONFIRM_MESSAGE",
+      t("confirm_delete.title"),
+      t("confirm_delete.message"),
     )
     if (!isOK) return
 
