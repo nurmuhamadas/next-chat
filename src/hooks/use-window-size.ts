@@ -14,6 +14,8 @@ function useWindowSize() {
       })
     }
 
+    handleResize()
+
     window.addEventListener("resize", handleResize)
     // Cleanup listener on component unmount
     return () => {
