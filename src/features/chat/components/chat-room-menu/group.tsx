@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { LoaderIcon, MoreVerticalIcon } from "lucide-react"
@@ -15,12 +16,15 @@ import useLeaveGroup from "@/features/group/hooks/api/use-leave-group"
 import useUpdateGroupOption from "@/features/group/hooks/api/use-update-group-option"
 import useConfirm from "@/hooks/use-confirm-dialog"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { chatRoomGroupMenu } from "../../constants"
 import useGetRoom from "../../hooks/api/use-get-room"
 
 const ChatRoomMenuGroup = () => {
+  const t = useScopedI18n("room_menu.group")
+
   const id = useRoomId()
 
   const [Dialog, confirm] = useConfirm()
@@ -46,8 +50,8 @@ const ChatRoomMenuGroup = () => {
 
   const handleToggleMute = async (muted: boolean) => {
     const isOK = await confirm(
-      muted ? "MUTE_GROUP_CONFIRM_TITLE" : "UNMUTE_GROUP_CONFIRM_TITLE",
-      muted ? "MUTE_GROUP_CONFIRM_MESSAGE" : "UNMUTE_GROUP_CONFIRM_MESSAGE",
+      muted ? t("confirm_mute.title") : t("confirm_unmute.title"),
+      muted ? t("confirm_mute.message") : t("confirm_unmute.message"),
     )
     if (!isOK) return
 
@@ -63,8 +67,8 @@ const ChatRoomMenuGroup = () => {
 
   const handleLeaveGroup = async () => {
     const isOK = await confirm(
-      "LEAVE_GROUP_CONFIRM_TITLE",
-      "LEAVE_GROUP_CONFIRM_MESSAGE",
+      t("confirm_leave.title"),
+      t("confirm_leave.message"),
     )
     if (!isOK) return
 
@@ -80,8 +84,8 @@ const ChatRoomMenuGroup = () => {
 
   const handleClearChat = async () => {
     const isOK = await confirm(
-      "CLEAR_GROUP_CHAT_CONFIRM_TITLE",
-      "CLEAR_GROUP_CHAT_CONFIRM_MESSAGE",
+      t("confirm_delete.title"),
+      t("confirm_delete.message"),
     )
     if (!isOK) return
 
@@ -161,7 +165,7 @@ const ChatRoomMenuGroup = () => {
                 ) : (
                   <menu.icon />
                 )}{" "}
-                {menu.label}
+                {t(menu.label as any)}
               </DropdownMenuItem>
             )
           })}

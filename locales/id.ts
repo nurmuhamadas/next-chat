@@ -275,6 +275,30 @@ export default {
     },
   },
   room_menu: {
+    group: {
+      mute: "Bisukan",
+      unmute: "Aktifkan",
+      leave: "Keluar dari Grup",
+      delete: "Hapus Pesan",
+      confirm_mute: {
+        title: "Bisukan Grup",
+        message: "Apakah Anda yakin ingin membisukan grup ini?",
+      },
+      confirm_unmute: {
+        title: "Aktifkan Grup",
+        message: "Apakah Anda yakin ingin mengaktifkan grup ini?",
+      },
+      confirm_leave: {
+        title: "Keluar dari Grup",
+        message:
+          "Apakah Anda yakin ingin keluar dari grup ini? Anda tidak akan lagi menerima pesan dari grup ini.",
+      },
+      confirm_delete: {
+        title: "Hapus Pesan",
+        message:
+          "Apakah Anda yakin ingin menghapus pesan dari grup ini? Tindakan ini tidak dapat dibatalkan.",
+      },
+    },
     channel: {
       mute: "Bisukan",
       unmute: "Aktifkan",

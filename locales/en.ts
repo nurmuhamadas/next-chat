@@ -275,6 +275,30 @@ export default {
     },
   },
   room_menu: {
+    group: {
+      mute: "Mute",
+      unmute: "Unmute",
+      leave: "Leave Group",
+      delete: "Delete Messages",
+      confirm_mute: {
+        title: "Mute Group",
+        message: "Are you sure you want to mute this group?",
+      },
+      confirm_unmute: {
+        title: "Unmute Group",
+        message: "Are you sure you want to unmute this group?",
+      },
+      confirm_leave: {
+        title: "Leave Group",
+        message:
+          "Are you sure you want to leave this group? You will no longer receive messages from this group.",
+      },
+      confirm_delete: {
+        title: "Delete Messages",
+        message:
+          "Are you sure you want to delete messages from this group? This action cannot be undone.",
+      },
+    },
     channel: {
       mute: "Mute",
       unmute: "Unmute",
