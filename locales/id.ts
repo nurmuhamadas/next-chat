@@ -84,4 +84,17 @@ export default {
     about_us: "Tentang NextChat",
     logout: "Keluar",
   },
+  my_profile: {
+    title: "Profil Saya",
+    bio: "Bio",
+    username: "Nama Pengguna",
+    email: "Email",
+    edit_tooltip: "Ubah profil",
+    edit_title: "Edit Profil Saya",
+    edit_submit: "Simpan Perubahan",
+    messages: {
+      profile_created: "Profil berhasil dibuat.",
+      profile_updated: "Profil berhasil diperbarui.",
+    },
+  },
 } as const

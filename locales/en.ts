@@ -84,4 +84,18 @@ export default {
     about_us: "About NextChat",
     logout: "Logout",
   },
+  my_profile: {
+    title: "My Profile",
+    bio: "Bio",
+    username: "Username",
+    email: "Email",
+    copy_tooltip: "Copy {label} to clipboard",
+    edit_tooltip: "Edit profile",
+    edit_title: "Edit My Profile",
+    edit_submit: "Save Changes",
+    messages: {
+      profile_created: "Profile created successfully.",
+      profile_updated: "Profile updated successfully.",
+    },
+  },
 } as const

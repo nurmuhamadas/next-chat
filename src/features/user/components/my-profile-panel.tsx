@@ -16,6 +16,7 @@ import LeftPanelWrapper from "@/components/left-panel-wrapper"
 import SimpleTooltip from "@/components/simple-tooltip"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 import { useGetMyProfile } from "../hooks/api/use-get-my-profile"
@@ -23,6 +24,8 @@ import { useEditMyProfilePanel } from "../hooks/use-edit-my-profile-panel"
 import { useMyProfilePanel } from "../hooks/use-my-profile-panel"
 
 const MyProfilePanel = () => {
+  const t = useScopedI18n("my_profile")
+
   const { isMyProfileOpen, closeMyProfile } = useMyProfilePanel()
   const { openEditMyProfile } = useEditMyProfilePanel()
 
@@ -35,13 +38,13 @@ const MyProfilePanel = () => {
     icon: LucideIcon
   }[] = [
     {
-      label: "Bio",
+      label: t("bio"),
       value: data?.bio,
       copyText: data?.bio ?? "",
       icon: InfoIcon,
     },
     {
-      label: "Username",
+      label: t("username"),
       value: (
         <div className="flex gap-x-2">
           <span className="truncate">@{data?.username}</span>
@@ -51,7 +54,7 @@ const MyProfilePanel = () => {
       icon: AtSignIcon,
     },
     {
-      label: "Email",
+      label: t("email"),
       value: data?.email,
       copyText: data?.email ?? "",
       icon: MailIcon,
@@ -67,11 +70,11 @@ const MyProfilePanel = () => {
   return (
     <>
       <LeftPanelWrapper
-        title="My Profile"
+        title={t("title")}
         isOpen={isMyProfileOpen}
         onBack={closeMyProfile}
         action={
-          <SimpleTooltip content="Edit profile">
+          <SimpleTooltip content={t("edit_tooltip")}>
             <Button variant="icon" size="icon" onClick={openEditMyProfile}>
               <PencilIcon />
             </Button>
@@ -97,7 +100,9 @@ const MyProfilePanel = () => {
 
             return (
               <li key={info.label} className="">
-                <SimpleTooltip content={`Copy ${info.label}`}>
+                <SimpleTooltip
+                  content={t("copy_tooltip", { label: info.label })}
+                >
                   <button
                     className="flex w-full items-center gap-x-5 rounded px-1.5 py-3 hover:bg-grey-4 focus:outline-none"
                     onClick={() => handleCopy(info.copyText)}
