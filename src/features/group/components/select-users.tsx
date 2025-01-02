@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import useSearchUsers from "@/features/user/hooks/api/use-search-users"
+import { useScopedI18n } from "@/lib/locale/client"
 
 interface SelectUsersProps {
   selectedIds: string[]
@@ -24,6 +25,8 @@ const SelectUsers = ({
   selectedIds = [],
   onValuesChange,
 }: SelectUsersProps) => {
+  const t = useScopedI18n("group")
+
   const [isOpen, setIsOpen] = useState(false)
 
   const { data: users, isLoading } = useSearchUsers({ queryKey: "" })
@@ -50,7 +53,9 @@ const SelectUsers = ({
             variant="outline"
             className="h-14 w-full justify-between rounded"
           >
-            <p className="text-muted-foreground">Select members</p>
+            <p className="text-muted-foreground">
+              {t("form.members.placeholder")}
+            </p>
             <ChevronDownIcon className="size-5" />
           </Button>
         </DropdownMenuTrigger>
@@ -62,7 +67,7 @@ const SelectUsers = ({
           )}
           {!isLoading && users.length === 0 && (
             <div className="min-h-48 flex-center">
-              <p className="text-muted-foreground">No user found</p>
+              <p className="text-muted-foreground">{t("form.members.empty")}</p>
             </div>
           )}
           {!isLoading &&

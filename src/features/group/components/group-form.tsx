@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { ChangeEventHandler, useEffect, useRef, useState } from "react"
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ERROR } from "@/constants/error"
+import { useScopedI18n } from "@/lib/locale/client"
 import { debounce } from "@/lib/utils"
 
 import { GROUP_TYPE_OPT } from "../constants"
@@ -51,6 +53,8 @@ const GroupForm = ({
   errorMessage,
   onSubmit,
 }: GroupFormProps) => {
+  const t = useScopedI18n("group")
+
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [groupName, setGroupName] = useState(initialValues?.name ?? "")
@@ -140,11 +144,11 @@ const GroupForm = ({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t("form.name")}</FormLabel>
               <div className="relative flex">
                 <FormControl>
                   <Input
-                    placeholder="Enter your group name"
+                    placeholder={t("form.name.placeholder")}
                     {...field}
                     onChange={(e) => {
                       form.setValue("name", e.target.value)
@@ -172,10 +176,10 @@ const GroupForm = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description (Optional)</FormLabel>
+              <FormLabel>{t("form.description")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe your group"
+                  placeholder={t("form.description.placeholder")}
                   maxLength={2048}
                   {...field}
                 />
@@ -190,7 +194,7 @@ const GroupForm = ({
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Type</FormLabel>
+              <FormLabel>{t("form.type")}</FormLabel>
               <Select
                 value={field.value}
                 onValueChange={(value) =>
@@ -199,10 +203,7 @@ const GroupForm = ({
               >
                 <FormControl>
                   <SelectTrigger className="">
-                    <SelectValue
-                      className="placeholder:text-grey-2"
-                      placeholder="Choose your group type"
-                    />
+                    <SelectValue className="placeholder:text-grey-2" />
                   </SelectTrigger>
                 </FormControl>
 
@@ -213,7 +214,7 @@ const GroupForm = ({
                       value={value}
                       className="flex items-center gap-x-2"
                     >
-                      {label}
+                      {t(label as any)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -229,7 +230,7 @@ const GroupForm = ({
             name="memberIds"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Members</FormLabel>
+                <FormLabel>{t("form.members")}</FormLabel>
                 <SelectUsers
                   selectedIds={field.value ? field.value.split(",") : []}
                   onValuesChange={(ids) =>
@@ -249,7 +250,7 @@ const GroupForm = ({
             disabled={isLoading}
           >
             {isLoading && <LoaderIcon className="size-6 animate-spin" />}
-            {initialValues ? "Update Group" : "Create Group"}
+            {initialValues ? t("edit.submit") : t("new.submit")}
           </Button>
         </div>
       </form>

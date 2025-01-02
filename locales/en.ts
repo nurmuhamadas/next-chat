@@ -151,4 +151,32 @@ export default {
     new_group: "New Group",
     new_channel: "New Channel",
   },
+  group: {
+    new: {
+      title: "New Group",
+      submit: "Create Group",
+    },
+    edit: {
+      title: "Edit Group",
+      submit: "Update Group",
+    },
+    form: {
+      name: "Name",
+      "name.placeholder": "Enter your group name",
+      description: "Description (Optional)",
+      "description.placeholder": "Describe your group",
+      type: "Type",
+      type_opt: {
+        public: "Public",
+        private: "Private",
+      },
+      members: "Members",
+      "members.placeholder": "Select members",
+      "members.empty": "No user found",
+    },
+    messages: {
+      created: "Group created successfully.",
+      updated: "Group updated successfully.",
+    },
+  },
 } as const

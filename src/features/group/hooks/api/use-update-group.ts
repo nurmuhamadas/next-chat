@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { useScopedI18n } from "@/lib/locale/client"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
@@ -13,6 +14,8 @@ type RequestType = InferRequestType<
 >
 
 const useUpdateGroup = () => {
+  const t = useScopedI18n("group")
+
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ form, param }) => {
       const response = await client.api.groups[":groupId"].$patch({
@@ -28,7 +31,7 @@ const useUpdateGroup = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("GROUP_UPDATED")
+      toast.success(t("messages.updated"))
     },
     onError({ message }) {
       toast.error(message)

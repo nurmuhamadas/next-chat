@@ -150,4 +150,32 @@ export default {
     new_group: "Group Baru",
     new_channel: "Saluran Baru",
   },
+  group: {
+    new: {
+      title: "Grup Baru",
+      submit: "Buat Grup",
+    },
+    edit: {
+      title: "Edit Grup",
+      submit: "Perbarui Grup",
+    },
+    form: {
+      name: "Nama",
+      "name.placeholder": "Masukkan nama grup Anda",
+      description: "Deskripsi (Opsional)",
+      "description.placeholder": "Deskripsikan grup Anda",
+      type: "Tipe",
+      type_opt: {
+        public: "Publik",
+        private: "Pribadi",
+      },
+      members: "Anggota",
+      "members.placeholder": "Pilih anggota",
+      "members.empty": "Tidak ada user ditemukan.",
+    },
+    messages: {
+      created: "Grup berhasil dibuat.",
+      updated: "Grup berhasil diperbarui.",
+    },
+  },
 } as const

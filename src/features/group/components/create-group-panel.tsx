@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 
 import LeftPanelWrapper from "@/components/left-panel-wrapper"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useCreateGroup from "../hooks/api/use-create-group"
 import { useCreateGroupPanel } from "../hooks/use-create-group-panel"
@@ -12,6 +13,8 @@ import GroupForm from "./group-form"
 const CreateGroupPanel = () => {
   const queryClient = useQueryClient()
 
+  const t = useScopedI18n("group")
+
   const { isCreateGroupOpen, closeCreateGroup } = useCreateGroupPanel()
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -20,7 +23,7 @@ const CreateGroupPanel = () => {
 
   return (
     <LeftPanelWrapper
-      title="New Group"
+      title={t("new.title")}
       isOpen={isCreateGroupOpen}
       onBack={closeCreateGroup}
     >

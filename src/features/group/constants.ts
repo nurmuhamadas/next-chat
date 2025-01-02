@@ -8,11 +8,11 @@ export const GROUP_TYPE_OPT: {
   value: GroupType
 }[] = [
   {
-    label: "Public",
+    label: "form.type_opt.public",
     value: "PUBLIC",
   },
   {
-    label: "Private",
+    label: "form.type_opt.private",
     value: "PRIVATE",
   },
 ]

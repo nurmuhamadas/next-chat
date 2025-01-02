@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
+import { useScopedI18n } from "@/lib/locale/client"
 
 import useGetGroupById from "../hooks/api/use-get-group-by-id"
 import useGetGroupMembers from "../hooks/api/use-get-group-members"
@@ -16,6 +17,8 @@ import { useGroupAdminsPanel } from "../hooks/use-group-admins-panel"
 import GroupForm from "./group-form"
 
 const EditGroupPanel = () => {
+  const t = useScopedI18n("group")
+
   const type = useRoomType()
   const id = useRoomId()
 
@@ -41,7 +44,7 @@ const EditGroupPanel = () => {
 
   return (
     <RightPanelWrapper
-      title="Edit Group"
+      title={t("edit.title")}
       isOpen={isEditGroupOpen}
       onBack={closeEditGroup}
     >
