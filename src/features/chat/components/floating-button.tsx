@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useCreateChannelPanel } from "@/features/channel/hooks/use-create-channel-modal"
 import { useCreateGroupPanel } from "@/features/group/hooks/use-create-group-panel"
+import { useScopedI18n } from "@/lib/locale/client"
 
 const FloatingButton = () => {
+  const t = useScopedI18n("floating_menu")
+
   const [isOpen, setIsOpen] = useState(false)
 
   const { openCreateChannel } = useCreateChannelPanel()
@@ -28,10 +31,10 @@ const FloatingButton = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top" align="end">
           <DropdownMenuItem className="py-2.5" onClick={openCreateGroup}>
-            <UsersIcon /> New Group
+            <UsersIcon /> {t("new_group")}
           </DropdownMenuItem>
           <DropdownMenuItem className="py-2.5" onClick={openCreateChannel}>
-            <TvIcon /> New Channel
+            <TvIcon /> {t("new_channel")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

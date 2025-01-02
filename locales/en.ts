@@ -147,4 +147,8 @@ export default {
       settings_updated: "Settings updated successfully.",
     },
   },
+  floating_menu: {
+    new_group: "New Group",
+    new_channel: "New Channel",
+  },
 } as const

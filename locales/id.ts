@@ -146,4 +146,8 @@ export default {
       settings_updated: "Pengaturan berhasil diperbarui.",
     },
   },
+  floating_menu: {
+    new_group: "Group Baru",
+    new_channel: "Saluran Baru",
+  },
 } as const
