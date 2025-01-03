@@ -381,6 +381,8 @@ export default {
   room: {
     empty_title: "No Conversation found",
     empty_body: "Search and select user to start the conversation",
+    no_selected: "No conversation selected",
+    no_selected_body: "Selected conversation will be displayed here",
     more: "Show more",
     search: {
       placeholder: "Search",

@@ -381,7 +381,8 @@ export default {
   room: {
     empty_title: "Tidak ada percakapan yang ditemukan",
     empty_body: "Cari dan pilih pengguna untuk memulai percakapan",
-    more: "Tampilkan lebih banyak",
+    no_selected: "Tidak ada percakapan yang dipilih",
+    no_selected_body: "Percakapan yang dipilih akan ditampilkan di sini",
     search: {
       placeholder: "Cari",
       users: {
