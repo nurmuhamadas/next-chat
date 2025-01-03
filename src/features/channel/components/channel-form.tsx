@@ -215,7 +215,7 @@ const ChannelForm = ({
                       value={value}
                       className="flex items-center gap-x-2"
                     >
-                      {t(label as any)}
+                      {t(label as any, { count: 0 })}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -13,7 +13,6 @@ import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { roomTypeToRoomTypeModelLower } from "@/lib/utils"
 
-import { useI18n } from "../../../lib/locale/client"
 import useGetRoom from "../hooks/api/use-get-room"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
 
@@ -29,9 +28,6 @@ const ChatRoom = () => {
 
   const type = useRoomType()
   const id = useRoomId()
-
-  const t = useI18n()
-  console.log(t("hello.world", { param: "Guys" }))
 
   const groupId = type === "group" ? id : undefined
   const channelId = type === "channel" ? id : undefined
