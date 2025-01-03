@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ERROR } from "@/constants/error"
-import { useScopedI18n } from "@/lib/locale/client"
+import { useI18n, useScopedI18n } from "@/lib/locale/client"
 import { debounce } from "@/lib/utils"
 
 import { GROUP_TYPE_OPT } from "../constants"
@@ -53,6 +53,7 @@ const GroupForm = ({
   errorMessage,
   onSubmit,
 }: GroupFormProps) => {
+  const tErr = useI18n()
   const t = useScopedI18n("group")
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -95,7 +96,7 @@ const GroupForm = ({
 
   useEffect(() => {
     if (!isCheckingGroupName && isGroupNameAvailable === false) {
-      form.setError("name", { message: ERROR.GROUP_NAME_DUPLICATED })
+      form.setError("name", { message: tErr(ERROR.GROUP_NAME_DUPLICATED) })
     } else {
       form.clearErrors("name")
     }

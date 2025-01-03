@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ERROR } from "@/constants/error"
-import { useScopedI18n } from "@/lib/locale/client"
+import { useI18n, useScopedI18n } from "@/lib/locale/client"
 import { debounce } from "@/lib/utils"
 
 import { CHANNEL_TYPE_OPT } from "../constants"
@@ -51,6 +51,7 @@ const ChannelForm = ({
   errorMessage,
   onSubmit,
 }: ChannelFormProps) => {
+  const tErr = useI18n()
   const t = useScopedI18n("channel")
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -93,7 +94,7 @@ const ChannelForm = ({
 
   useEffect(() => {
     if (!isCheckingChannelName && isChannelNameAvailable === false) {
-      form.setError("name", { message: ERROR.CHANNEL_NAME_DUPLICATED })
+      form.setError("name", { message: tErr(ERROR.CHANNEL_NAME_DUPLICATED) })
     } else {
       form.clearErrors("name")
     }

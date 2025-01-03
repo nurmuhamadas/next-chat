@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { ERROR } from "@/constants/error"
+import { useI18n } from "@/lib/locale/client"
 import { debounce } from "@/lib/utils"
 
 import useUsernameAvaiability from "../hooks/use-username-availability"
@@ -27,6 +28,8 @@ interface UsernameFormInputProps {
 }
 
 const UsernameFormInput = ({ form, initialValue }: UsernameFormInputProps) => {
+  const t = useI18n()
+
   const [username, setUsername] = useState(initialValue ?? "")
 
   const { data: isUsernameAvailable, isFetching: isCheckingUsername } =
@@ -38,7 +41,7 @@ const UsernameFormInput = ({ form, initialValue }: UsernameFormInputProps) => {
 
   useEffect(() => {
     if (!isCheckingUsername && isUsernameAvailable === false) {
-      form.setError("username", { message: ERROR.USERNAME_ALREADY_EXIST })
+      form.setError("username", { message: t(ERROR.USERNAME_ALREADY_EXIST) })
     } else {
       form.clearErrors("username")
     }
