@@ -6,7 +6,7 @@ import { createMiddleware } from "hono/factory"
 import { ERROR } from "@/constants/error"
 import { prisma } from "@/lib/prisma"
 
-import { createError } from "./utils"
+import AuthorizationError from "./exceptions/authorization-error"
 
 type AdditionalContext = {
   Variables: {
@@ -28,7 +28,7 @@ export const validateProfileMiddleware = createMiddleware<AdditionalContext>(
     })
 
     if (!profile) {
-      return c.json(createError(ERROR.COMPLETE_PROFILE_FIRST), 403)
+      throw new AuthorizationError(ERROR.COMPLETE_PROFILE_FIRST)
     }
 
     c.set("userProfile", profile)

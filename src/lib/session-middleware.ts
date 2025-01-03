@@ -10,8 +10,8 @@ import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
 import { softDeleteSession } from "@/features/auth/lib/queries"
 import { verifyToken } from "@/features/auth/lib/utils"
 
+import AuthenticationError from "./exceptions/authentication-error"
 import { prisma } from "./prisma"
-import { createError } from "./utils"
 
 type AdditionalContext = {
   Variables: {
@@ -61,12 +61,12 @@ export const sessionMiddleware = createMiddleware<AdditionalContext>(
     } catch (error) {
       deleteCookie(c, AUTH_COOKIE_KEY)
       if (error instanceof JwtTokenInvalid) {
-        return c.json(createError(ERROR.INVALID_TOKEN), 401)
+        throw new AuthenticationError(ERROR.INVALID_TOKEN)
       }
       if (error instanceof JwtTokenExpired) {
-        return c.json(createError(ERROR.TOKEN_EXPIRED), 401)
+        throw new AuthenticationError(ERROR.TOKEN_EXPIRED)
       }
-      return c.json(createError(ERROR.UNAUTHORIZE), 401)
+      throw new AuthenticationError(ERROR.UNAUTHORIZE)
     }
   },
 )

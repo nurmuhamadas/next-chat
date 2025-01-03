@@ -8,6 +8,7 @@ import { v7 as uuidV7 } from "uuid"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_SECRET } from "@/lib/config"
+import InvariantError from "@/lib/exceptions/invariant-error"
 import { prisma } from "@/lib/prisma"
 
 import { AUTH_COOKIE_KEY, DEVICE_ID_COOKIE_KEY } from "../constants"
@@ -74,14 +75,18 @@ export const validateToken = async ({
     await verifyToken(token)
 
     if (!originToken || originToken.token !== token) {
-      return ERROR.INVALID_TOKEN
+      throw new InvariantError(ERROR.INVALID_TOKEN)
     }
     if (isBefore(originToken.expiresAt, new Date())) {
       return ERROR.TOKEN_EXPIRED
     }
   } catch (error) {
-    if (error instanceof JwtTokenInvalid) return ERROR.INVALID_TOKEN
-    if (error instanceof JwtTokenExpired) return ERROR.TOKEN_EXPIRED
+    if (error instanceof JwtTokenInvalid) {
+      throw new InvariantError(ERROR.INVALID_TOKEN)
+    }
+    if (error instanceof JwtTokenExpired) {
+      throw new InvariantError(ERROR.TOKEN_EXPIRED)
+    }
   }
 }
 

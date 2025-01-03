@@ -2,11 +2,11 @@ import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 
 import { ERROR } from "@/constants/error"
+import NotFoundError from "@/lib/exceptions/not-found-error"
 import { prisma } from "@/lib/prisma"
 import { sessionMiddleware } from "@/lib/session-middleware"
-import { createError, successResponse } from "@/lib/utils"
+import { successResponse } from "@/lib/utils"
 import { validateProfileMiddleware } from "@/lib/validate-profile-middleware"
-import { zodErrorHandler } from "@/lib/zod-error-handler"
 
 import { clearPrivateChat } from "../lib/queries"
 import { mapOptionModelToOption } from "../lib/utils"
@@ -27,7 +27,7 @@ const privateChatApp = new Hono()
       })
 
       if (!user) {
-        return c.json(createError(ERROR.USER_NOT_FOUND), 404)
+        throw new NotFoundError(ERROR.USER_NOT_FOUND)
       }
 
       const option = await prisma.privateChatOption.findFirst({
@@ -44,7 +44,7 @@ const privateChatApp = new Hono()
       })
 
       if (!option) {
-        return c.json(createError(ERROR.PRIVATE_CHAT_OPTION_NOT_FOUND), 404)
+        throw new NotFoundError(ERROR.PRIVATE_CHAT_OPTION_NOT_FOUND)
       }
 
       const response: GetPrivateChatOptionResponse = successResponse(
@@ -57,7 +57,7 @@ const privateChatApp = new Hono()
     "/:userId/options",
     sessionMiddleware,
     validateProfileMiddleware,
-    zValidator("json", updatePrivateChatOptionSchema, zodErrorHandler),
+    zValidator("json", updatePrivateChatOptionSchema),
     async (c) => {
       const { userId: userReqId } = c.req.param()
       const { notification } = c.req.valid("json")
@@ -69,7 +69,7 @@ const privateChatApp = new Hono()
       })
 
       if (!user) {
-        return c.json(createError(ERROR.USER_NOT_FOUND), 404)
+        throw new NotFoundError(ERROR.USER_NOT_FOUND)
       }
 
       const option = await prisma.privateChatOption.findFirst({
@@ -86,7 +86,7 @@ const privateChatApp = new Hono()
       })
 
       if (!option) {
-        return c.json(createError(ERROR.PRIVATE_CHAT_OPTION_NOT_FOUND), 404)
+        throw new NotFoundError(ERROR.PRIVATE_CHAT_OPTION_NOT_FOUND)
       }
 
       const result = await prisma.privateChatOption.update({
@@ -114,7 +114,7 @@ const privateChatApp = new Hono()
       })
 
       if (!user) {
-        return c.json(createError(ERROR.USER_NOT_FOUND), 404)
+        throw new NotFoundError(ERROR.USER_NOT_FOUND)
       }
 
       const option = await prisma.privateChatOption.findFirst({
@@ -131,7 +131,7 @@ const privateChatApp = new Hono()
       })
 
       if (!option) {
-        return c.json(createError(ERROR.PRIVATE_CHAT_OPTION_NOT_FOUND), 404)
+        throw new NotFoundError(ERROR.PRIVATE_CHAT_OPTION_NOT_FOUND)
       }
 
       await clearPrivateChat({ userId, lastOption: option })

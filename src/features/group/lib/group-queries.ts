@@ -1,7 +1,8 @@
 import { GroupType, RoomType } from "@prisma/client"
-import { StatusCode } from "hono/utils/http-status"
 
 import { ERROR } from "@/constants/error"
+import AuthorizationError from "@/lib/exceptions/authorization-error"
+import InvariantError from "@/lib/exceptions/invariant-error"
 import { prisma } from "@/lib/prisma"
 import { generateInviteCode } from "@/lib/utils"
 
@@ -10,14 +11,7 @@ import { getGroupIncludeQuery } from "./utils"
 export const validateGroupMember = async (
   userId: string,
   memberIds: string[],
-): Promise<
-  | undefined
-  | {
-      error: string
-      path?: (string | number)[]
-      code: StatusCode
-    }
-> => {
+): Promise<void> => {
   // USER SHOULD ADD REGISTERED USER ONLY
   const validUsers = await prisma.user.findMany({
     where: {
@@ -26,15 +20,15 @@ export const validateGroupMember = async (
     },
     select: { id: true },
   })
-  console.log(validUsers)
+
   if (validUsers.length < memberIds.length) {
     const validUserIds = validUsers.map((v) => v.id)
     const notValidUserId = memberIds.find((id) => !validUserIds.includes(id))
-    return {
-      error: ERROR.MEMBER_ID_NOT_FOUND,
-      path: ["members", notValidUserId!],
-      code: 400,
-    }
+
+    throw new InvariantError(ERROR.MEMBER_ID_NOT_FOUND, [
+      "members",
+      notValidUserId!,
+    ])
   }
 
   // USER SHOULD NOT ADD BLOCKED USER AS MEMBER
@@ -46,7 +40,7 @@ export const validateGroupMember = async (
     },
   })
   if (blockedUsers.length > 0) {
-    return { error: ERROR.ADD_BLOCKED_USERS_NOT_ALLOWED, code: 403 }
+    throw new AuthorizationError(ERROR.ADD_BLOCKED_USERS_NOT_ALLOWED)
   }
 
   // USER SHOULD NOT ADD BLOCKED USER AS MEMBER
@@ -58,7 +52,7 @@ export const validateGroupMember = async (
     },
   })
   if (blockedByUsers.length > 0) {
-    return { error: ERROR.ADDDED_BY_BLOCKED_USER_NOT_ALLOWED, code: 403 }
+    throw new AuthorizationError(ERROR.ADDDED_BY_BLOCKED_USER_NOT_ALLOWED)
   }
 
   return undefined

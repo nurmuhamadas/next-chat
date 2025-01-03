@@ -8,6 +8,8 @@ import {
 import { DefaultArgs } from "@prisma/client/runtime/library"
 
 import { ERROR } from "@/constants/error"
+import AuthorizationError from "@/lib/exceptions/authorization-error"
+import InvariantError from "@/lib/exceptions/invariant-error"
 import { prisma } from "@/lib/prisma"
 
 import { getMessageInludeQuery } from "./utils"
@@ -22,24 +24,14 @@ export const validateMessage = async ({
   receiverId: string
   userId: string
   parentMessageId?: string
-}): Promise<
-  | undefined
-  | {
-      error: string
-      path?: (string | number)[]
-      code: 400 | 403
-    }
-> => {
+}): Promise<void> => {
   if (roomType === "PRIVATE") {
     const blockingUser = await prisma.blockedUser.findFirst({
       where: { blockedUserId: receiverId, userId, unblockedAt: null },
     })
 
     if (blockingUser) {
-      return {
-        error: ERROR.CANNOT_SEND_MESSAGE_TO_BLOCKED_USER,
-        code: 403,
-      }
+      throw new AuthorizationError(ERROR.CANNOT_SEND_MESSAGE_TO_BLOCKED_USER)
     }
   }
 
@@ -52,18 +44,10 @@ export const validateMessage = async ({
       },
     })
     if (!group) {
-      return {
-        error: ERROR.GROUP_NOT_FOUND,
-        code: 400,
-        path: ["receiverId"],
-      }
+      throw new AuthorizationError(ERROR.GROUP_NOT_FOUND)
     }
     if (group.members.length === 0) {
-      return {
-        error: ERROR.NOT_GROUP_MEMBER,
-        code: 403,
-        path: ["receiverId"],
-      }
+      throw new AuthorizationError(ERROR.NOT_GROUP_MEMBER)
     }
   }
 
@@ -78,18 +62,10 @@ export const validateMessage = async ({
       },
     })
     if (!channel) {
-      return {
-        error: ERROR.CHANNEL_NOT_FOUND,
-        code: 400,
-        path: ["receiverId"],
-      }
+      throw new InvariantError(ERROR.CHANNEL_NOT_FOUND)
     }
     if (channel.subscribers.length === 0 || !channel.subscribers[0]?.isAdmin) {
-      return {
-        error: ERROR.USER_IS_NOT_ADMIN,
-        code: 403,
-        path: ["receiverId"],
-      }
+      throw new AuthorizationError(ERROR.USER_IS_NOT_ADMIN)
     }
   }
 
@@ -109,11 +85,7 @@ export const validateMessage = async ({
 
   if (parentMessageId) {
     if (!parentMessage) {
-      return {
-        error: ERROR.MESSAGE_NOT_FOUND,
-        code: 400,
-        path: ["parentMessageId"],
-      }
+      throw new InvariantError(ERROR.MESSAGE_NOT_FOUND)
     }
 
     if (
@@ -127,26 +99,14 @@ export const validateMessage = async ({
         parentMessage.privateChat.user1Id === userId
       )
     ) {
-      return {
-        error: ERROR.PARENT_MESSAGE_NOT_IN_ROOM,
-        code: 400,
-        path: ["parentMessageId"],
-      }
+      throw new InvariantError(ERROR.PARENT_MESSAGE_NOT_IN_ROOM)
     } else if (parentMessage.groupId && parentMessage.groupId !== receiverId) {
-      return {
-        error: ERROR.PARENT_MESSAGE_NOT_IN_ROOM,
-        code: 400,
-        path: ["parentMessageId"],
-      }
+      throw new InvariantError(ERROR.PARENT_MESSAGE_NOT_IN_ROOM)
     } else if (
       parentMessage.channelId &&
       parentMessage.channelId !== receiverId
     ) {
-      return {
-        error: ERROR.PARENT_MESSAGE_NOT_IN_ROOM,
-        code: 400,
-        path: ["parentMessageId"],
-      }
+      throw new InvariantError(ERROR.PARENT_MESSAGE_NOT_IN_ROOM)
     }
   }
 
