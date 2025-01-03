@@ -234,6 +234,7 @@ export default {
       notification_updated: "Notification updated successfully.",
       left_group: "You have left the group.",
       delete_message: "Message deleted successfully.",
+      joined_group: "Joined group successfully",
     },
   },
   channel: {
@@ -292,6 +293,7 @@ export default {
       notification_updated: "Notification updated successfully.",
       left_channel: "You have left the channel.",
       delete_message: "Message deleted successfully.",
+      joined_channel: "Subscribed channel successfully",
     },
   },
   room_menu: {
@@ -421,6 +423,7 @@ export default {
     group: {
       only_member: "Only group members can view the messages.",
       join: "Join Group",
+      success: "Joined group successfully",
     },
     channel: {
       only_member: "Only channel subscribers can view the messages.",

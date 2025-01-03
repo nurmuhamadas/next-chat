@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon, MoreVerticalIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,8 @@ import useGetRoom from "../../hooks/api/use-get-room"
 
 const ChatRoomMenuGroup = () => {
   const t = useScopedI18n("room_menu.group")
+
+  const queryClient = useQueryClient()
 
   const id = useRoomId()
 
@@ -76,6 +79,9 @@ const ChatRoomMenuGroup = () => {
       { param: { groupId: id } },
       {
         onSuccess() {
+          queryClient.invalidateQueries({
+            queryKey: ["get-group-by-id", id],
+          })
           refetchOption()
         },
       },

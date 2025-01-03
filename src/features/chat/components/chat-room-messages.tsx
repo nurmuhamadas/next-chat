@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import Image from "next/image"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { isToday, isYesterday, parseISO } from "date-fns"
 import { LoaderIcon } from "lucide-react"
 
@@ -40,6 +41,8 @@ const ChatRoomMessages = ({
 }: ChatRoomMessagesProps) => {
   const currentLocal = useCurrentLocale()
   const t = useScopedI18n("messages")
+
+  const queryClient = useQueryClient()
 
   const type = useRoomType()
   const id = useRoomId()
@@ -153,19 +156,45 @@ const ChatRoomMessages = ({
 
   const handleJoinGroup = () => {
     if (group) {
-      joinGroup({
-        param: { groupId: group.id },
-        json: { code: group.inviteCode },
-      })
+      joinGroup(
+        {
+          param: { groupId: group.id },
+          json: { code: group.inviteCode },
+        },
+        {
+          onSuccess() {
+            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({
+              queryKey: ["get-group-by-id", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-group-option", id],
+            })
+          },
+        },
+      )
     }
   }
 
   const handleJoinChannel = () => {
     if (channel) {
-      joinChannel({
-        param: { channelId: channel.id },
-        json: { code: channel.inviteCode },
-      })
+      joinChannel(
+        {
+          param: { channelId: channel.id },
+          json: { code: channel.inviteCode },
+        },
+        {
+          onSuccess() {
+            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({
+              queryKey: ["get-channel-by-id", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-channel-option", id],
+            })
+          },
+        },
+      )
     }
   }
 

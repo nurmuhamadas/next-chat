@@ -109,8 +109,8 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
     // archive: !room.archived,
     delete:
       room.type === "chat" ||
-      (room.type === "group" && room.isActive) ||
-      (room.type === "channel" && room.isActive),
+      (room.type === "group" && !room.isActive) ||
+      (room.type === "channel" && !room.isActive),
   }
 
   const menuList = chatRoomListMenu.filter((menu) => {

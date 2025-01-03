@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { useQueryClient } from "@tanstack/react-query"
 import { LoaderIcon, MoreVerticalIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,8 @@ import useGetRoom from "../../hooks/api/use-get-room"
 
 const ChatRoomMenuChannel = () => {
   const t = useScopedI18n("room_menu.channel")
+
+  const queryClient = useQueryClient()
 
   const id = useRoomId()
 
@@ -78,6 +81,9 @@ const ChatRoomMenuChannel = () => {
       { param: { channelId: id } },
       {
         onSuccess() {
+          queryClient.invalidateQueries({
+            queryKey: ["get-channel-by-id", id],
+          })
           refetchOption()
         },
       },

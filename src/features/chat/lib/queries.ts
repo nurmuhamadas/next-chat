@@ -67,7 +67,10 @@ export const deleteRoom = ({
       data: {
         deletedAt: new Date(),
         unreadMessage: {
-          update: { count: 0 },
+          upsert: {
+            create: { count: 0, userId: ownerId },
+            update: { count: 0 },
+          },
         },
       },
     })

@@ -234,6 +234,7 @@ export default {
       notification_updated: "Notifikasi berhasil diperbarui.",
       left_group: "Anda telah meninggalkan grup.",
       delete_message: "Pesan berhasil dihapus.",
+      joined_group: "Berhasil bergabung ke grup",
     },
   },
   channel: {
@@ -292,6 +293,7 @@ export default {
       notification_updated: "Notifikasi berhasil diperbarui.",
       left_channel: "Anda telah meninggalkan saluran.",
       delete_message: "Pesan berhasil dihapus.",
+      joined_channel: "Berhasil berlangganan ke saluran",
     },
   },
   room_menu: {

@@ -68,7 +68,7 @@ const UsernameFormInput = ({ form, initialValue }: UsernameFormInputProps) => {
             </FormControl>
 
             {username && (
-              <div className="absolute right-3 top-[18px]">
+              <div className="absolute right-3 top-0">
                 {isCheckingUsername ? (
                   <LoaderIcon className="size-4 animate-spin" />
                 ) : isUsernameAvailable === true ? (

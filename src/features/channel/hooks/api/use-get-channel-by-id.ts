@@ -4,7 +4,7 @@ import { client } from "@/lib/rpc"
 
 const useGetChannelById = ({ id }: { id?: string }) => {
   const query = useQuery({
-    queryKey: ["get-group-by-id", id],
+    queryKey: ["get-channel-by-id", id],
     queryFn: async () => {
       const response = await client.api.channels[":channelId"].$get({
         param: { channelId: id ?? "" },

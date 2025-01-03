@@ -138,6 +138,6 @@ export const ERROR = {
   ROOM_NOT_ARCHIVED: "error.room.not_archived",
   CANNOT_DELETE_JOINED_GROUP: "error.room.cannot_delete_joined_group",
   CANNOT_DELETE_SUBSCRIBED_CHANNEL:
-    "error.room.should_unsubscribe_channel_first",
+    "error.room.cannot_delete_subscribed_channel",
   INVALID_ROOM_TYPE: "error.room.invalid_type",
 } as const
