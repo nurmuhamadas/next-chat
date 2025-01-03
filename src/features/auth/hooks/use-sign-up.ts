@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { useScopedI18n } from "@/lib/locale/client"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
@@ -13,6 +14,8 @@ type RequestType = InferRequestType<
 >
 
 const useSignUp = () => {
+  const t = useScopedI18n("auth.message")
+
   return useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ json }) => {
       const response = await client.api.auth["sign-up"].$post({
@@ -27,7 +30,7 @@ const useSignUp = () => {
       return result
     },
     onSuccess: () => {
-      toast.success("REGISTER_SUCCESS")
+      toast.success(t("register_success"))
     },
   })
 }

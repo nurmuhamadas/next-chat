@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { useScopedI18n } from "@/lib/locale/client"
 import { client } from "@/lib/rpc"
 
 type ResponseType = InferResponseType<
@@ -15,6 +16,8 @@ type RequestType = InferRequestType<
 >
 
 const useSignIn = () => {
+  const t = useScopedI18n("auth.message")
+
   const router = useRouter()
 
   return useMutation<ResponseType, Error, RequestType>({
@@ -33,7 +36,7 @@ const useSignIn = () => {
     onSuccess: ({ data }) => {
       if (data.status === "success") {
         router.push("/")
-        toast.success("LOGGED_IN")
+        toast.success(t("signed_in"))
       }
     },
   })

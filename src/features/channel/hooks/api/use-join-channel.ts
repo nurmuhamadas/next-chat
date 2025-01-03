@@ -27,9 +27,7 @@ const useJoinChannel = () => {
 
       return result
     },
-    onSuccess: () => {
-      toast.success("JOINED_CHANNEL")
-    },
+    onSuccess: () => {},
     onError({ message }) {
       toast.error(message)
     },
