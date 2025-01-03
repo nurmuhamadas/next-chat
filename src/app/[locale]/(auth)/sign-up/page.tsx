@@ -9,7 +9,7 @@ import SignUpForm from "@/features/auth/components/sign-up-form"
 import { useScopedI18n } from "@/lib/locale/client"
 
 const SignUpPage = () => {
-  const [showVerification, setShowVerification] = useState(false)
+  const [showVerification] = useState(false)
 
   const t = useScopedI18n("auth.sign_up")
 
@@ -22,13 +22,14 @@ const SignUpPage = () => {
       )}
       <SignUpForm
         showVerification={showVerification}
-        onSuccess={() => setShowVerification(true)}
+        // onSuccess={() => setShowVerification(true)}
+        onSuccess={() => {}}
       />
       {!showVerification && (
         <p className="text-center body-2">
           {t("question")}
           <Button variant="link" className="ml-2 px-0" asChild>
-            <Link href="/sign-in">{t("submit")}</Link>
+            <Link href="/sign-in">{t("link")}</Link>
           </Button>
         </p>
       )}

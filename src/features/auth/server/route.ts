@@ -26,7 +26,6 @@ import {
   generateSessionToken,
   generateVerificationToken,
   getDeviceId,
-  getTokenExpired,
   hashPassword,
   setAuthCookies,
   validateToken,
@@ -69,15 +68,17 @@ const authApp = new Hono()
 
     const hashedPassword = await hashPassword(password)
 
-    const token = await generateVerificationToken({ email, username })
+    // * Temporary disable email verification
+    // const token = await generateVerificationToken({ email, username })
     await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
-        verificationToken: {
-          create: { token, expiresAt: getTokenExpired() },
-        },
+        emailVerifiedAt: new Date(),
+        // verificationToken: {
+        //   create: { token, expiresAt: getTokenExpired() },
+        // },
       },
     })
 
@@ -109,25 +110,26 @@ const authApp = new Hono()
       throw new InvariantError(ERROR.INVALID_CREDENTIALS)
     }
 
-    if (!existingUser.emailVerifiedAt) {
-      const response: SignInResponse = successResponse({
-        status: "unverified",
-      })
-      return c.json(response)
-    }
+    // * Temporary disable email verification and 2FA
+    // if (!existingUser.emailVerifiedAt) {
+    //   const response: SignInResponse = successResponse({
+    //     status: "unverified",
+    //   })
+    //   return c.json(response)
+    // }
 
-    const setting = existingUser.setting
-    if (setting?.enable2FA) {
-      const token = await generateVerificationToken({
-        email,
-        username: existingUser.username,
-      })
-      await createOrUpdateVerificationToken({ email, token })
-      // TODO: send email login
+    // const setting = existingUser.setting
+    // if (setting?.enable2FA) {
+    //   const token = await generateVerificationToken({
+    //     email,
+    //     username: existingUser.username,
+    //   })
+    //   await createOrUpdateVerificationToken({ email, token })
+    //   // TODO: send email login
 
-      const response: SignInResponse = successResponse({ status: "2fa" })
-      return c.json(response)
-    }
+    //   const response: SignInResponse = successResponse({ status: "2fa" })
+    //   return c.json(response)
+    // }
 
     const deviceId = getDeviceId(c) ?? generateDeviceId()
     const token = await generateSessionToken({
