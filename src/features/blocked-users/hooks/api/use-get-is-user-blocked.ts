@@ -12,9 +12,6 @@ const useGetIsUserBlocked = ({ userId = "" }: { userId?: string }) => {
       ].$get({ param: { blockedUserId: userId } })
 
       const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
 
       return result.data
     },

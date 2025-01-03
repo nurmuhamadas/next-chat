@@ -10,9 +10,6 @@ export const useGetMyProfile = (data?: { enabled?: boolean }) => {
       const response = await client.api.users["my-profile"].$get({})
 
       const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
 
       return result.data
     },
