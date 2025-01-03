@@ -188,7 +188,7 @@ const ChatRoomMessages = ({
               {isJoiningChannel && (
                 <LoaderIcon className="size-4 animate-spin" />
               )}
-              {t("channel.only_member")}
+              {t("channel.subscribe")}
             </Button>
           </div>
         )}
@@ -201,6 +201,7 @@ const ChatRoomMessages = ({
       className={cn(
         "w-full flex-1 overflow-hidden py-1",
         isEmpty && "flex-col-center",
+        channel && !channel.isAdmin && "pb-6",
       )}
     >
       {!isLoading && isEmpty && (

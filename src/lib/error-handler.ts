@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import { Context } from "hono"
+import { deleteCookie } from "hono/cookie"
 import { BlankEnv, HTTPResponseError } from "hono/types"
 import { ZodError } from "zod"
 
+import { AUTH_COOKIE_KEY } from "@/features/auth/constants"
+
+import AuthenticationError from "./exceptions/authentication-error"
 import ClientError from "./exceptions/client-error"
 import { getI18n } from "./locale/server"
 import { customLogger } from "./custom-logger"
@@ -16,6 +20,11 @@ export const honoErrorHandler = async (
   const t = await getI18n()
 
   if (error instanceof ClientError) {
+    if (error instanceof AuthenticationError) {
+      deleteCookie(c, AUTH_COOKIE_KEY)
+      return c.redirect("/sign-in")
+    }
+
     customLogger(
       "ERROR:",
       `Message: ${error.message}`,
