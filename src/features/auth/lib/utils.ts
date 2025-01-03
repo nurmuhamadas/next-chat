@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { PasswordResetToken, Session, VerificationToken } from "@prisma/client"
+import { compare, hash } from "bcryptjs"
 import { addDays, addMinutes, addYears, isBefore } from "date-fns"
 import { Context } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
@@ -16,14 +18,11 @@ import { AUTH_COOKIE_KEY, DEVICE_ID_COOKIE_KEY } from "../constants"
 const SALT_ROUND = 10
 
 export const hashPassword = (password: string) => {
-  return Bun.password.hash(password, {
-    algorithm: "bcrypt",
-    cost: SALT_ROUND,
-  })
+  return hash(password, SALT_ROUND)
 }
 
 export const comparePassword = (password: string, hashedPassword: string) => {
-  return Bun.password.verify(password, hashedPassword)
+  return compare(password, hashedPassword)
 }
 
 export const generateSessionToken = (data: SessionToken) => {

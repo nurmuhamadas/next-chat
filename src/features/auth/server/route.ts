@@ -94,7 +94,7 @@ const authApp = new Hono()
     const existingUser = await prisma.user.findUnique({
       where: { email },
       include: {
-        setting: { select: { enable2FA: true } },
+        // setting: { select: { enable2FA: true } },
         profile: { select: { id: true } },
       },
     })
