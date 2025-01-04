@@ -43,6 +43,7 @@ interface GroupFormProps {
   initialImageUrl?: string
   initialValues?: Partial<z.infer<typeof groupSchema>>
   errorMessage?: string
+  onClearError?(): void
   onSubmit(values: z.infer<typeof groupSchema>): void
 }
 
@@ -51,6 +52,7 @@ const GroupForm = ({
   initialValues,
   initialImageUrl = "",
   errorMessage,
+  onClearError,
   onSubmit,
 }: GroupFormProps) => {
   const tErr = useI18n()
@@ -108,7 +110,7 @@ const GroupForm = ({
         onSubmit={form.handleSubmit(submitForm)}
         className="w-full space-y-5"
       >
-        <ErrorAlert message={errorMessage} />
+        <ErrorAlert message={errorMessage} onClose={onClearError} />
 
         <div className="flex justify-center">
           <input

@@ -23,6 +23,7 @@ const CompleteProfileForm = () => {
       <ProfileForm
         isLoading={isPending}
         errorMessage={errorMessage}
+        onClearError={() => setErrorMessage("")}
         showLogout
         onSubmit={(values) =>
           createProfile(

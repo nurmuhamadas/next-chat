@@ -58,7 +58,10 @@ const ResetPasswordForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-5">
-        <ErrorAlert message={errorMessage} />
+        <ErrorAlert
+          message={errorMessage}
+          onClose={() => setErrorMessage("")}
+        />
 
         <FormField
           control={form.control}

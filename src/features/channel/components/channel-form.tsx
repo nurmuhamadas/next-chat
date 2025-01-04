@@ -41,6 +41,7 @@ interface ChannelFormProps {
   initialImageUrl?: string
   initialValues?: Partial<z.infer<typeof channelSchema>>
   errorMessage?: string
+  onClearError?(): void
   onSubmit(values: z.infer<typeof channelSchema>): void
 }
 
@@ -49,6 +50,7 @@ const ChannelForm = ({
   initialValues,
   initialImageUrl = "",
   errorMessage,
+  onClearError,
   onSubmit,
 }: ChannelFormProps) => {
   const tErr = useI18n()
@@ -106,7 +108,7 @@ const ChannelForm = ({
         onSubmit={form.handleSubmit(submitForm)}
         className="w-full space-y-5"
       >
-        <ErrorAlert message={errorMessage} />
+        <ErrorAlert message={errorMessage} onClose={onClearError} />
 
         <div className="flex justify-center">
           <input

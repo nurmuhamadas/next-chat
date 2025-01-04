@@ -31,6 +31,7 @@ const CreateGroupPanel = () => {
         <GroupForm
           isLoading={isPending}
           errorMessage={errorMessage}
+          onClearError={() => setErrorMessage("")}
           onSubmit={(form) => {
             createGroup(
               { form },
