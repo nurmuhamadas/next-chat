@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import * as React from "react"
@@ -14,6 +15,7 @@ import {
 } from "react-hook-form"
 
 import { Label } from "@/components/ui/label"
+import { useI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
 const Form = FormProvider
@@ -147,6 +149,7 @@ const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
+  const t = useI18n()
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message) : children
 
@@ -161,7 +164,7 @@ const FormMessage = React.forwardRef<
       className={cn("caption text-error", className)}
       {...props}
     >
-      {body}
+      {t(body as any, { count: 0 })}
     </p>
   )
 })
