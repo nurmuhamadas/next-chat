@@ -24,17 +24,21 @@ declare interface ErrorResponse {
   }
 }
 
-declare type ApiResponse<T> = {
-  success: true
-  data: T
-}
+declare type ApiResponse<T> =
+  | {
+      success: true
+      data: T
+    }
+  | ErrorResponse
 
-declare type ApiCollectionResponse<T> = {
-  success: true
-  data: T[]
-  total: number
-  cursor?: string
-}
+declare type ApiCollectionResponse<T> =
+  | {
+      success: true
+      data: T[]
+      total: number
+      cursor?: string
+    }
+  | ErrorResponse
 
 // AUTH API
 declare type SignUpResponse = ApiResponse<{ username: string; email: string }>

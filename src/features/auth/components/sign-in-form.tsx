@@ -64,9 +64,9 @@ const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
     signIn(
       { json: values },
       {
-        onSuccess({ data }) {
-          if (data.status !== "success") {
-            setVerifyType(data.status)
+        onSuccess(data) {
+          if (data.success && data.data.status !== "success") {
+            setVerifyType(data.data.status)
             onSuccess()
             startTimer()
           }

@@ -27,12 +27,14 @@ const useSignIn = () => {
       })
 
       const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error.message)
+      }
 
       return result
     },
-    onSuccess: ({ data }) => {
-      console.log(data)
-      if (data.status === "success") {
+    onSuccess: (data) => {
+      if (data.success && data.data.status === "success") {
         router.push("/")
         toast.success(t("signed_in"))
       }

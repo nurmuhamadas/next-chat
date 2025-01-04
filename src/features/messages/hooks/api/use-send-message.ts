@@ -15,6 +15,9 @@ const useSendMessage = () => {
       })
 
       const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error.message)
+      }
 
       return result
     },

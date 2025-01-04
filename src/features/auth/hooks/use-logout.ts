@@ -21,6 +21,9 @@ const useLogout = () => {
       const response = await client.api.auth["sign-out"].$post()
 
       const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error.message)
+      }
 
       return result
     },

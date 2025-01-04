@@ -32,11 +32,13 @@ const BlockedUsersPanel = () => {
     unblockUser(
       { param: { blockedUserId: id } },
       {
-        onSuccess({ data }) {
-          refetch()
-          queryClient.invalidateQueries({
-            queryKey: ["get-is-blocked-user", data.id],
-          })
+        onSuccess(data) {
+          if (data.success) {
+            refetch()
+            queryClient.invalidateQueries({
+              queryKey: ["get-is-blocked-user", data.data.id],
+            })
+          }
         },
       },
     )
