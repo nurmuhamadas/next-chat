@@ -1,5 +1,3 @@
-import { useRef } from "react"
-
 import { LoaderIcon } from "lucide-react"
 
 import ChatSkeleton from "@/components/chat-skeleton"
@@ -16,11 +14,10 @@ const SearchUserResult = () => {
 
   const { searchQuery } = useSearchQuery()
 
-  const lastQuery = useRef<string | undefined>(searchQuery)
-
   const {
     data: rooms,
     isLoading: loadingRoom,
+    isFetchingNextPage: loadingNextRoom,
     hasNextPage: hasNextRooms,
     fetchNextPage: fetchNextRooms,
   } = useSearchPrivateRooms({
@@ -30,6 +27,7 @@ const SearchUserResult = () => {
   const {
     data: users,
     isLoading: loadingUsers,
+    isFetchingNextPage: loadingNextUsers,
     hasNextPage: hasNextUsers,
     fetchNextPage: fetchNextUsers,
   } = useSearchUsers({
@@ -40,7 +38,7 @@ const SearchUserResult = () => {
   const isLoading = loadingUsers || loadingRoom
   const isEmpty = rooms.length === 0 && users.length === 0
 
-  if (isLoading && searchQuery !== lastQuery.current) {
+  if (isLoading && isEmpty) {
     return <ChatSkeleton />
   }
 
@@ -70,13 +68,13 @@ const SearchUserResult = () => {
             )
           })}
 
-          {loadingRoom && searchQuery === lastQuery.current && (
+          {loadingNextRoom && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {!loadingRoom && hasNextRooms && (
+          {!loadingNextRoom && hasNextRooms && (
             <Button variant="link" onClick={() => fetchNextRooms()}>
               {t("more")}
             </Button>
@@ -100,13 +98,13 @@ const SearchUserResult = () => {
             )
           })}
 
-          {loadingUsers && searchQuery === lastQuery.current && (
+          {loadingNextUsers && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {!loadingUsers && hasNextUsers && (
+          {!loadingNextUsers && hasNextUsers && (
             <Button variant="link" onClick={() => fetchNextUsers()}>
               {t("more")}
             </Button>
