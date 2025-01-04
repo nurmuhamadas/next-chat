@@ -31,6 +31,7 @@ const CreateChannelPanel = () => {
         <ChannelForm
           isLoading={isPending}
           errorMessage={errorMessage}
+          onClearError={() => setErrorMessage("")}
           onSubmit={(form) => {
             createChannel(
               { form },

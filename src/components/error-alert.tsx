@@ -1,23 +1,14 @@
-import { useEffect, useState } from "react"
-
 import { TriangleAlertIcon, XIcon } from "lucide-react"
 
 import { Button } from "./ui/button"
 
 interface ErrorAlertProps {
   message?: string
+  onClose?(): void
 }
 
-const ErrorAlert = ({ message }: ErrorAlertProps) => {
-  const [isShown, setIsShown] = useState(true)
-
-  useEffect(() => {
-    if (message) {
-      setIsShown(true)
-    }
-  }, [message])
-
-  if (!message || !isShown) return null
+const ErrorAlert = ({ message, onClose }: ErrorAlertProps) => {
+  if (!message) return null
 
   return (
     <div className="flex items-center gap-x-3 rounded-md bg-error/15 p-3">
@@ -27,7 +18,7 @@ const ErrorAlert = ({ message }: ErrorAlertProps) => {
         variant="icon"
         size="icon-sm"
         className="text-error hover:bg-error/20"
-        onClick={() => setIsShown(false)}
+        onClick={onClose}
       >
         <XIcon />
       </Button>

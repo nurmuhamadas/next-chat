@@ -1,5 +1,3 @@
-import { useRef } from "react"
-
 import { LoaderIcon } from "lucide-react"
 
 import ChatSkeleton from "@/components/chat-skeleton"
@@ -17,11 +15,10 @@ const SearchGroupResult = () => {
 
   const { searchQuery } = useSearchQuery()
 
-  const lastQuery = useRef<string | undefined>(searchQuery)
-
   const {
     data: joinedGroups,
     isLoading: loadingJoined,
+    isFetchingNextPage: loadingNextJoined,
     fetchNextPage: nextJoinedGroups,
     hasNextPage: hasNextJoined,
   } = useGetGroups({
@@ -31,6 +28,7 @@ const SearchGroupResult = () => {
   const {
     data: publicGroups,
     isLoading: loadingPublic,
+    isFetchingNextPage: loadingNextPublic,
     fetchNextPage: nextPublicGroups,
     hasNextPage: hasNextPublic,
   } = useSearchGroups({
@@ -41,7 +39,7 @@ const SearchGroupResult = () => {
   const isLoading = loadingPublic || loadingJoined
   const isEmpty = joinedGroups.length === 0 && publicGroups.length === 0
 
-  if (isLoading && searchQuery !== lastQuery.current) {
+  if (isLoading && isEmpty) {
     return <ChatSkeleton />
   }
 
@@ -71,13 +69,13 @@ const SearchGroupResult = () => {
             )
           })}
 
-          {loadingJoined && searchQuery === lastQuery.current && (
+          {loadingNextJoined && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {!loadingJoined && hasNextJoined && (
+          {!loadingNextJoined && hasNextJoined && (
             <Button variant="link" onClick={() => nextJoinedGroups()}>
               {t("more")}
             </Button>
@@ -101,13 +99,13 @@ const SearchGroupResult = () => {
             )
           })}
 
-          {loadingPublic && searchQuery === lastQuery.current && (
+          {loadingNextPublic && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {!loadingPublic && hasNextPublic && (
+          {!loadingNextPublic && hasNextPublic && (
             <Button variant="link" onClick={() => nextPublicGroups()}>
               {t("more")}
             </Button>

@@ -1,5 +1,3 @@
-import { useRef } from "react"
-
 import { LoaderIcon } from "lucide-react"
 
 import ChatSkeleton from "@/components/chat-skeleton"
@@ -17,11 +15,10 @@ const SearchChannelResult = () => {
 
   const { searchQuery } = useSearchQuery()
 
-  const lastQuery = useRef<string | undefined>(searchQuery)
-
   const {
     data: joinedChannels,
     isLoading: loadingJoined,
+    isFetchingNextPage: loadingNextJoined,
     hasNextPage: hasNextJoined,
     fetchNextPage: fetchNextJoined,
   } = useGetChannels({
@@ -31,6 +28,7 @@ const SearchChannelResult = () => {
   const {
     data: publicChannels,
     isLoading: loadingPublic,
+    isFetchingNextPage: loadingNextPublic,
     hasNextPage: hasNextPublic,
     fetchNextPage: fetchNextPublic,
   } = useSearchChannels({
@@ -41,7 +39,7 @@ const SearchChannelResult = () => {
   const isLoading = loadingPublic || loadingJoined
   const isEmpty = joinedChannels.length === 0 && publicChannels.length === 0
 
-  if (isLoading && searchQuery !== lastQuery.current) {
+  if (isLoading && isEmpty) {
     return <ChatSkeleton />
   }
 
@@ -71,13 +69,13 @@ const SearchChannelResult = () => {
             )
           })}
 
-          {loadingJoined && searchQuery === lastQuery.current && (
+          {loadingNextJoined && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {!loadingJoined && hasNextJoined && (
+          {!loadingNextJoined && hasNextJoined && (
             <Button variant="link" onClick={() => fetchNextJoined()}>
               {t("more")}
             </Button>
@@ -101,13 +99,13 @@ const SearchChannelResult = () => {
             )
           })}
 
-          {loadingPublic && searchQuery === lastQuery.current && (
+          {loadingNextPublic && (
             <div className="h-24 flex-center">
               <LoaderIcon className="size-4 animate-spin" />
             </div>
           )}
 
-          {!loadingPublic && hasNextPublic && (
+          {!loadingNextPublic && hasNextPublic && (
             <Button variant="link" onClick={() => fetchNextPublic()}>
               {t("more")}
             </Button>

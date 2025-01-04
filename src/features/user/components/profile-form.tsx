@@ -40,6 +40,7 @@ interface ProfileFormProps {
   initialValues?: z.infer<typeof profileSchema>
   errorMessage?: string
   showLogout?: boolean
+  onClearError?(): void
   onSubmit(values: z.infer<typeof profileSchema>): void
 }
 
@@ -50,6 +51,7 @@ const ProfileForm = ({
   initialImageUrl = "",
   errorMessage,
   showLogout,
+  onClearError,
   onSubmit,
 }: ProfileFormProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -88,7 +90,7 @@ const ProfileForm = ({
         onSubmit={form.handleSubmit(submitForm)}
         className="w-full space-y-5"
       >
-        <ErrorAlert message={errorMessage} />
+        <ErrorAlert message={errorMessage} onClose={onClearError} />
 
         <div className="flex justify-center">
           <input

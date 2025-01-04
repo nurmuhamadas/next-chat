@@ -137,6 +137,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
                 e.stopPropagation()
                 handleMenuClick(menu.action)
               }}
+              disabled={isActionLoading[menu.action]}
             >
               {isActionLoading[menu.action] ? (
                 <LoaderIcon className="animate-spin" />
