@@ -13,7 +13,8 @@ import settingApp from "@/features/settings/server/route"
 import userApp from "@/features/user/server/route"
 import { customLogger } from "@/lib/custom-logger"
 import { honoErrorHandler } from "@/lib/error-handler"
-// export const runtime = "edge"
+
+export const runtime = "nodejs"
 
 const app = new Hono().basePath("/api")
 

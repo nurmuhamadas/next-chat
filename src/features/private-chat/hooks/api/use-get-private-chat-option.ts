@@ -13,6 +13,9 @@ const useGetPrivateChatOption = ({ userId = "" }: { userId?: string }) => {
       )
 
       const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error.message)
+      }
 
       return result.data
     },

@@ -25,6 +25,8 @@ export const honoErrorHandler = async (
       return c.redirect("/sign-in")
     }
 
+    console.log(error)
+
     customLogger(
       "ERROR:",
       `Message: ${error.message}`,
