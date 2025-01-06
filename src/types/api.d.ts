@@ -16,29 +16,29 @@ declare interface UserSession {
   isProfileComplete: boolean
 }
 
-declare interface ErrorResponse {
-  success: false
-  error: {
-    message: string
-    path?: (string | number)[]
-  }
+declare interface ApiError {
+  message: string
+  path?: (string | number)[]
 }
 
-declare type ApiResponse<T> =
-  | {
-      success: true
-      data: T
-    }
-  | ErrorResponse
+declare interface ErrorResponse {
+  success: false
+  error: ApiError
+}
 
-declare type ApiCollectionResponse<T> =
-  | {
-      success: true
-      data: T[]
-      total: number
-      cursor?: string
-    }
-  | ErrorResponse
+declare type InferResponse<T> = T extends ApiResponse<infer U> ? U : never
+
+declare type ApiResponse<T> = {
+  success: true
+  data: T
+}
+
+declare type ApiCollectionResponse<T> = {
+  success: true
+  data: T[]
+  total: number
+  cursor?: string
+}
 
 // AUTH API
 declare type SignUpResponse = ApiResponse<{ username: string; email: string }>
