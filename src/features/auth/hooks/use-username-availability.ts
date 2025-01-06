@@ -1,23 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useUsernameAvaiability = ({ username }: { username: string }) => {
   const query = useQuery({
     queryKey: ["username-availability", username],
     queryFn: async () => {
-      const response = await client.api.auth["username-availability"][
-        ":username"
-      ].$get({
-        param: { username },
-      })
+      const response = await api.auth.getUsernameAvailability(username)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
     enabled: !!username,
   })

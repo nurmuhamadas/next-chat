@@ -1,40 +1,30 @@
 import { useRouter } from "next/navigation"
 
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-in"]["$post"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.auth)["sign-in"]["$post"]
->
+import { signInSchema } from "../schema"
+
+type ResponseType = InferResponse<SignInResponse>
+type RequestType = z.infer<typeof signInSchema>
 
 const useSignIn = () => {
   const t = useScopedI18n("auth.message")
 
   const router = useRouter()
 
-  return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-in"].$post({
-        json,
-      })
+  return useMutation<ResponseType, ApiError, RequestType>({
+    mutationFn: async (data) => {
+      const response = await api.auth.signIn(data)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: (data) => {
-      if (data.success && data.data.status === "success") {
+      if (data.status === "success") {
         router.push("/")
         toast.success(t("signed_in"))
       }

@@ -7,6 +7,7 @@ import { BASE_API_URL } from "../config"
 const apiClient = axios.create({
   baseURL: BASE_API_URL,
   timeout: 30000,
+  withCredentials: true,
 })
 
 apiClient.interceptors.response.use(
