@@ -30,5 +30,14 @@ export const api = {
         `/users/search?${queryParams}`,
       )
     },
+    searchForMember(
+      groupId: string,
+      params: z.infer<typeof searchQuerySchema>,
+    ) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, SearchUsersForMemberResponse>(
+        `/users/search-for-member/${groupId}?${queryParams}`,
+      )
+    },
   },
 }
