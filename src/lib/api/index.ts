@@ -42,5 +42,8 @@ export const api = {
     getMyProfile() {
       return apiClient.get<unknown, GetMyProfileResponse>("/users/my-profile")
     },
+    getProfile(userId: string) {
+      return apiClient.get<unknown, GetMyProfileResponse>(`/users/${userId}`)
+    },
   },
 }
