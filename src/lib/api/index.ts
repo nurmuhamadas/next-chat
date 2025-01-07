@@ -55,4 +55,12 @@ export const api = {
       return apiClient.patch<unknown, UpdateSettingResponse>("/settings", data)
     },
   },
+  blockedUsers: {
+    get(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, GetBlockedUsersResponse>(
+        `/blocked-users?${queryParams}`,
+      )
+    },
+  },
 }

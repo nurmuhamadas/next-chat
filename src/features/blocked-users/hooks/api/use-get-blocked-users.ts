@@ -1,27 +1,20 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetBlockedUsers = ({
-  limit,
+  limit = 20,
   enabled = true,
 }: {
-  limit?: string
+  limit?: number
   enabled?: boolean
 }) => {
   const query = useInfiniteQuery({
     queryKey: ["get-blocked-users", limit],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api["blocked-users"].$get({
-        query: { cursor: pageParam, limit },
-      })
+      const response = await api.blockedUsers.get({ cursor: pageParam, limit })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     enabled,
     initialPageParam: undefined,
