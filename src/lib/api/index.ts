@@ -19,5 +19,8 @@ export const api = {
     createUserProfile(data: FormData) {
       return apiClient.post<unknown, CreateUserProfileResponse>("/users", data)
     },
+    updateUserProfile(data: FormData) {
+      return apiClient.patch<unknown, PatchUserProfileResponse>("/users", data)
+    },
   },
 }

@@ -3,6 +3,7 @@ declare interface SessionToken {
   username: string
   deviceId: string
   email: string
+  userAgent: string
   isProfileComplete: boolean
 }
 
