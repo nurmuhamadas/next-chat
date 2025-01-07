@@ -48,6 +48,9 @@ export const api = {
     },
   },
   settings: {
+    get() {
+      return apiClient.get<unknown, GetSettingResponse>("/settings")
+    },
     update(data: z.infer<typeof settingSchema>) {
       return apiClient.patch<unknown, UpdateSettingResponse>("/settings", data)
     },

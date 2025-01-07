@@ -1,19 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetSetting = () => {
   const query = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
-      const response = await client.api.settings.$get({})
+      const response = await api.settings.get()
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
   })
 
