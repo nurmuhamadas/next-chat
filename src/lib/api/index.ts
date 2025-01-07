@@ -39,5 +39,8 @@ export const api = {
         `/users/search-for-member/${groupId}?${queryParams}`,
       )
     },
+    getMyProfile() {
+      return apiClient.get<unknown, GetMyProfileResponse>("/users/my-profile")
+    },
   },
 }
