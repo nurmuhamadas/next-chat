@@ -1,22 +1,15 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetIsUserBlocked = ({ userId = "" }: { userId?: string }) => {
   const query = useQuery({
     queryKey: ["get-is-blocked-user", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const response = await client.api["blocked-users"][":blockedUserId"][
-        "is-blocked"
-      ].$get({ param: { blockedUserId: userId } })
+      const response = await api.blockedUsers.getIsUserBlocked(userId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
   })
 

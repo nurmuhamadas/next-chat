@@ -62,5 +62,10 @@ export const api = {
         `/blocked-users?${queryParams}`,
       )
     },
+    getIsUserBlocked(userId: string) {
+      return apiClient.get<unknown, GetIsBlockedUserResponse>(
+        `/blocked-users/${userId}/is-blocked`,
+      )
+    },
   },
 }
