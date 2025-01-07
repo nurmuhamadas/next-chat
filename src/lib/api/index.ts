@@ -15,4 +15,9 @@ export const api = {
     signIn: (data: z.infer<typeof signInSchema>) =>
       apiClient.post<unknown, SignInResponse>(`/auth/sign-in`, data),
   },
+  users: {
+    createUserProfile(data: FormData) {
+      return apiClient.post<unknown, CreateUserProfileResponse>("/users", data)
+    },
+  },
 }
