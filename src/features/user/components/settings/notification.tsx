@@ -19,7 +19,7 @@ const NotificationSettings = () => {
         isLoading={isLoading || isPending}
         onValueChange={(value) => {
           updateSetting(
-            { json: { notifications: value as NotificationType[] } },
+            { notifications: value as NotificationType[] },
             {
               onSuccess() {
                 refetch()

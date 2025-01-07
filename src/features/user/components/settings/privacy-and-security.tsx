@@ -19,7 +19,7 @@ const PrivacyAndSecuritySettings = () => {
         isLoading={isLoading || isPending}
         onValueChange={(value) => {
           updateSetting(
-            { json: { allowToAddToGroup: value } },
+            { allowToAddToGroup: value },
             {
               onSuccess() {
                 refetch()
@@ -36,7 +36,7 @@ const PrivacyAndSecuritySettings = () => {
         isLoading={isLoading || isPending}
         onValueChange={(value) => {
           updateSetting(
-            { json: { enable2FA: value } },
+            { enable2FA: value },
             {
               onSuccess() {
                 refetch()

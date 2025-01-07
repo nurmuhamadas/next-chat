@@ -3,6 +3,7 @@ import { z } from "zod"
 
 import { searchQuerySchema } from "@/constants"
 import { signInSchema, signUpSchema } from "@/features/auth/schema"
+import { settingSchema } from "@/features/settings/schema"
 
 import apiClient from "./axios"
 
@@ -44,6 +45,11 @@ export const api = {
     },
     getProfile(userId: string) {
       return apiClient.get<unknown, GetMyProfileResponse>(`/users/${userId}`)
+    },
+  },
+  settings: {
+    update(data: z.infer<typeof settingSchema>) {
+      return apiClient.patch<unknown, UpdateSettingResponse>("/settings", data)
     },
   },
 }
