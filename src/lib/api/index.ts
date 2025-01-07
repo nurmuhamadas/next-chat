@@ -72,5 +72,10 @@ export const api = {
         `/blocked-users/${userId}`,
       )
     },
+    unblockUser(userId: string) {
+      return apiClient.delete<unknown, UnblockUserResponse>(
+        `/blocked-users/${userId}`,
+      )
+    },
   },
 }

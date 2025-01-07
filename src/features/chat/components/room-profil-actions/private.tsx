@@ -63,7 +63,7 @@ const RoomProfilActionsPrivate = () => {
     if (!isOk) return
 
     unblockUser(
-      { param: { blockedUserId: id } },
+      { blockedUserId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({

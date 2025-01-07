@@ -98,7 +98,7 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     unblockUser(
-      { param: { blockedUserId: id } },
+      { blockedUserId: id },
       {
         onSuccess() {
           refetchBlocked()
