@@ -1,5 +1,7 @@
+import queryString from "query-string"
 import { z } from "zod"
 
+import { searchQuerySchema } from "@/constants"
 import { signInSchema, signUpSchema } from "@/features/auth/schema"
 
 import apiClient from "./axios"
@@ -21,6 +23,12 @@ export const api = {
     },
     updateUserProfile(data: FormData) {
       return apiClient.patch<unknown, PatchUserProfileResponse>("/users", data)
+    },
+    search(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, SearchUsersResponse>(
+        `/users/search?${queryParams}`,
+      )
     },
   },
 }
