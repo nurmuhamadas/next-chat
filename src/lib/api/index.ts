@@ -67,5 +67,10 @@ export const api = {
         `/blocked-users/${userId}/is-blocked`,
       )
     },
+    blockUser(userId: string) {
+      return apiClient.post<unknown, BlockUserResponse>(
+        `/blocked-users/${userId}`,
+      )
+    },
   },
 }
