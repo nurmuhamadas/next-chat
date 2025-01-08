@@ -122,5 +122,11 @@ export const api = {
     getById(groupId: string) {
       return apiClient.get<unknown, GetGroupResponse>(`/groups/${groupId}`)
     },
+    update(groupId: string, data: FormData) {
+      return apiClient.patch<unknown, PatchGroupResponse>(
+        `/groups/${groupId}`,
+        data,
+      )
+    },
   },
 }
