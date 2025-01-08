@@ -76,7 +76,7 @@ const ChatRoomMenuGroup = () => {
     if (!isOK) return
 
     leaveGroup(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({

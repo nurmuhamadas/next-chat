@@ -68,7 +68,7 @@ const RoomProfilActionsGroup = () => {
     if (!isOK) return
 
     leaveGroup(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["get-group-option", id] })

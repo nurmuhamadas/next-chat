@@ -135,6 +135,11 @@ export const api = {
         data,
       )
     },
+    leave(groupId: string) {
+      return apiClient.post<unknown, LeaveGroupResponse>(
+        `/groups/${groupId}/left`,
+      )
+    },
     members: {
       get(groupId: string, params: z.infer<typeof searchQuerySchema>) {
         const queryParams = queryString.stringify(params)
