@@ -82,7 +82,7 @@ const RoomProfilActionsPrivate = () => {
     if (!isOk) return
 
     deleteChat(
-      { param: { userId: id } },
+      { userId: id },
       {
         onSuccess() {},
       },

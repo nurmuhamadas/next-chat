@@ -116,7 +116,7 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     clearChat(
-      { param: { userId: id } },
+      { userId: id },
       {
         onSuccess() {
           refetchOption()

@@ -1,33 +1,20 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api)["private-chat"][":userId"]["chat"]["$delete"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api)["private-chat"][":userId"]["chat"]["$delete"]
->
+type ResponseType = InferResponse<DeleteAllPrivateChatResponse>
+type RequestType = { userId: string }
 
 const useClearPrivateChat = () => {
   const t = useScopedI18n("private_chat.messages")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api["private-chat"][":userId"][
-        "chat"
-      ].$delete({ param })
+    mutationFn: async ({ userId }) => {
+      const response = await api.privateChat.clearChat(userId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("message_deleted"))

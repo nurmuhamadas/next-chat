@@ -94,5 +94,10 @@ export const api = {
         option,
       )
     },
+    clearChat(userId: string) {
+      return apiClient.delete<unknown, DeleteAllPrivateChatResponse>(
+        `/private-chat/${userId}/chat`,
+      )
+    },
   },
 }
