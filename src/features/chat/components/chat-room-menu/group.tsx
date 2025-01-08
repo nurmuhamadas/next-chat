@@ -99,7 +99,7 @@ const ChatRoomMenuGroup = () => {
     if (!isOK) return
 
     clearChat(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {
           refetchOption()

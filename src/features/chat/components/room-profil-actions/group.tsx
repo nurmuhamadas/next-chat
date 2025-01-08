@@ -94,7 +94,7 @@ const RoomProfilActionsGroup = () => {
     if (!isOK) return
 
     deleteGroupChat(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {},
       },

@@ -140,6 +140,11 @@ export const api = {
         `/groups/${groupId}/left`,
       )
     },
+    clearChat(groupId: string) {
+      return apiClient.delete<unknown, DeleteAllGroupChatResponse>(
+        `/groups/${groupId}/chat`,
+      )
+    },
     members: {
       get(groupId: string, params: z.infer<typeof searchQuerySchema>) {
         const queryParams = queryString.stringify(params)
