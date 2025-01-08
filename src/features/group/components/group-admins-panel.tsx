@@ -52,9 +52,7 @@ const GroupAdminsPanel = () => {
 
     removeUserId.current = user.id
     removeAdmin(
-      {
-        param: { groupId: id, userId: user.id },
-      },
+      { groupId: id, userId: user.id },
       {
         onSuccess() {
           refetchMembers()

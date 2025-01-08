@@ -614,7 +614,7 @@ const groupApp = new Hono()
 
       const isAdmin = group.members.find((v) => v.userId === userId)?.isAdmin
       if (!isAdmin) {
-        throw new AuthorizationError(ERROR.ONLY_ADMIN_CAN_ADD_ADMIN)
+        throw new AuthorizationError(ERROR.ONLY_ADMIN_CAN_REMOVE_ADMIN)
       }
 
       const member = group.members.find((v) => v.userId === removedAdminId)

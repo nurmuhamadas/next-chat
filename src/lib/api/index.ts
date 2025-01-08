@@ -152,6 +152,11 @@ export const api = {
           `/groups/${groupId}/members/${userId}/admin`,
         )
       },
+      remove(groupId: string, userId: string) {
+        return apiClient.delete<unknown, UnsetAdminGroupResponse>(
+          `/groups/${groupId}/members/${userId}/admin`,
+        )
+      },
     },
   },
 }
