@@ -109,7 +109,7 @@ declare type GetGroupResponse = ApiResponse<Group>
 
 declare type GetGroupMembersResponse = ApiCollectionResponse<GroupMember>
 
-declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
+declare type SearchPublicGroupsResponse = ApiCollectionResponse<GroupSearch>
 
 declare type DeleteGroupResponse = ApiResponse<{ id: string }>
 

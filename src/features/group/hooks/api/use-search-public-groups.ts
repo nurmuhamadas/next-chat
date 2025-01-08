@@ -1,27 +1,24 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-const useSearchGroups = ({
+const useSearchPublicGroups = ({
   queryKey,
-  limit,
+  limit = 20,
 }: {
   queryKey?: string
-  limit?: string
+  limit?: number
 }) => {
   const query = useInfiniteQuery({
-    queryKey: ["search-groups", queryKey, limit],
+    queryKey: ["search-public-groups", queryKey, limit],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api.groups.search.$get({
-        query: { query: queryKey, limit, cursor: pageParam },
+      const response = await api.groups.searchPublicGroups({
+        query: queryKey,
+        limit,
+        cursor: pageParam,
       })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
@@ -42,4 +39,4 @@ const useSearchGroups = ({
   }
 }
 
-export default useSearchGroups
+export default useSearchPublicGroups

@@ -113,5 +113,11 @@ export const api = {
         `/groups/name-availability/${groupName}`,
       )
     },
+    searchPublicGroups(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, SearchPublicGroupsResponse>(
+        `/groups/search?${queryParams}`,
+      )
+    },
   },
 }
