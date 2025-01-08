@@ -49,9 +49,7 @@ const AddGroupAdminsPanel = () => {
 
     addedUserId.current = user.id
     addAdmin(
-      {
-        param: { groupId: id, userId: user.id },
-      },
+      { groupId: id, userId: user.id },
       {
         onSuccess() {
           refetchMembers()

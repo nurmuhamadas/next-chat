@@ -146,5 +146,12 @@ export const api = {
         )
       },
     },
+    admins: {
+      add(groupId: string, userId: string) {
+        return apiClient.post<unknown, SetAdminGroupResponse>(
+          `/groups/${groupId}/members/${userId}/admin`,
+        )
+      },
+    },
   },
 }
