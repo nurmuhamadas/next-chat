@@ -63,7 +63,7 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     updateOption(
-      { param: { userId: id }, json: { notification: !muted } },
+      { userId: id, option: { notification: !muted } },
       {
         onSuccess() {
           refetchOption()

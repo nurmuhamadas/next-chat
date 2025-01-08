@@ -3,6 +3,7 @@ import { z } from "zod"
 
 import { searchQuerySchema } from "@/constants"
 import { signInSchema, signUpSchema } from "@/features/auth/schema"
+import { updatePrivateChatOptionSchema } from "@/features/private-chat/schema"
 import { settingSchema } from "@/features/settings/schema"
 
 import apiClient from "./axios"
@@ -82,6 +83,15 @@ export const api = {
     getPrivateChatOption(userId: string) {
       return apiClient.get<unknown, GetPrivateChatOptionResponse>(
         `/private-chat/${userId}/options`,
+      )
+    },
+    updatePrivateChatOption(
+      userId: string,
+      option: z.infer<typeof updatePrivateChatOptionSchema>,
+    ) {
+      return apiClient.patch<unknown, UpdatePrivateChatOptionResponse>(
+        `/private-chat/${userId}/options`,
+        option,
       )
     },
   },
