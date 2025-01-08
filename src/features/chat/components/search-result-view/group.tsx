@@ -23,7 +23,7 @@ const SearchGroupResult = () => {
     hasNextPage: hasNextJoined,
   } = useGetGroups({
     queryKey: searchQuery,
-    limit: "5",
+    limit: 5,
   })
   const {
     data: publicGroups,

@@ -42,7 +42,7 @@ const ForwardMessageModal = () => {
   })
   const { data: groups, isLoading: loadingGroups } = useGetGroups({
     queryKey: searchKey,
-    limit: "5",
+    limit: 5,
     enabled: isForwardModalOpen,
   })
   const { data: channels, isLoading: loadingChannels } = useGetChannels({
