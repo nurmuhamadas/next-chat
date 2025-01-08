@@ -88,14 +88,7 @@ const groupApp = new Hono()
     validateProfileMiddleware,
     zValidator("form", groupSchema),
     async (c) => {
-      const {
-        name,
-        image,
-        type,
-        memberIds: memberIdsStr,
-        description,
-      } = c.req.valid("form")
-      const memberIds = !!memberIdsStr ? memberIdsStr.split(",") : []
+      const { name, image, type, memberIds, description } = c.req.valid("form")
 
       const imageFile = image as unknown as File
 

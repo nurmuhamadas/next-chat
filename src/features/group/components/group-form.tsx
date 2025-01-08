@@ -74,7 +74,7 @@ const GroupForm = ({
       name: initialValues?.name ?? "",
       description: initialValues?.description ?? "",
       type: initialValues?.type ?? "PUBLIC",
-      memberIds: undefined,
+      memberIds: [],
     },
   })
 
@@ -235,10 +235,8 @@ const GroupForm = ({
               <FormItem>
                 <FormLabel>{t("form.members")}</FormLabel>
                 <SelectUsers
-                  selectedIds={field.value ? field.value.split(",") : []}
-                  onValuesChange={(ids) =>
-                    form.setValue("memberIds", ids.join(","))
-                  }
+                  selectedIds={field.value}
+                  onValuesChange={(ids) => form.setValue("memberIds", ids)}
                 />
                 <FormMessage />
               </FormItem>

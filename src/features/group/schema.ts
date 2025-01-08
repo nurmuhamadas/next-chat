@@ -21,10 +21,7 @@ export const groupSchema = z.object({
     required_error: ERROR.GROUP_TYPE_REQUIRED,
     invalid_type_error: ERROR.INVALID_GROUP_TYPE,
   }),
-  memberIds: z
-    .string({ description: "string of memberId separated with comma" })
-    .optional()
-    .default(""),
+  memberIds: z.array(z.string()).default([]),
   image: imageProfileSchema,
 })
 

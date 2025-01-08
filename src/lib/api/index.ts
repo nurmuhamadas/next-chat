@@ -105,5 +105,8 @@ export const api = {
       const queryParams = queryString.stringify(params)
       return apiClient.get<unknown, GetGroupsResponse>(`/groups?${queryParams}`)
     },
+    create(data: FormData) {
+      return apiClient.post<unknown, CreateGroupResponse>("/groups", data)
+    },
   },
 }
