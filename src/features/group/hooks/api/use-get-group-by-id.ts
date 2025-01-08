@@ -1,21 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-const useGetGroupById = ({ id }: { id?: string }) => {
+const useGetGroupById = ({ id = "" }: { id?: string }) => {
   const query = useQuery({
     queryKey: ["get-group-by-id", id],
     queryFn: async () => {
-      const response = await client.api.groups[":groupId"].$get({
-        param: { groupId: id ?? "" },
-      })
+      const response = await api.groups.getById(id)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
     enabled: !!id,
   })

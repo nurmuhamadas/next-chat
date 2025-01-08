@@ -119,5 +119,8 @@ export const api = {
         `/groups/search?${queryParams}`,
       )
     },
+    getById(groupId: string) {
+      return apiClient.get<unknown, GetGroupResponse>(`/groups/${groupId}`)
+    },
   },
 }
