@@ -50,7 +50,7 @@ const RoomProfileMembersGroup = () => {
     removedId.current = member.id
 
     removeMember(
-      { param: { groupId: id, userId: member.id } },
+      { groupId: id, userId: member.id },
       {
         onSettled() {
           removedId.current = null

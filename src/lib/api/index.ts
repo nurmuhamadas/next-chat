@@ -140,6 +140,11 @@ export const api = {
           `/groups/${groupId}/members/${userId}`,
         )
       },
+      remove(groupId: string, userId: string) {
+        return apiClient.delete<unknown, DeleteGroupMemberResponse>(
+          `/groups/${groupId}/members/${userId}`,
+        )
+      },
     },
   },
 }
