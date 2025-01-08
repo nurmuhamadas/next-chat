@@ -1,22 +1,17 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetGroupMembers = ({ groupId = "" }: { groupId?: string }) => {
   const query = useInfiniteQuery({
     queryKey: ["get-group-members", groupId],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api.groups[":groupId"].members.$get({
-        param: { groupId },
-        query: { cursor: pageParam },
+      const response = await api.groups.members.get(groupId, {
+        limit: 20,
+        cursor: pageParam,
       })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     enabled: !!groupId,
     initialPageParam: undefined,

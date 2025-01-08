@@ -128,5 +128,13 @@ export const api = {
         data,
       )
     },
+    members: {
+      get(groupId: string, params: z.infer<typeof searchQuerySchema>) {
+        const queryParams = queryString.stringify(params)
+        return apiClient.get<unknown, GetGroupMembersResponse>(
+          `/groups/${groupId}/members?${queryParams}`,
+        )
+      },
+    },
   },
 }
