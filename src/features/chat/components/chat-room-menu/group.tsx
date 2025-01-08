@@ -82,6 +82,9 @@ const ChatRoomMenuGroup = () => {
           queryClient.invalidateQueries({
             queryKey: ["get-group-by-id", id],
           })
+          queryClient.invalidateQueries({
+            queryKey: ["get-group-members", id],
+          })
           refetchOption()
         },
       },

@@ -49,7 +49,10 @@ const RoomProfilActionsGroup = () => {
             queryClient.invalidateQueries({ queryKey: ["rooms"] })
             queryClient.invalidateQueries({ queryKey: ["room", id] })
             queryClient.invalidateQueries({
-              queryKey: ["get-is-group-member", id],
+              queryKey: ["get-group-members", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-group-by-id", id],
             })
             queryClient.invalidateQueries({
               queryKey: ["get-group-option", id],
@@ -73,7 +76,10 @@ const RoomProfilActionsGroup = () => {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["get-group-option", id] })
           queryClient.invalidateQueries({
-            queryKey: ["get-is-group-member", id],
+            queryKey: ["get-group-members", id],
+          })
+          queryClient.invalidateQueries({
+            queryKey: ["get-group-by-id", id],
           })
         },
       },
@@ -109,7 +115,7 @@ const RoomProfilActionsGroup = () => {
           queryClient.invalidateQueries({ queryKey: ["rooms"] })
           queryClient.invalidateQueries({ queryKey: ["room", id] })
           queryClient.invalidateQueries({
-            queryKey: ["get-is-group-member", id],
+            queryKey: ["get-group-by-id", id],
           })
           queryClient.invalidateQueries({
             queryKey: ["get-group-option", id],

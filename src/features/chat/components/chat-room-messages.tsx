@@ -165,6 +165,9 @@ const ChatRoomMessages = ({
               queryKey: ["get-group-by-id", id],
             })
             queryClient.invalidateQueries({
+              queryKey: ["get-group-members", id],
+            })
+            queryClient.invalidateQueries({
               queryKey: ["get-group-option", id],
             })
           },
