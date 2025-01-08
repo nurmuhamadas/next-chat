@@ -103,6 +103,8 @@ declare type PatchGroupResponse = ApiResponse<Group>
 
 declare type GetGroupsResponse = ApiCollectionResponse<Group>
 
+declare type GetNameAvailabilityResponse = ApiResponse<boolean>
+
 declare type GetGroupResponse = ApiResponse<Group>
 
 declare type GetGroupMembersResponse = ApiCollectionResponse<GroupMember>

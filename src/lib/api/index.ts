@@ -108,5 +108,10 @@ export const api = {
     create(data: FormData) {
       return apiClient.post<unknown, CreateGroupResponse>("/groups", data)
     },
+    getNameAvailability(groupName: string) {
+      return apiClient.get<unknown, GetNameAvailabilityResponse>(
+        `/groups/name-availability/${groupName}`,
+      )
+    },
   },
 }
