@@ -1,23 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetPrivateChatOption = ({ userId = "" }: { userId?: string }) => {
   const query = useQuery({
     queryKey: ["get-private-chat-option", userId],
     queryFn: async () => {
-      const response = await client.api["private-chat"][":userId"].options.$get(
-        {
-          param: { userId },
-        },
-      )
+      const response = await api.privateChat.getPrivateChatOption(userId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
     enabled: !!userId,
   })

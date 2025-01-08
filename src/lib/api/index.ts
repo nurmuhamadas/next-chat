@@ -78,4 +78,11 @@ export const api = {
       )
     },
   },
+  privateChat: {
+    getPrivateChatOption(userId: string) {
+      return apiClient.get<unknown, GetPrivateChatOptionResponse>(
+        `/private-chat/${userId}/options`,
+      )
+    },
+  },
 }
