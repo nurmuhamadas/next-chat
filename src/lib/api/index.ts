@@ -135,6 +135,11 @@ export const api = {
           `/groups/${groupId}/members?${queryParams}`,
         )
       },
+      add(groupId: string, userId: string) {
+        return apiClient.post<unknown, AddGroupMemberResponse>(
+          `/groups/${groupId}/members/${userId}`,
+        )
+      },
     },
   },
 }

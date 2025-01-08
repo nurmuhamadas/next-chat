@@ -55,9 +55,7 @@ const AddGroupMemberPanel = () => {
     if (user.allowAddToGroup) {
       addingUserId.current = user.id
       addMember(
-        {
-          param: { groupId: id, userId: user.id },
-        },
+        { groupId: id, userId: user.id },
         {
           onSuccess() {
             refetchUsers()
