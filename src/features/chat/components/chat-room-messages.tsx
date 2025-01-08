@@ -157,10 +157,7 @@ const ChatRoomMessages = ({
   const handleJoinGroup = () => {
     if (group) {
       joinGroup(
-        {
-          param: { groupId: group.id },
-          json: { code: group.inviteCode },
-        },
+        { groupId: group.id, data: { code: group.inviteCode } },
         {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: ["rooms"] })

@@ -43,7 +43,7 @@ const RoomProfilActionsGroup = () => {
   const handleJoinGroup = () => {
     if (group) {
       joinGroup(
-        { json: { code: group.inviteCode }, param: { groupId: id } },
+        { data: { code: group.inviteCode }, groupId: id },
         {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: ["rooms"] })
