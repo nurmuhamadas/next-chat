@@ -59,7 +59,7 @@ const ChatRoomMenuGroup = () => {
     if (!isOK) return
 
     updateOption(
-      { param: { groupId: id }, json: { notification: !muted } },
+      { groupId: id, data: { notification: !muted } },
       {
         onSuccess() {
           refetchOption()

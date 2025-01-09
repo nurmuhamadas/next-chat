@@ -32,10 +32,7 @@ const RoomProfileOptionsGroup = () => {
   const handleNotifChange = (value: boolean) => {
     setIsNotifActive(value)
     updateOption(
-      {
-        json: { notification: value },
-        param: { groupId: id },
-      },
+      { groupId: id, data: { notification: value } },
       {
         onSuccess() {
           refetchOption()

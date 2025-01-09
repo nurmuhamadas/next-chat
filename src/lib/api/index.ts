@@ -3,7 +3,10 @@ import { z } from "zod"
 
 import { searchQuerySchema } from "@/constants"
 import { signInSchema, signUpSchema } from "@/features/auth/schema"
-import { joinGroupSchema } from "@/features/group/schema"
+import {
+  joinGroupSchema,
+  updateGroupOptionSchema,
+} from "@/features/group/schema"
 import { updatePrivateChatOptionSchema } from "@/features/private-chat/schema"
 import { settingSchema } from "@/features/settings/schema"
 
@@ -179,6 +182,12 @@ export const api = {
       get(groupId: string) {
         return apiClient.get<unknown, GetGroupOptionResponse>(
           `/groups/${groupId}/options`,
+        )
+      },
+      update(groupId: string, data: z.infer<typeof updateGroupOptionSchema>) {
+        return apiClient.patch<unknown, UpdateGroupNotifResponse>(
+          `/groups/${groupId}/options`,
+          data,
         )
       },
     },
