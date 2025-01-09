@@ -175,5 +175,12 @@ export const api = {
         )
       },
     },
+    options: {
+      get(groupId: string) {
+        return apiClient.get<unknown, GetGroupOptionResponse>(
+          `/groups/${groupId}/options`,
+        )
+      },
+    },
   },
 }
