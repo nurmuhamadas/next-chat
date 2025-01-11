@@ -61,7 +61,6 @@ const ChatRoomMessages = ({
   const {
     data: messages,
     isLoading: loadingMessage,
-    refetch,
     hasNextPage,
     fetchNextPage,
   } = useGetMessages({ id, roomType: type })
@@ -129,16 +128,6 @@ const ChatRoomMessages = ({
       onDeletedMessageChange(messages?.find((m) => m.id === deletedMessageId))
     }
   }, [deletedMessageId, onDeletedMessageChange, isLoading, messagesStr])
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      refetch()
-    }, 5000)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [refetch])
 
   useEffect(() => {
     if (messages.length > 0) {
