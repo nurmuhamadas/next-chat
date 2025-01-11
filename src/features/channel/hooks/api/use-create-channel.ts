@@ -1,28 +1,32 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<typeof client.api.channels.$post, 200>
-type RequestType = InferRequestType<typeof client.api.channels.$post>
+import { channelSchema } from "../../schema"
+
+type ResponseType = InferResponse<CreateChannelResponse>
+type RequestType = z.infer<typeof channelSchema>
 
 const useCreateChannel = () => {
   const t = useScopedI18n("channel")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.channels.$post({
-        form,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
+    mutationFn: async (data) => {
+      const formData = new FormData()
+      formData.append("name", data.name)
+      formData.append("type", data.type)
+      if (data.description) {
+        formData.append("description", data.description)
       }
+      if (data.image) {
+        formData.append("image", data.image)
+      }
+      const response = await api.channels.create(formData)
 
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("messages.created"))

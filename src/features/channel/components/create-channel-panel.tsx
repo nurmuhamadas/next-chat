@@ -33,18 +33,15 @@ const CreateChannelPanel = () => {
           errorMessage={errorMessage}
           onClearError={() => setErrorMessage("")}
           onSubmit={(form) => {
-            createChannel(
-              { form },
-              {
-                onSuccess() {
-                  closeCreateChannel()
-                  queryClient.invalidateQueries({ queryKey: ["rooms"] })
-                },
-                onError(error) {
-                  setErrorMessage(error.message)
-                },
+            createChannel(form, {
+              onSuccess() {
+                closeCreateChannel()
+                queryClient.invalidateQueries({ queryKey: ["rooms"] })
               },
-            )
+              onError(error) {
+                setErrorMessage(error.message)
+              },
+            })
           }}
         />
       </div>

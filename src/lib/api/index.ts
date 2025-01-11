@@ -199,5 +199,8 @@ export const api = {
         `/channels?${queryParams}`,
       )
     },
+    create(data: FormData) {
+      return apiClient.post<unknown, CreateChannelResponse>("/channels", data)
+    },
   },
 }
