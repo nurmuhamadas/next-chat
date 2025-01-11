@@ -239,6 +239,11 @@ export const api = {
           `/channels/${channelId}/subscribers/${userId}/admin`,
         )
       },
+      remove(channelId: string, userId: string) {
+        return apiClient.delete<unknown, UnsetAdminChannelResponse>(
+          `/channels/${channelId}/subscribers/${userId}/admin`,
+        )
+      },
     },
   },
 }
