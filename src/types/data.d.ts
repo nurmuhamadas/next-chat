@@ -189,7 +189,7 @@ declare interface Channel {
   imageUrl: string | null
   inviteCode: string
   totalSubscribers: number
-  isSubscribers: boolean
+  isSubscriber: boolean
   isAdmin: boolean
 }
 

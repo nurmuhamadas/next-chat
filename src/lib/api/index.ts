@@ -214,5 +214,10 @@ export const api = {
         `/channels/search?${queryParams}`,
       )
     },
+    getById(channelId: string) {
+      return apiClient.get<unknown, GetChannelResponse>(
+        `/channels/${channelId}`,
+      )
+    },
   },
 }

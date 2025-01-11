@@ -51,7 +51,7 @@ const ChatRoom = () => {
   const isLoading = loadingGroup || loadingChannel || loadingRoom
   const isGroupMember = group?.isMember ?? false
   const isGroupAdmin = group?.isAdmin ?? false
-  const isChannelSubs = channel?.isSubscribers ?? false
+  const isChannelSubs = channel?.isSubscriber ?? false
   const isChannelAdmin = channel?.isAdmin ?? false
 
   const hideInput =
