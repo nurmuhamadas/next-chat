@@ -219,5 +219,11 @@ export const api = {
         `/channels/${channelId}`,
       )
     },
+    update(channelId: string, data: FormData) {
+      return apiClient.patch<unknown, PatchChannelResponse>(
+        `/channels/${channelId}`,
+        data,
+      )
+    },
   },
 }
