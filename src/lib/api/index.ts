@@ -208,5 +208,11 @@ export const api = {
         `/channels/name-availability/${channelName}`,
       )
     },
+    searchPublicChannels(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, SearchChannelsResponse>(
+        `/channels/search?${queryParams}`,
+      )
+    },
   },
 }
