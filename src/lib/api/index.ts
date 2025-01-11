@@ -282,4 +282,12 @@ export const api = {
       },
     },
   },
+  rooms: {
+    get(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, GetRoomListResponse>(
+        `/rooms?${queryParams}`,
+      )
+    },
+  },
 }
