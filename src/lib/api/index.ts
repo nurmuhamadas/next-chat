@@ -262,5 +262,12 @@ export const api = {
         )
       },
     },
+    options: {
+      get(channelId: string) {
+        return apiClient.get<unknown, GetChannelOptionResponse>(
+          `/channels/${channelId}/options`,
+        )
+      },
+    },
   },
 }
