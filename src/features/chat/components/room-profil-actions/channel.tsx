@@ -11,11 +11,13 @@ import useJoinChannel from "@/features/channel/hooks/api/use-join-channel"
 import useLeaveChannel from "@/features/channel/hooks/api/use-leave-channel"
 import useConfirm from "@/hooks/use-confirm-dialog"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useRoomType } from "@/hooks/use-room-type"
 
 const RoomProfilActionsChannel = () => {
   const queryClient = useQueryClient()
 
   const id = useRoomId()
+  const type = useRoomType()
 
   const [Dialog, confirm] = useConfirm()
 
@@ -84,9 +86,13 @@ const RoomProfilActionsChannel = () => {
     if (!isOK) return
 
     deleteChannel(
-      { param: { channelId: id } },
+      { channelId: id },
       {
-        onSuccess() {},
+        onSuccess() {
+          queryClient.invalidateQueries({
+            queryKey: ["get-messages", id, type, 20],
+          })
+        },
       },
     )
   }

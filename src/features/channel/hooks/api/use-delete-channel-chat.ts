@@ -1,33 +1,22 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.channels)[":channelId"]["chat"]["$delete"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.channels)[":channelId"]["chat"]["$delete"]
->
+type ResponseType = InferResponse<DeleteAllChannelChatResponse>
+type RequestType = {
+  channelId: string
+}
 
 const useDeleteChannelChat = () => {
   const t = useScopedI18n("channel.messages")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.channels[":channelId"]["chat"].$delete({
-        param,
-      })
+    mutationFn: async ({ channelId }) => {
+      const response = await api.channels.clearChat(channelId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("delete_message"))

@@ -237,6 +237,11 @@ export const api = {
         `/channels/${channelId}/unsubscribe`,
       )
     },
+    clearChat(channelId: string) {
+      return apiClient.delete<unknown, DeleteAllChannelChatResponse>(
+        `/channels/${channelId}/chat`,
+      )
+    },
     subscribers: {
       get(channelId: string, params: z.infer<typeof searchQuerySchema>) {
         const queryParams = queryString.stringify(params)
