@@ -165,7 +165,7 @@ declare type UpdateChannelOptionResponse = ApiResponse<ChannelOption>
 /** Include groups and channels chat */
 declare type GetRoomListResponse = ApiCollectionResponse<Room>
 
-declare type SearchPrivateRoomResponse = ApiCollectionResponse<UserSearch>
+declare type GetPrivateRoomsResponse = ApiCollectionResponse<PrivateRoom>
 
 declare type GetRoomResponse = ApiResponse<Room>
 

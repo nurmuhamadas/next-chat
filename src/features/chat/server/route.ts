@@ -126,7 +126,7 @@ const roomApp = new Hono()
       const total = result.length
       const nextCursor =
         total > 0 && total === limit ? result[total - 1].id : undefined
-      const response: SearchPrivateRoomResponse = successCollectionResponse(
+      const response: GetPrivateRoomsResponse = successCollectionResponse(
         userSearch,
         total,
         nextCursor,

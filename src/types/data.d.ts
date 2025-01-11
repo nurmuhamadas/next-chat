@@ -79,6 +79,13 @@ declare interface Room {
   lastMessage: LastMessage | null
 }
 
+declare interface PrivateRoom {
+  id: string
+  name: string
+  imageUrl: string | null
+  lastSeenAt: string | null
+}
+
 declare interface PrivateChatOption {
   userId: string
   privateChatId: string

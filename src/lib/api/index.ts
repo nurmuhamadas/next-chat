@@ -289,5 +289,11 @@ export const api = {
         `/rooms?${queryParams}`,
       )
     },
+    getPrivateRooms(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, GetPrivateRoomsResponse>(
+        `/rooms/private?${queryParams}`,
+      )
+    },
   },
 }

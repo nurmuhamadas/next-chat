@@ -22,7 +22,7 @@ const SearchUserResult = () => {
     fetchNextPage: fetchNextRooms,
   } = useSearchPrivateRooms({
     queryKey: searchQuery,
-    limit: "5",
+    limit: 5,
   })
   const {
     data: users,

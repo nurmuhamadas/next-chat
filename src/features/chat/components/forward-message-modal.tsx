@@ -37,7 +37,7 @@ const ForwardMessageModal = () => {
 
   const { data: userRooms, isLoading: loadingRoom } = useSearchPrivateRooms({
     queryKey: searchKey,
-    limit: "5",
+    limit: 5,
     enabled: isForwardModalOpen,
   })
   const { data: groups, isLoading: loadingGroups } = useGetGroups({
@@ -47,7 +47,7 @@ const ForwardMessageModal = () => {
   })
   const { data: channels, isLoading: loadingChannels } = useGetChannels({
     queryKey: searchKey,
-    limit: "5",
+    limit: 5,
     enabled: isForwardModalOpen,
   })
   const isLoading = loadingRoom || loadingGroups || loadingChannels
