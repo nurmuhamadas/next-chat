@@ -34,7 +34,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handlePinRoom = () => {
     pinRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["rooms"] })

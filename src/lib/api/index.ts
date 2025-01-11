@@ -295,5 +295,12 @@ export const api = {
         `/rooms/private?${queryParams}`,
       )
     },
+    pinned: {
+      add(roomId: string) {
+        return apiClient.post<unknown, PinRoomResponse>(
+          `/rooms/pinned/${roomId}`,
+        )
+      },
+    },
   },
 }
