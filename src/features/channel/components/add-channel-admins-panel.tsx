@@ -52,9 +52,7 @@ const AddChannelAdminsPanel = () => {
 
     addedUserId.current = user.id
     addAdmin(
-      {
-        param: { channelId: id, userId: user.id },
-      },
+      { channelId: id, userId: user.id },
       {
         onSuccess() {
           refetchMembers()

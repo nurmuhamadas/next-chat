@@ -233,5 +233,12 @@ export const api = {
         )
       },
     },
+    admins: {
+      add(channelId: string, userId: string) {
+        return apiClient.post<unknown, SetAdminChannelResponse>(
+          `/channels/${channelId}/subscribers/${userId}/admin`,
+        )
+      },
+    },
   },
 }
