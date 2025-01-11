@@ -202,5 +202,11 @@ export const api = {
     create(data: FormData) {
       return apiClient.post<unknown, CreateChannelResponse>("/channels", data)
     },
+
+    getNameAvailability(channelName: string) {
+      return apiClient.get<unknown, GetNameAvailabilityResponse>(
+        `/channels/name-availability/${channelName}`,
+      )
+    },
   },
 }
