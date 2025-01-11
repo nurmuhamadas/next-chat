@@ -159,7 +159,7 @@ declare type DeleteAllChannelChatResponse = ApiResponse<boolean>
 
 declare type GetChannelOptionResponse = ApiResponse<ChannelOption | null>
 
-declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
+declare type UpdateChannelOptionResponse = ApiResponse<ChannelOption>
 
 // ROOM API
 /** Include groups and channels chat */

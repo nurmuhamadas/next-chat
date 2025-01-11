@@ -34,8 +34,8 @@ const RoomProfileOptionsChannel = () => {
     setIsNotifActive(value)
     updateChannelOption(
       {
-        json: { notification: value },
-        param: { channelId: id },
+        channelId: id,
+        data: { notification: value },
       },
       {
         onSuccess() {

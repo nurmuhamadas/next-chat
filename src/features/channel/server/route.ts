@@ -747,7 +747,7 @@ const channelApp = new Hono()
         notification,
       })
 
-      const response: UpdateChannelNotifResponse = successResponse(
+      const response: UpdateChannelOptionResponse = successResponse(
         mapChannelOptionModelToOption(result),
       )
       return c.json(response)

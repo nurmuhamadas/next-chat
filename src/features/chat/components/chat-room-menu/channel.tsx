@@ -63,7 +63,7 @@ const ChatRoomMenuChannel = () => {
     if (!isOK) return
 
     updateOption(
-      { param: { channelId: id }, json: { notification: !muted } },
+      { channelId: id, data: { notification: !muted } },
       {
         onSuccess() {
           refetchOption()

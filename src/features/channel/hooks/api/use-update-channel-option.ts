@@ -1,33 +1,26 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.channels)[":channelId"]["options"]["$patch"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.channels)[":channelId"]["options"]["$patch"]
->
+import { updateChannelOptionSchema } from "../../schema"
+
+type ResponseType = InferResponse<UpdateChannelOptionResponse>
+type RequestType = {
+  channelId: string
+  data: z.infer<typeof updateChannelOptionSchema>
+}
 
 const useUpdateChannelOption = () => {
   const t = useScopedI18n("channel.messages")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json, param }) => {
-      const response = await client.api.channels[":channelId"]["options"][
-        "$patch"
-      ]({ json, param })
+    mutationFn: async ({ channelId, data }) => {
+      const response = await api.channels.options.update(channelId, data)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("notification_updated"))

@@ -3,7 +3,10 @@ import { z } from "zod"
 
 import { searchQuerySchema } from "@/constants"
 import { signInSchema, signUpSchema } from "@/features/auth/schema"
-import { subscribeChannelSchema } from "@/features/channel/schema"
+import {
+  subscribeChannelSchema,
+  updateChannelOptionSchema,
+} from "@/features/channel/schema"
 import {
   joinGroupSchema,
   updateGroupOptionSchema,
@@ -266,6 +269,15 @@ export const api = {
       get(channelId: string) {
         return apiClient.get<unknown, GetChannelOptionResponse>(
           `/channels/${channelId}/options`,
+        )
+      },
+      update(
+        channelId: string,
+        data: z.infer<typeof updateChannelOptionSchema>,
+      ) {
+        return apiClient.patch<unknown, UpdateChannelOptionResponse>(
+          `/channels/${channelId}/options`,
+          data,
         )
       },
     },
