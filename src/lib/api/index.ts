@@ -225,5 +225,13 @@ export const api = {
         data,
       )
     },
+    subscribers: {
+      get(channelId: string, params: z.infer<typeof searchQuerySchema>) {
+        const queryParams = queryString.stringify(params)
+        return apiClient.get<unknown, GetChannelSubscribersResponse>(
+          `/channels/${channelId}/subscribers?${queryParams}`,
+        )
+      },
+    },
   },
 }
