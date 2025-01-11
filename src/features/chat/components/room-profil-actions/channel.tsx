@@ -33,7 +33,7 @@ const RoomProfilActionsChannel = () => {
   const handleSubsChannel = () => {
     if (channel) {
       joinChannel(
-        { json: { code: channel.inviteCode }, param: { channelId: id } },
+        { data: { code: channel.inviteCode }, channelId: id },
         {
           onSuccess() {
             queryClient.invalidateQueries({

@@ -40,7 +40,7 @@ import {
 } from "../lib/utils"
 import {
   channelSchema,
-  joinChannelSchema,
+  subscribeChannelSchema,
   updateChannelOptionSchema,
 } from "../schema"
 
@@ -543,7 +543,7 @@ const channelApp = new Hono()
     "/:channelId/join",
     sessionMiddleware,
     validateProfileMiddleware,
-    zValidator("json", joinChannelSchema),
+    zValidator("json", subscribeChannelSchema),
     async (c) => {
       const { code } = c.req.valid("json")
       const { channelId } = c.req.param()

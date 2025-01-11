@@ -23,7 +23,7 @@ export const channelSchema = z.object({
   image: imageProfileSchema,
 })
 
-export const joinChannelSchema = z.object({
+export const subscribeChannelSchema = z.object({
   code: z
     .string({
       required_error: ERROR.JOIN_CODE_REQUIRED,

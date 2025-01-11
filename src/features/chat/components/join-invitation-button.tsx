@@ -39,7 +39,7 @@ const JoinInvitationButton = ({
     }
     if (roomType === "channel") {
       joinChannel(
-        { param: { channelId: roomId }, json: { code: inviteCode } },
+        { channelId: roomId, data: { code: inviteCode } },
         {
           onSuccess() {
             router.replace(`/${roomType}/${roomId}`)

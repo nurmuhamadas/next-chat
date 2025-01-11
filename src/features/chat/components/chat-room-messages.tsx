@@ -168,10 +168,7 @@ const ChatRoomMessages = ({
   const handleJoinChannel = () => {
     if (channel) {
       joinChannel(
-        {
-          param: { channelId: channel.id },
-          json: { code: channel.inviteCode },
-        },
+        { channelId: channel.id, data: { code: channel.inviteCode } },
         {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: ["rooms"] })
