@@ -192,4 +192,12 @@ export const api = {
       },
     },
   },
+  channels: {
+    get(params: z.infer<typeof searchQuerySchema>) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, GetChannelsResponse>(
+        `/channels?${queryParams}`,
+      )
+    },
+  },
 }
