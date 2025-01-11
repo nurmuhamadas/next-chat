@@ -232,6 +232,11 @@ export const api = {
         data,
       )
     },
+    unsubscribe(channelId: string) {
+      return apiClient.post<unknown, LeaveChannelResponse>(
+        `/channels/${channelId}/unsubscribe`,
+      )
+    },
     subscribers: {
       get(channelId: string, params: z.infer<typeof searchQuerySchema>) {
         const queryParams = queryString.stringify(params)

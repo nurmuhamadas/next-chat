@@ -62,7 +62,7 @@ const RoomProfilActionsChannel = () => {
     if (!isOK) return
 
     leaveChannel(
-      { param: { channelId: id } },
+      { channelId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
