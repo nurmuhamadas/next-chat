@@ -45,7 +45,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handleUnpinRoom = () => {
     unpinRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["rooms"] })

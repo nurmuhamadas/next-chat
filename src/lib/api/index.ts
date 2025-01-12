@@ -301,6 +301,11 @@ export const api = {
           `/rooms/pinned/${roomId}`,
         )
       },
+      remove(roomId: string) {
+        return apiClient.delete<unknown, UnpinRoomResponse>(
+          `/rooms/pinned/${roomId}`,
+        )
+      },
     },
   },
 }
