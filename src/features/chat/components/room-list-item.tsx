@@ -23,7 +23,7 @@ const RoomListItem = ({
   locale,
 }: RoomListItemProps) => {
   return (
-    <Link href={`/${data.type}/${data.id}`}>
+    <Link href={`/${data.type}/${data.actionId}`}>
       <li
         className={cn(
           "flex items-center gap-x-3 rounded-lg p-1.5 pl-3 hover:bg-grey-4 group",

@@ -68,6 +68,7 @@ declare interface LastMessage {
 
 declare interface Room {
   id: string
+  actionId: string
   type: RoomType
   name: string
   imageUrl: string | null
