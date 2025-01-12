@@ -109,7 +109,7 @@ const RoomProfilActionsGroup = () => {
     if (!isOK) return
 
     deleteRoom(
-      { param: { roomId: id } },
+      { roomId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["rooms"] })

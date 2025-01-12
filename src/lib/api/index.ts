@@ -298,6 +298,9 @@ export const api = {
         `/rooms/private?${queryParams}`,
       )
     },
+    delete(roomId: string) {
+      return apiClient.delete<unknown, DeleteRoomResponse>(`/rooms/${roomId}`)
+    },
     pinned: {
       add(roomId: string) {
         return apiClient.post<unknown, PinRoomResponse>(

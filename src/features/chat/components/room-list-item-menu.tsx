@@ -67,7 +67,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handleDeleteRoom = () => {
     deleteRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["rooms"] })
