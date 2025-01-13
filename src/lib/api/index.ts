@@ -315,6 +315,18 @@ export const api = {
         )
       },
     },
+    archived: {
+      add(roomId: string) {
+        return apiClient.post<unknown, ArchiveRoomResponse>(
+          `/rooms/archived/${roomId}`,
+        )
+      },
+      remove(roomId: string) {
+        return apiClient.delete<unknown, UnarchiveRoomResponse>(
+          `/rooms/archived/${roomId}`,
+        )
+      },
+    },
   },
   messages: {
     create(data: FormData) {

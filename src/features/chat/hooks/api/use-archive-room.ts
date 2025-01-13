@@ -1,30 +1,17 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.rooms.archived)[":roomId"]["$post"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.rooms.archived)[":roomId"]["$post"]
->
+type ResponseType = InferResponse<ArchiveRoomResponse>
+type RequestType = { roomId: string }
 
 const useArchiveRoom = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.rooms.archived[":roomId"].$post({
-        param,
-      })
+    mutationFn: async ({ roomId }) => {
+      const response = await api.rooms.archived.add(roomId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {},
     onError({ message }) {

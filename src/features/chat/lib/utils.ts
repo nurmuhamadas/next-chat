@@ -120,6 +120,7 @@ export const mapRoomModelToRoom = (
 
   return {
     id,
+    actionId: id,
     name,
     imageUrl,
     lastMessage: room.lastMessage
