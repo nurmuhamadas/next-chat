@@ -65,10 +65,8 @@ const ChatRoom = () => {
     if ((room?.totalUnreadMessages ?? 0) > 0) {
       readMessage(
         {
-          param: {
-            receiverId: id,
-            roomType: roomTypeToRoomTypeModelLower(type),
-          },
+          receiverId: id,
+          roomType: roomTypeToRoomTypeModelLower(type),
         },
         {
           onSuccess() {

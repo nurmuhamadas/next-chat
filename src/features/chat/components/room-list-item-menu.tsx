@@ -56,7 +56,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handleArchiveRoom = () => {
     archiveRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["rooms"] })
