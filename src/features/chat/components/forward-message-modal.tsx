@@ -61,8 +61,8 @@ const ForwardMessageModal = () => {
 
     forwardMessage(
       {
-        param: { messageId: forwardMessageId },
-        json: {
+        messageId: forwardMessageId,
+        data: {
           roomType: roomTypeToRoomTypeModel(type),
           receiverId: id,
         },

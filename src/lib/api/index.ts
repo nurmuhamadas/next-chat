@@ -11,7 +11,10 @@ import {
   joinGroupSchema,
   updateGroupOptionSchema,
 } from "@/features/group/schema"
-import { updateMessageSchema } from "@/features/messages/schema"
+import {
+  forwardMessageSchema,
+  updateMessageSchema,
+} from "@/features/messages/schema"
 import { updatePrivateChatOptionSchema } from "@/features/private-chat/schema"
 import { settingSchema } from "@/features/settings/schema"
 
@@ -366,6 +369,12 @@ export const api = {
     deleteByAdmin(messageId: string) {
       return apiClient.delete<unknown, DeleteMessageResponse>(
         `/messages/${messageId}/all`,
+      )
+    },
+    forward(messageId: string, data: z.infer<typeof forwardMessageSchema>) {
+      return apiClient.post<unknown, ForwardMessageResponse>(
+        `/messages/${messageId}/forwarded`,
+        data,
       )
     },
   },
