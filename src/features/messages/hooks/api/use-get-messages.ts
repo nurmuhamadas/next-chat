@@ -1,35 +1,28 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetMessages = ({
   id = "",
   roomType,
-  limit,
+  limit = 20,
 }: {
   id: string
   roomType: RoomType
-  limit?: string
+  limit?: number
 }) => {
   const type =
-    roomType === "chat" ? "private" : roomType === "group" ? "group" : "channel"
+    roomType === "chat" ? "PRIVATE" : roomType === "group" ? "GROUP" : "CHANNEL"
 
   const query = useInfiniteQuery({
     queryKey: ["get-messages", id, type, limit],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api.messages[":roomType"][
-        ":receiverId"
-      ].$get({
-        param: { roomType: type, receiverId: id },
-        query: { limit, cursor: pageParam },
+      const response = await api.messages.get(type, id, {
+        limit,
+        cursor: pageParam,
       })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     enabled: !!id && !!type,
     initialPageParam: undefined,

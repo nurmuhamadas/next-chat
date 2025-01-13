@@ -318,5 +318,15 @@ export const api = {
     create(data: FormData) {
       return apiClient.post<unknown, CreateMessageResponse>(`/messages`, data)
     },
+    get(
+      roomType: string,
+      receiverId: string,
+      params: z.infer<typeof searchQuerySchema>,
+    ) {
+      const queryParams = queryString.stringify(params)
+      return apiClient.get<unknown, GetMessagesResponse>(
+        `/messages/${roomType}/${receiverId}?${queryParams}`,
+      )
+    },
   },
 }
