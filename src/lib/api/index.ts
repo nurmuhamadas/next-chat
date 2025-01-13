@@ -350,5 +350,10 @@ export const api = {
         `/messages/${messageId}/all`,
       )
     },
+    deleteByAdmin(messageId: string) {
+      return apiClient.delete<unknown, DeleteMessageResponse>(
+        `/messages/${messageId}/all`,
+      )
+    },
   },
 }
