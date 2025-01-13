@@ -345,5 +345,10 @@ export const api = {
         `/messages/${messageId}/me`,
       )
     },
+    deleteForAll(messageId: string) {
+      return apiClient.delete<unknown, DeleteMessageResponse>(
+        `/messages/${messageId}/all`,
+      )
+    },
   },
 }

@@ -45,7 +45,7 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
 
   const handleDeleteForAll = () => {
     deleteForAll(
-      { param: { messageId: message.id } },
+      { messageId: message.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
