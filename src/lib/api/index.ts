@@ -11,6 +11,7 @@ import {
   joinGroupSchema,
   updateGroupOptionSchema,
 } from "@/features/group/schema"
+import { updateMessageSchema } from "@/features/messages/schema"
 import { updatePrivateChatOptionSchema } from "@/features/private-chat/schema"
 import { settingSchema } from "@/features/settings/schema"
 
@@ -331,6 +332,12 @@ export const api = {
     read(roomType: RoomTypeModelLower, receiverId: string) {
       return apiClient.post<unknown, MarkMessageAsReadResponse>(
         `/messages/${roomType}/${receiverId}/read`,
+      )
+    },
+    update(messageId: string, data: z.infer<typeof updateMessageSchema>) {
+      return apiClient.put<unknown, UpdateMessageResponse>(
+        `/messages/${messageId}`,
+        data,
       )
     },
   },

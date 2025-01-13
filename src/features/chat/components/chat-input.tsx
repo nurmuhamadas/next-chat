@@ -74,8 +74,8 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     if (editedMessage) {
       updateMessage(
         {
-          json: { message, isEmojiOnly: String(isEmojiOnly) },
-          param: { messageId: editedMessage.id },
+          messageId: editedMessage.id,
+          data: { message, isEmojiOnly },
         },
         {
           onSuccess() {
