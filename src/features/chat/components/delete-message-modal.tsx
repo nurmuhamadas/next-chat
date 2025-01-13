@@ -59,7 +59,7 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
 
   const handleDeleteForMe = () => {
     deleteForMe(
-      { param: { messageId: message.id } },
+      { messageId: message.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
