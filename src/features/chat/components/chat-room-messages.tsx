@@ -133,10 +133,8 @@ const ChatRoomMessages = ({
     if (messages.length > 0) {
       if (lastMessage.current && messages[0].id !== lastMessage.current?.id) {
         readMessage({
-          param: {
-            roomType: roomTypeToRoomTypeModelLower(type),
-            receiverId: id,
-          },
+          roomType: roomTypeToRoomTypeModelLower(type),
+          receiverId: id,
         })
       }
       lastMessage.current = messages[0]

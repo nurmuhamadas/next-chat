@@ -328,5 +328,10 @@ export const api = {
         `/messages/${roomType}/${receiverId}?${queryParams}`,
       )
     },
+    read(roomType: RoomTypeModelLower, receiverId: string) {
+      return apiClient.post<unknown, MarkMessageAsReadResponse>(
+        `/messages/${roomType}/${receiverId}/read`,
+      )
+    },
   },
 }
