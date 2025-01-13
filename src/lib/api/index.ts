@@ -27,6 +27,7 @@ export const api = {
       apiClient.post<unknown, SignUpResponse>(`/auth/sign-up`, data),
     signIn: (data: z.infer<typeof signInSchema>) =>
       apiClient.post<unknown, SignInResponse>(`/auth/sign-in`, data),
+    signOut: () => apiClient.post<unknown, LogoutResponse>(`/auth/sign-out`),
   },
   users: {
     createUserProfile(data: FormData) {

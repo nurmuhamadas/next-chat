@@ -1,15 +1,12 @@
 import { useRouter } from "next/navigation"
 
 import { useMutation } from "@tanstack/react-query"
-import { InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.auth)["sign-out"]["$post"]
->
+type ResponseType = InferResponse<LogoutResponse>
 
 const useLogout = () => {
   const t = useScopedI18n("auth.message")
@@ -18,14 +15,9 @@ const useLogout = () => {
 
   return useMutation<ResponseType, Error>({
     mutationFn: async () => {
-      const response = await client.api.auth["sign-out"].$post()
+      const response = await api.auth.signOut()
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("signed_out"))
