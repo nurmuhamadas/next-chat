@@ -314,4 +314,9 @@ export const api = {
       },
     },
   },
+  messages: {
+    create(data: FormData) {
+      return apiClient.post<unknown, CreateMessageResponse>(`/messages`, data)
+    },
+  },
 }

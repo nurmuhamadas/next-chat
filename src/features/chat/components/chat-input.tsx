@@ -96,7 +96,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     } else {
       sendMessage(
         {
-          form: {
+          data: {
             receiverId: id,
             roomType:
               type === "chat"
@@ -106,7 +106,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   : "CHANNEL",
             attachments: att,
             message,
-            isEmojiOnly: String(isEmojiOnly),
+            isEmojiOnly,
             parentMessageId: repliedMessage?.id,
           },
         },
