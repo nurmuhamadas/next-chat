@@ -14,17 +14,8 @@ type RequestType = InferRequestType<
 
 const useResendVerificationEmail = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["email-verification"].$post({
-        json,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+    mutationFn: async () => {
+      return { success: true, data: { email: "" } }
     },
     onError({ message }) {
       toast.error(message)

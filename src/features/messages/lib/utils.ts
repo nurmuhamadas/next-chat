@@ -118,6 +118,5 @@ export const mapMessageModelToMessage = (
       ? false
       : message.updatedAt.toISOString() !== message.createdAt.toISOString(),
     createdAt: message.createdAt?.toISOString(),
-    updatedAt: message.updatedAt?.toISOString() ?? null,
   }
 }

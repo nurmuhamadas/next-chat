@@ -56,7 +56,7 @@ const RoomListItem = ({
             >
               {data.type !== "chat" && data.lastMessage && (
                 <span className="font-semibold text-white">
-                  {data.lastMessage?.sender}:{" "}
+                  {data.lastMessage?.name}:{" "}
                 </span>
               )}
               {data.lastMessage?.message}

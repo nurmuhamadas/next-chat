@@ -61,13 +61,14 @@ declare interface UserSearchForMember {
 
 declare interface LastMessage {
   id: string
-  sender: string
+  name: string
   message: string | null
   time: string
 }
 
 declare interface Room {
   id: string
+  /** userId or groupId or channelId */
   actionId: string
   type: RoomType
   name: string
@@ -120,7 +121,6 @@ declare interface Message {
   status: MessageStatus
   attachments: Attachment[]
   isUpdated: boolean
-  updatedAt: string | null
   createdAt: string
 }
 

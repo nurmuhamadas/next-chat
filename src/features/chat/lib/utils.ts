@@ -129,7 +129,7 @@ export const mapRoomModelToRoom = (
           message: isMessageDeleted
             ? room.lastMessage.status
             : room.lastMessage.message,
-          sender: room.lastMessage.sender.profile?.name ?? "Unknown",
+          name: room.lastMessage.sender.profile?.name ?? "Unknown",
           time: room.lastMessage.createdAt?.toISOString(),
         }
       : null,

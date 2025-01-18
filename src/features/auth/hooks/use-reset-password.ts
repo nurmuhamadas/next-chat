@@ -21,17 +21,8 @@ const useResetPassword = () => {
   const router = useRouter()
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["password-reset"].$post({
-        json,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+    mutationFn: async () => {
+      return { success: true, data: true }
     },
     onSuccess: () => {
       toast.success(t("password_reset_success"))
