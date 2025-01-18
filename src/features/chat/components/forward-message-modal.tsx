@@ -17,7 +17,7 @@ import useGetChannels from "@/features/channel/hooks/api/use-get-channels"
 import useGetGroups from "@/features/group/hooks/api/use-get-groups"
 import useForwardMessage from "@/features/messages/hooks/api/use-forward-message"
 import { useScopedI18n } from "@/lib/locale/client"
-import { debounce, roomTypeToRoomTypeModel } from "@/lib/utils"
+import { debounce } from "@/lib/utils"
 
 import useSearchPrivateRooms from "../hooks/api/use-search-private-rooms"
 import { useForwardMessageModal } from "../hooks/use-forward-message-modal"
@@ -63,7 +63,7 @@ const ForwardMessageModal = () => {
       {
         messageId: forwardMessageId,
         data: {
-          roomType: roomTypeToRoomTypeModel(type),
+          roomType: type,
           receiverId: id,
         },
       },

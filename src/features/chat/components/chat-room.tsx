@@ -11,7 +11,6 @@ import useGetGroupById from "@/features/group/hooks/api/use-get-group-by-id"
 import useReadMessage from "@/features/messages/hooks/api/use-read-message"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
-import { roomTypeToRoomTypeModelLower } from "@/lib/utils"
 
 import useGetRoom from "../hooks/api/use-get-room"
 import { useSelectedMessageIds } from "../hooks/use-selected-message-ids"
@@ -66,7 +65,7 @@ const ChatRoom = () => {
       readMessage(
         {
           receiverId: id,
-          roomType: roomTypeToRoomTypeModelLower(type),
+          roomType: type,
         },
         {
           onSuccess() {

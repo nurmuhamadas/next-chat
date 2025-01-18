@@ -1,7 +1,5 @@
 declare type RoomType = "chat" | "group" | "channel"
 
-declare type RoomTypeModelLower = "private" | "group" | "channel"
-
 declare type MainMenuAction =
   | "open-profile"
   | "open-saved-message"

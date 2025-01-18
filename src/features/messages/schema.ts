@@ -1,8 +1,13 @@
-import { RoomType } from "@prisma/client"
 import { z } from "zod"
 
 import { attachmentSchema } from "@/constants"
 import { ERROR } from "@/constants/error"
+
+export const ROOM_TYPES: Record<RoomType, RoomType> = {
+  chat: "chat",
+  group: "group",
+  channel: "channel",
+}
 
 export const createMessageSchema = z
   .object({
@@ -14,7 +19,9 @@ export const createMessageSchema = z
       .optional()
       .transform((v) => (v === "undefined" ? undefined : v)),
     receiverId: z.string({ invalid_type_error: ERROR.INVALID_TYPE }),
-    roomType: z.nativeEnum(RoomType),
+    roomType: z.nativeEnum(ROOM_TYPES, {
+      invalid_type_error: ERROR.INVALID_ROOM_TYPE,
+    }),
     parentMessageId: z
       .string({ invalid_type_error: ERROR.INVALID_TYPE })
       .optional()
@@ -51,15 +58,15 @@ export const updateMessageSchema = z.object({
 })
 
 export const getMessageParamSchema = z.object({
-  roomType: z
-    .enum(["private", "group", "channel"], {
-      invalid_type_error: ERROR.INVALID_ROOM_TYPE,
-    })
-    .transform((v) => v.toUpperCase() as RoomType),
+  roomType: z.nativeEnum(ROOM_TYPES, {
+    invalid_type_error: ERROR.INVALID_ROOM_TYPE,
+  }),
   receiverId: z.string().min(1, ERROR.REQUIRED),
 })
 
 export const forwardMessageSchema = z.object({
-  roomType: z.nativeEnum(RoomType),
+  roomType: z.nativeEnum(ROOM_TYPES, {
+    invalid_type_error: ERROR.INVALID_ROOM_TYPE,
+  }),
   receiverId: z.string().min(1, ERROR.REQUIRED),
 })

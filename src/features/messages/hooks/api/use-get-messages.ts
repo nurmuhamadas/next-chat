@@ -11,20 +11,17 @@ const useGetMessages = ({
   roomType: RoomType
   limit?: number
 }) => {
-  const type =
-    roomType === "chat" ? "PRIVATE" : roomType === "group" ? "GROUP" : "CHANNEL"
-
   const query = useInfiniteQuery({
-    queryKey: ["get-messages", id, type, limit],
+    queryKey: ["get-messages", id, roomType, limit],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await api.messages.get(type, id, {
+      const response = await api.messages.get(roomType, id, {
         limit,
         cursor: pageParam,
       })
 
       return response
     },
-    enabled: !!id && !!type,
+    enabled: !!id && !!roomType,
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,
   })

@@ -98,12 +98,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
         {
           data: {
             receiverId: id,
-            roomType:
-              type === "chat"
-                ? "PRIVATE"
-                : type === "group"
-                  ? "GROUP"
-                  : "CHANNEL",
+            roomType: type,
             attachments: att,
             message,
             isEmojiOnly,

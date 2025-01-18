@@ -336,7 +336,7 @@ export const api = {
       return apiClient.post<unknown, CreateMessageResponse>(`/messages`, data)
     },
     get(
-      roomType: string,
+      roomType: RoomType,
       receiverId: string,
       params: z.infer<typeof searchQuerySchema>,
     ) {
@@ -345,7 +345,7 @@ export const api = {
         `/messages/${roomType}/${receiverId}?${queryParams}`,
       )
     },
-    read(roomType: RoomTypeModelLower, receiverId: string) {
+    read(roomType: RoomType, receiverId: string) {
       return apiClient.post<unknown, MarkMessageAsReadResponse>(
         `/messages/${roomType}/${receiverId}/read`,
       )
