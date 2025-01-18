@@ -87,9 +87,9 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             cancelReplyMessage()
 
             queryClient.invalidateQueries({
-              queryKey: ["get-messages", id, type, undefined, undefined],
+              queryKey: ["get-messages", id, type, 20],
             })
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )
@@ -120,9 +120,9 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             cancelReplyMessage()
 
             queryClient.invalidateQueries({
-              queryKey: ["get-messages", id, type, undefined, undefined],
+              queryKey: ["get-messages", id, type, 20],
             })
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )

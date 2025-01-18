@@ -39,7 +39,7 @@ const RoomProfilActionsChannel = () => {
         {
           onSuccess() {
             queryClient.invalidateQueries({
-              queryKey: ["rooms"],
+              queryKey: ["rooms", 20],
             })
             queryClient.invalidateQueries({
               queryKey: ["room", id],

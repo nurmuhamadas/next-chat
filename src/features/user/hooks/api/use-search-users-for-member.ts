@@ -12,7 +12,7 @@ const useSearchUsersForMember = ({
   groupId?: string
 }) => {
   const query = useInfiniteQuery({
-    queryKey: ["search-users-for-member", queryKey, limit],
+    queryKey: ["search-users-for-member", limit, queryKey],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await api.users.searchForMember(groupId, {
         query: queryKey,

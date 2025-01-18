@@ -72,7 +72,7 @@ const EditChannelPanel = () => {
                   {
                     onSuccess() {
                       refetch()
-                      queryClient.invalidateQueries({ queryKey: ["rooms"] })
+                      queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
                       closeEditChannel()
                     },
                   },

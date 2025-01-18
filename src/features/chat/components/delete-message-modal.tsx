@@ -49,7 +49,7 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
       {
         onSuccess() {
           queryClient.invalidateQueries({
-            queryKey: ["get-messages", id, type],
+            queryKey: ["get-messages", id, type, 20],
           })
           cancelDeleteMessage()
         },
@@ -63,7 +63,7 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
       {
         onSuccess() {
           queryClient.invalidateQueries({
-            queryKey: ["get-messages", id, type],
+            queryKey: ["get-messages", id, type, 20],
           })
           cancelDeleteMessage()
         },
@@ -77,7 +77,7 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
       {
         onSuccess() {
           queryClient.invalidateQueries({
-            queryKey: ["get-messages", id, type],
+            queryKey: ["get-messages", id, type, 20],
           })
           cancelDeleteMessage()
         },

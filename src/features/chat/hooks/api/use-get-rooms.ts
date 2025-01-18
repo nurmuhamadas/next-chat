@@ -4,7 +4,7 @@ import { api } from "@/lib/api"
 
 const useGetRooms = ({ limit = 20 }: { limit?: number }) => {
   const query = useInfiniteQuery({
-    queryKey: ["rooms"],
+    queryKey: ["rooms", limit],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await api.rooms.get({ cursor: pageParam, limit })
 

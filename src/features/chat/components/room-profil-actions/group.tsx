@@ -112,7 +112,7 @@ const RoomProfilActionsGroup = () => {
       { roomId: id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           queryClient.invalidateQueries({ queryKey: ["room", id] })
           queryClient.invalidateQueries({
             queryKey: ["get-group-by-id", id],

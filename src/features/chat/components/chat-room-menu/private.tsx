@@ -84,7 +84,7 @@ const ChatRoomMenuPrivate = () => {
       {
         onSuccess() {
           refetchBlocked()
-          queryClient.invalidateQueries({ queryKey: ["get-blocked-users"] })
+          queryClient.invalidateQueries({ queryKey: ["get-blocked-users", 20] })
         },
       },
     )
@@ -102,7 +102,7 @@ const ChatRoomMenuPrivate = () => {
       {
         onSuccess() {
           refetchBlocked()
-          queryClient.invalidateQueries({ queryKey: ["get-blocked-users"] })
+          queryClient.invalidateQueries({ queryKey: ["get-blocked-users", 20] })
         },
       },
     )

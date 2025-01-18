@@ -36,7 +36,7 @@ const CreateGroupPanel = () => {
             createGroup(form, {
               onSuccess() {
                 closeCreateGroup()
-                queryClient.invalidateQueries({ queryKey: ["rooms"] })
+                queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
               },
               onError(error) {
                 setErrorMessage(error.message)

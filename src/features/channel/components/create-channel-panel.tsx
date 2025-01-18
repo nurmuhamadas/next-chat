@@ -36,7 +36,7 @@ const CreateChannelPanel = () => {
             createChannel(form, {
               onSuccess() {
                 closeCreateChannel()
-                queryClient.invalidateQueries({ queryKey: ["rooms"] })
+                queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
               },
               onError(error) {
                 setErrorMessage(error.message)

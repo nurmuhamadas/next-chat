@@ -10,7 +10,7 @@ const useSearchPublicGroups = ({
   limit?: number
 }) => {
   const query = useInfiniteQuery({
-    queryKey: ["search-public-groups", queryKey, limit],
+    queryKey: ["search-public-groups", limit, queryKey],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await api.groups.searchPublicGroups({
         query: queryKey,

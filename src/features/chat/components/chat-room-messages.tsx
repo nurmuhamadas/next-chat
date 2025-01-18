@@ -147,7 +147,7 @@ const ChatRoomMessages = ({
         { groupId: group.id, data: { code: group.inviteCode } },
         {
           onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
             queryClient.invalidateQueries({
               queryKey: ["get-group-by-id", id],
             })
@@ -169,7 +169,7 @@ const ChatRoomMessages = ({
         { channelId: channel.id, data: { code: channel.inviteCode } },
         {
           onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
             queryClient.invalidateQueries({
               queryKey: ["get-channel-by-id", id],
             })

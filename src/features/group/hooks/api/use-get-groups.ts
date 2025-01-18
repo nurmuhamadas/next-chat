@@ -12,7 +12,7 @@ const useGetGroups = ({
   enabled?: boolean
 }) => {
   const query = useInfiniteQuery({
-    queryKey: ["get-groups", queryKey, limit],
+    queryKey: ["get-groups", limit, queryKey],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await api.groups.get({
         limit,

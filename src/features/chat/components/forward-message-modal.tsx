@@ -70,7 +70,7 @@ const ForwardMessageModal = () => {
       {
         onSuccess() {
           setSendingId("")
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )

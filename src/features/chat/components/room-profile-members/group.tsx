@@ -58,7 +58,7 @@ const RoomProfileMembersGroup = () => {
         onSuccess() {
           refetchMembers()
           queryClient.invalidateQueries({
-            queryKey: ["search-users-for-member"],
+            queryKey: ["search-users-for-member", 20],
           })
         },
       },

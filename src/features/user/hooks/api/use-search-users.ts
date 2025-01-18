@@ -10,7 +10,7 @@ const useSearchUsers = ({
   limit?: number
 }) => {
   const query = useInfiniteQuery({
-    queryKey: ["search-users", queryKey, limit],
+    queryKey: ["search-users", limit, queryKey],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
       const response = await api.users.search({
         query: queryKey,

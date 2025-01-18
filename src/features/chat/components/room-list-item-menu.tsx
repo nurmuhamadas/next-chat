@@ -37,7 +37,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
       { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
@@ -48,7 +48,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
       { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
@@ -59,7 +59,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
       { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
@@ -70,7 +70,7 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
       { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
