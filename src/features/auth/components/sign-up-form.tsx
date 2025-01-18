@@ -16,7 +16,6 @@ import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
 import { useScopedI18n } from "@/lib/locale/client"
 
-import useResendVerificationEmail from "../hooks/use-resend-verification-email"
 import useSignUp from "../hooks/use-sign-up"
 import { signUpSchema } from "../schema"
 
@@ -33,11 +32,13 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
   const t = useScopedI18n("auth")
 
   const [errorMessage, setErrorMessage] = useState("")
-  const [count, setCount] = useState(60)
+  const [count] = useState(60)
 
   const { mutate: signUp, isPending } = useSignUp()
-  const { mutate: resendEmail, isPending: isResending } =
-    useResendVerificationEmail()
+  const { mutate: resendEmail, isPending: isResending } = {
+    isPending: false,
+    mutate: () => {},
+  }
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -49,18 +50,18 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
     },
   })
 
-  const startTimer = () => {
-    const intervalId = setInterval(() => {
-      setCount((v) => {
-        if (v > 0) {
-          return v - 1
-        }
+  // const startTimer = () => {
+  //   const intervalId = setInterval(() => {
+  //     setCount((v) => {
+  //       if (v > 0) {
+  //         return v - 1
+  //       }
 
-        clearInterval(intervalId)
-        return 0
-      })
-    }, 1000)
-  }
+  //       clearInterval(intervalId)
+  //       return 0
+  //     })
+  //   }, 1000)
+  // }
 
   const onSubmit = (values: z.infer<typeof signUpSchema>) => {
     signUp(values, {
@@ -77,14 +78,7 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
   }
 
   const onResend = () => {
-    resendEmail(
-      { json: { email: form.getValues("email") } },
-      {
-        onSuccess() {
-          startTimer()
-        },
-      },
-    )
+    resendEmail()
   }
 
   if (showVerification) {

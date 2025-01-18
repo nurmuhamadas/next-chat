@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Form, FormField } from "@/components/ui/form"
 import { useScopedI18n } from "@/lib/locale/client"
 
-import useResetPassword from "../hooks/use-reset-password"
 import { passwordResetSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
@@ -28,7 +27,10 @@ const ResetPasswordForm = () => {
 
   const [errorMessage, setErrorMessage] = useState("")
 
-  const { mutate: resetPassword, isPending } = useResetPassword()
+  const { mutate: resetPassword, isPending } = {
+    isPending: false,
+    mutate: () => {},
+  }
 
   const form = useForm<z.infer<typeof passwordResetSchema>>({
     resolver: zodResolver(passwordResetSchema),
@@ -40,14 +42,8 @@ const ResetPasswordForm = () => {
 
   const onSubmit = (values: z.infer<typeof passwordResetSchema>) => {
     if (email && token) {
-      resetPassword(
-        { json: { ...values, email, token } },
-        {
-          onError(error) {
-            setErrorMessage(error.message)
-          },
-        },
-      )
+      console.log(values)
+      resetPassword()
     }
   }
 

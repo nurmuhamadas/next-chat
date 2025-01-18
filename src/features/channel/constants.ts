@@ -8,11 +8,11 @@ export const CHANNEL_TYPE_OPT: {
   value: ChannelType
 }[] = [
   {
-    label: "Public",
+    label: "form.type_opt.public",
     value: "PUBLIC",
   },
   {
-    label: "Private",
+    label: "form.type_opt.private",
     value: "PRIVATE",
   },
 ]

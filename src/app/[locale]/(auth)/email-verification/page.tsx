@@ -7,7 +7,6 @@ import { redirect, useSearchParams } from "next/navigation"
 import { CheckCircle2Icon, Loader2, TriangleAlertIcon } from "lucide-react"
 
 import { Card } from "@/components/ui/card"
-import useVerifyEmail from "@/features/auth/hooks/use-verify-email"
 import { useScopedI18n } from "@/lib/locale/client"
 
 const EmailVerificationPage = () => {
@@ -17,24 +16,17 @@ const EmailVerificationPage = () => {
 
   const t = useScopedI18n("auth.email_verification")
 
-  const [error, setError] = useState("")
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [error] = useState("")
+  const [isSuccess] = useState(false)
 
-  const { mutate: verifyEmail, isPending } = useVerifyEmail()
+  const { mutate: verifyEmail, isPending } = {
+    isPending: false,
+    mutate: () => {},
+  }
 
   useEffect(() => {
     if (token && email) {
-      verifyEmail(
-        { json: { email, token } },
-        {
-          onSuccess() {
-            setIsSuccess(true)
-          },
-          onError(error) {
-            setError(error.message)
-          },
-        },
-      )
+      verifyEmail()
     }
   }, [email, token, verifyEmail])
 

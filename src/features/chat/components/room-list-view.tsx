@@ -5,7 +5,7 @@ import { LoaderIcon } from "lucide-react"
 import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import useGetSetting from "@/features/user/hooks/api/use-get-setting"
+import useGetSetting from "@/features/settings/hooks/use-get-setting"
 import { useCurrentLocale, useScopedI18n } from "@/lib/locale/client"
 
 import useGetRooms from "../hooks/api/use-get-rooms"

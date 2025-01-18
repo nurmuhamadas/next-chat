@@ -17,7 +17,6 @@ import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
 import { useScopedI18n } from "@/lib/locale/client"
 
-import useResendVerificationEmail from "../hooks/use-resend-verification-email"
 import useSignIn from "../hooks/use-sign-in"
 import { signInSchema } from "../schema"
 
@@ -39,8 +38,10 @@ const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
   )
 
   const { mutate: signIn, isPending } = useSignIn()
-  const { mutate: resendEmail, isPending: isResending } =
-    useResendVerificationEmail()
+  const { mutate: resendEmail, isPending: isResending } = {
+    isPending: false,
+    mutate: () => {},
+  }
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -82,14 +83,7 @@ const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
   }
 
   const onResend = () => {
-    resendEmail(
-      { json: { email: form.getValues("email") } },
-      {
-        onSuccess() {
-          startTimer()
-        },
-      },
-    )
+    resendEmail()
   }
 
   const MESSAGES = {
