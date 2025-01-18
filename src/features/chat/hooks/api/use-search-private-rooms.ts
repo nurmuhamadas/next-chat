@@ -1,29 +1,26 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useSearchPrivateRooms = ({
   queryKey,
-  limit,
+  limit = 20,
   enabled = true,
 }: {
   queryKey?: string
-  limit?: string
+  limit?: number
   enabled?: boolean
 }) => {
   const query = useInfiniteQuery({
     queryKey: ["search-private-rooms", limit, queryKey],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api.rooms["search-private"].$get({
-        query: { cursor: pageParam, limit, query: queryKey },
+      const response = await api.rooms.getPrivateRooms({
+        cursor: pageParam,
+        limit,
+        query: queryKey,
       })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     enabled,
     initialPageParam: undefined,
@@ -31,7 +28,7 @@ const useSearchPrivateRooms = ({
   })
 
   const data = query.data
-    ? query.data.pages.reduce<UserSearch[]>(
+    ? query.data.pages.reduce<PrivateRoom[]>(
         (acc, curr) => [...acc, ...curr.data],
         [],
       )

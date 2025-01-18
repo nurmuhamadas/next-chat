@@ -1,5 +1,3 @@
-import { useEffect } from "react"
-
 import Image from "next/image"
 
 import { LoaderIcon } from "lucide-react"
@@ -22,22 +20,11 @@ const RoomListView = () => {
   const {
     data: rooms,
     isLoading: loadingRooms,
-    refetch,
     hasNextPage,
     fetchNextPage,
   } = useGetRooms({})
 
   const isLoading = loadingRooms || settingLoading
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      refetch()
-    }, 5000)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [refetch])
 
   if (isLoading && rooms.length === 0) {
     return <ChatSkeleton rows={5} />

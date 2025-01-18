@@ -1,25 +1,40 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-type ResponseType = InferResponseType<typeof client.api.messages.$post, 200>
-type RequestType = InferRequestType<typeof client.api.messages.$post>
+import { createMessageSchema } from "../../schema"
+
+type ResponseType = InferResponse<CreateMessageResponse>
+type RequestType = {
+  data: z.infer<typeof createMessageSchema>
+}
 
 const useSendMessage = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.messages.$post({
-        form,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
+    mutationFn: async ({ data }) => {
+      const formData = new FormData()
+      formData.append("receiverId", data.receiverId)
+      formData.append("roomType", data.roomType)
+      if (data.message) {
+        formData.append("message", data.message)
       }
+      if (data.isEmojiOnly) {
+        formData.append("isEmojiOnly", String(data.isEmojiOnly))
+      }
+      if (data.originalMessageId) {
+        formData.append("originalMessageId", data.originalMessageId)
+      }
+      if (data.parentMessageId) {
+        formData.append("parentMessageId", data.parentMessageId)
+      }
+      data.attachments?.map((file: File) =>
+        formData.append("attachments", file),
+      )
+      const response = await api.messages.create(formData)
 
-      return result
+      return response.data
     },
     onSuccess: () => {},
     onError({ message }) {

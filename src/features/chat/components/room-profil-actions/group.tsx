@@ -43,13 +43,16 @@ const RoomProfilActionsGroup = () => {
   const handleJoinGroup = () => {
     if (group) {
       joinGroup(
-        { json: { code: group.inviteCode }, param: { groupId: id } },
+        { data: { code: group.inviteCode }, groupId: id },
         {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: ["rooms"] })
             queryClient.invalidateQueries({ queryKey: ["room", id] })
             queryClient.invalidateQueries({
-              queryKey: ["get-is-group-member", id],
+              queryKey: ["get-group-members", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-group-by-id", id],
             })
             queryClient.invalidateQueries({
               queryKey: ["get-group-option", id],
@@ -68,12 +71,15 @@ const RoomProfilActionsGroup = () => {
     if (!isOK) return
 
     leaveGroup(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({ queryKey: ["get-group-option", id] })
           queryClient.invalidateQueries({
-            queryKey: ["get-is-group-member", id],
+            queryKey: ["get-group-members", id],
+          })
+          queryClient.invalidateQueries({
+            queryKey: ["get-group-by-id", id],
           })
         },
       },
@@ -88,7 +94,7 @@ const RoomProfilActionsGroup = () => {
     if (!isOK) return
 
     deleteGroupChat(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {},
       },
@@ -103,13 +109,13 @@ const RoomProfilActionsGroup = () => {
     if (!isOK) return
 
     deleteRoom(
-      { param: { roomId: id } },
+      { roomId: id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           queryClient.invalidateQueries({ queryKey: ["room", id] })
           queryClient.invalidateQueries({
-            queryKey: ["get-is-group-member", id],
+            queryKey: ["get-group-by-id", id],
           })
           queryClient.invalidateQueries({
             queryKey: ["get-group-option", id],

@@ -1,31 +1,23 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.messages)[":messageId"]["forwarded"]["$post"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.messages)[":messageId"]["forwarded"]["$post"]
->
+import { forwardMessageSchema } from "../../schema"
+
+type ResponseType = InferResponse<ForwardMessageResponse>
+type RequestType = {
+  messageId: string
+  data: z.infer<typeof forwardMessageSchema>
+}
 
 const useForwardMessage = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param, json }) => {
-      const response = await client.api.messages[":messageId"].forwarded.$post({
-        param,
-        json,
-      })
+    mutationFn: async ({ messageId, data }) => {
+      const response = await api.messages.forward(messageId, data)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {},
     onError({ message }) {

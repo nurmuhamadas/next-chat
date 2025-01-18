@@ -37,17 +37,17 @@ const ForwardMessageModal = () => {
 
   const { data: userRooms, isLoading: loadingRoom } = useSearchPrivateRooms({
     queryKey: searchKey,
-    limit: "5",
+    limit: 5,
     enabled: isForwardModalOpen,
   })
   const { data: groups, isLoading: loadingGroups } = useGetGroups({
     queryKey: searchKey,
-    limit: "5",
+    limit: 5,
     enabled: isForwardModalOpen,
   })
   const { data: channels, isLoading: loadingChannels } = useGetChannels({
     queryKey: searchKey,
-    limit: "5",
+    limit: 5,
     enabled: isForwardModalOpen,
   })
   const isLoading = loadingRoom || loadingGroups || loadingChannels
@@ -61,8 +61,8 @@ const ForwardMessageModal = () => {
 
     forwardMessage(
       {
-        param: { messageId: forwardMessageId },
-        json: {
+        messageId: forwardMessageId,
+        data: {
           roomType: roomTypeToRoomTypeModel(type),
           receiverId: id,
         },
@@ -70,7 +70,7 @@ const ForwardMessageModal = () => {
       {
         onSuccess() {
           setSendingId("")
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )

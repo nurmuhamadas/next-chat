@@ -1,28 +1,22 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
+import { settingSchema } from "@/features/settings/schema"
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<typeof client.api.settings.$patch, 200>
-type RequestType = InferRequestType<typeof client.api.settings.$patch>
+type ResponseType = InferResponse<UpdateSettingResponse>
+type RequestType = z.infer<typeof settingSchema>
 
 const useUpdateSetting = () => {
   const t = useScopedI18n("settings.messages")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.settings.$patch({
-        json,
-      })
+    mutationFn: async (data) => {
+      const response = await api.settings.update(data)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("settings_updated"))

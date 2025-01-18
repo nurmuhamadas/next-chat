@@ -17,6 +17,7 @@ import useLeaveChannel from "@/features/channel/hooks/api/use-leave-channel"
 import useUpdateChannelOption from "@/features/channel/hooks/api/use-update-channel-option"
 import useConfirm from "@/hooks/use-confirm-dialog"
 import { useRoomId } from "@/hooks/use-room-id"
+import { useRoomType } from "@/hooks/use-room-type"
 import { useScopedI18n } from "@/lib/locale/client"
 import { cn } from "@/lib/utils"
 
@@ -29,6 +30,7 @@ const ChatRoomMenuChannel = () => {
   const queryClient = useQueryClient()
 
   const id = useRoomId()
+  const type = useRoomType()
 
   const [Dialog, confirm] = useConfirm()
 
@@ -61,7 +63,7 @@ const ChatRoomMenuChannel = () => {
     if (!isOK) return
 
     updateOption(
-      { param: { channelId: id }, json: { notification: !muted } },
+      { channelId: id, data: { notification: !muted } },
       {
         onSuccess() {
           refetchOption()
@@ -78,7 +80,7 @@ const ChatRoomMenuChannel = () => {
     if (!isOK) return
 
     leaveChannel(
-      { param: { channelId: id } },
+      { channelId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
@@ -98,9 +100,12 @@ const ChatRoomMenuChannel = () => {
     if (!isOK) return
 
     clearChat(
-      { param: { channelId: id } },
+      { channelId: id },
       {
         onSuccess() {
+          queryClient.invalidateQueries({
+            queryKey: ["get-messages", id, type, 20],
+          })
           refetchOption()
           refetchRoom()
         },

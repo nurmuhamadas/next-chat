@@ -33,18 +33,15 @@ const CreateGroupPanel = () => {
           errorMessage={errorMessage}
           onClearError={() => setErrorMessage("")}
           onSubmit={(form) => {
-            createGroup(
-              { form },
-              {
-                onSuccess() {
-                  closeCreateGroup()
-                  queryClient.invalidateQueries({ queryKey: ["rooms"] })
-                },
-                onError(error) {
-                  setErrorMessage(error.message)
-                },
+            createGroup(form, {
+              onSuccess() {
+                closeCreateGroup()
+                queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
               },
-            )
+              onError(error) {
+                setErrorMessage(error.message)
+              },
+            })
           }}
         />
       </div>

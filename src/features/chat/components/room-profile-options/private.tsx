@@ -33,10 +33,7 @@ const RoomProfileOptionsPrivate = () => {
   const handleNotifChange = (value: boolean) => {
     setIsNotifActive(value)
     updateOption(
-      {
-        json: { notification: value },
-        param: { userId: id },
-      },
+      { userId: id, option: { notification: value } },
       {
         onSuccess() {
           refetchOption()

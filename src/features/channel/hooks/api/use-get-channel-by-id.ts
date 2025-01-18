@@ -1,21 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-const useGetChannelById = ({ id }: { id?: string }) => {
+const useGetChannelById = ({ id = "" }: { id?: string }) => {
   const query = useQuery({
     queryKey: ["get-channel-by-id", id],
     queryFn: async () => {
-      const response = await client.api.channels[":channelId"].$get({
-        param: { channelId: id ?? "" },
-      })
+      const response = await api.channels.getById(id)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
     enabled: !!id,
   })

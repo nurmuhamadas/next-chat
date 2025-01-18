@@ -29,7 +29,7 @@ export const constructFileUrl = (bucketFileId: string) => {
 }
 
 export const destructFileId = (fileUrl: string) => {
-  return fileUrl.split(APPWRITE_ENDPOINT)[1].split("/")[5]
+  return fileUrl.split(APPWRITE_ENDPOINT)[1]?.split("/")[5]
 }
 
 export const constructDownloadUrl = (bucketFileId: string) => {

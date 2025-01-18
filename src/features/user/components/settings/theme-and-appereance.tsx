@@ -73,7 +73,7 @@ const ThemeAndAppereanceSettings = () => {
         isLoading={isLoading || isPending}
         onValueChange={(value) => {
           updateSetting(
-            { json: { timeFormat: value as TimeFormat } },
+            { timeFormat: value as TimeFormat },
             {
               onSuccess() {
                 refetch()

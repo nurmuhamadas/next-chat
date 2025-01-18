@@ -45,11 +45,11 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
 
   const handleDeleteForAll = () => {
     deleteForAll(
-      { param: { messageId: message.id } },
+      { messageId: message.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
-            queryKey: ["get-messages", id, type],
+            queryKey: ["get-messages", id, type, 20],
           })
           cancelDeleteMessage()
         },
@@ -59,11 +59,11 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
 
   const handleDeleteForMe = () => {
     deleteForMe(
-      { param: { messageId: message.id } },
+      { messageId: message.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
-            queryKey: ["get-messages", id, type],
+            queryKey: ["get-messages", id, type, 20],
           })
           cancelDeleteMessage()
         },
@@ -73,11 +73,11 @@ const DeleteMessageModal = ({ message, isAdmin }: DeleteMessageModalProps) => {
 
   const handleDeleteByAdmin = () => {
     deleteByAdmin(
-      { param: { messageId: message.id } },
+      { messageId: message.id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
-            queryKey: ["get-messages", id, type],
+            queryKey: ["get-messages", id, type, 20],
           })
           cancelDeleteMessage()
         },

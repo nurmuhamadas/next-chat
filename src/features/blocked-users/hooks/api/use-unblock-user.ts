@@ -1,33 +1,20 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api)["blocked-users"][":blockedUserId"]["$delete"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api)["blocked-users"][":blockedUserId"]["$delete"]
->
+type ResponseType = InferResponse<UnblockUserResponse>
+type RequestType = { blockedUserId: string }
 
 const useUnblockUser = () => {
   const t = useScopedI18n("blocked_user")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api["blocked-users"][
-        ":blockedUserId"
-      ].$delete({ param })
+    mutationFn: async ({ blockedUserId }) => {
+      const response = await api.blockedUsers.unblockUser(blockedUserId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("messages.unblock_success"))

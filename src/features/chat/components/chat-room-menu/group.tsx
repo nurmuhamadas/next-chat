@@ -59,7 +59,7 @@ const ChatRoomMenuGroup = () => {
     if (!isOK) return
 
     updateOption(
-      { param: { groupId: id }, json: { notification: !muted } },
+      { groupId: id, data: { notification: !muted } },
       {
         onSuccess() {
           refetchOption()
@@ -76,11 +76,14 @@ const ChatRoomMenuGroup = () => {
     if (!isOK) return
 
     leaveGroup(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
             queryKey: ["get-group-by-id", id],
+          })
+          queryClient.invalidateQueries({
+            queryKey: ["get-group-members", id],
           })
           refetchOption()
         },
@@ -96,7 +99,7 @@ const ChatRoomMenuGroup = () => {
     if (!isOK) return
 
     clearChat(
-      { param: { groupId: id } },
+      { groupId: id },
       {
         onSuccess() {
           refetchOption()

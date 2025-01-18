@@ -50,7 +50,7 @@ const RoomProfileMembersGroup = () => {
     removedId.current = member.id
 
     removeMember(
-      { param: { groupId: id, userId: member.id } },
+      { groupId: id, userId: member.id },
       {
         onSettled() {
           removedId.current = null
@@ -58,7 +58,7 @@ const RoomProfileMembersGroup = () => {
         onSuccess() {
           refetchMembers()
           queryClient.invalidateQueries({
-            queryKey: ["search-users-for-member"],
+            queryKey: ["search-users-for-member", 20],
           })
         },
       },

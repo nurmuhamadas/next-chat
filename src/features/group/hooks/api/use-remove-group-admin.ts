@@ -1,33 +1,23 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.groups)[":groupId"]["members"][":userId"]["admin"]["$delete"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.groups)[":groupId"]["members"][":userId"]["admin"]["$delete"]
->
+type ResponseType = InferResponse<UnsetAdminGroupResponse>
+type RequestType = {
+  groupId: string
+  userId: string
+}
 
 const useRemoveGroupAdmin = () => {
   const t = useScopedI18n("group.messages")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.groups[":groupId"]["members"][
-        ":userId"
-      ]["admin"].$delete({ param })
+    mutationFn: async ({ groupId, userId }) => {
+      const response = await api.groups.admins.remove(groupId, userId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("removed_admins"))

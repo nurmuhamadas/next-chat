@@ -3,6 +3,7 @@
 import { useState } from "react"
 
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderIcon } from "lucide-react"
@@ -27,6 +28,8 @@ interface SignUpFormProps {
   onSuccess(): void
 }
 const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
+  const router = useRouter()
+
   const t = useScopedI18n("auth")
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -60,18 +63,17 @@ const SignUpForm = ({ showVerification, onSuccess }: SignUpFormProps) => {
   }
 
   const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    signUp(
-      { json: values },
-      {
-        onSuccess() {
-          onSuccess()
-          startTimer()
-        },
-        onError(error) {
-          setErrorMessage(error.message)
-        },
+    signUp(values, {
+      onSuccess() {
+        onSuccess()
+        // * Temporary disabled
+        // startTimer()
+        router.push("/sign-in")
       },
-    )
+      onError(error) {
+        setErrorMessage(error.message)
+      },
+    })
   }
 
   const onResend = () => {

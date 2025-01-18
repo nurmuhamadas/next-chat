@@ -44,7 +44,7 @@ const RoomProfilActionsPrivate = () => {
     if (!isOk) return
 
     blockUser(
-      { param: { blockedUserId: id } },
+      { blockedUserId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
@@ -63,7 +63,7 @@ const RoomProfilActionsPrivate = () => {
     if (!isOk) return
 
     unblockUser(
-      { param: { blockedUserId: id } },
+      { blockedUserId: id },
       {
         onSuccess() {
           queryClient.invalidateQueries({
@@ -82,7 +82,7 @@ const RoomProfilActionsPrivate = () => {
     if (!isOk) return
 
     deleteChat(
-      { param: { userId: id } },
+      { userId: id },
       {
         onSuccess() {},
       },

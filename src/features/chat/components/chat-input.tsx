@@ -74,8 +74,8 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
     if (editedMessage) {
       updateMessage(
         {
-          json: { message, isEmojiOnly: String(isEmojiOnly) },
-          param: { messageId: editedMessage.id },
+          messageId: editedMessage.id,
+          data: { message, isEmojiOnly },
         },
         {
           onSuccess() {
@@ -87,16 +87,16 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             cancelReplyMessage()
 
             queryClient.invalidateQueries({
-              queryKey: ["get-messages", id, type, undefined, undefined],
+              queryKey: ["get-messages", id, type, 20],
             })
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )
     } else {
       sendMessage(
         {
-          form: {
+          data: {
             receiverId: id,
             roomType:
               type === "chat"
@@ -106,7 +106,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
                   : "CHANNEL",
             attachments: att,
             message,
-            isEmojiOnly: String(isEmojiOnly),
+            isEmojiOnly,
             parentMessageId: repliedMessage?.id,
           },
         },
@@ -120,9 +120,9 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             cancelReplyMessage()
 
             queryClient.invalidateQueries({
-              queryKey: ["get-messages", id, type, undefined, undefined],
+              queryKey: ["get-messages", id, type, 20],
             })
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )

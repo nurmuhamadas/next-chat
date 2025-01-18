@@ -1,21 +1,14 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-const useGetRooms = ({ limit }: { limit?: string }) => {
+const useGetRooms = ({ limit = 20 }: { limit?: number }) => {
   const query = useInfiniteQuery({
-    queryKey: ["rooms"],
+    queryKey: ["rooms", limit],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api.rooms.$get({
-        query: { cursor: pageParam, limit },
-      })
+      const response = await api.rooms.get({ cursor: pageParam, limit })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     initialPageParam: undefined,
     getNextPageParam: (lastPage) => lastPage.cursor,

@@ -23,7 +23,7 @@ const SearchChannelResult = () => {
     fetchNextPage: fetchNextJoined,
   } = useGetChannels({
     queryKey: searchQuery,
-    limit: "5",
+    limit: 5,
   })
   const {
     data: publicChannels,
@@ -33,7 +33,7 @@ const SearchChannelResult = () => {
     fetchNextPage: fetchNextPublic,
   } = useSearchChannels({
     queryKey: searchQuery,
-    limit: "5",
+    limit: 5,
   })
 
   const isLoading = loadingPublic || loadingJoined

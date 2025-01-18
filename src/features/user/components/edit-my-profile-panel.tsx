@@ -36,14 +36,11 @@ const EditMyProfilePanel = () => {
             isLoading={isPending}
             buttonLabel={t("edit_submit")}
             onSubmit={(values) => {
-              updateProfile(
-                { form: values },
-                {
-                  onSuccess() {
-                    refetch()
-                  },
+              updateProfile(values, {
+                onSuccess() {
+                  refetch()
                 },
-              )
+              })
             }}
           />
         </div>

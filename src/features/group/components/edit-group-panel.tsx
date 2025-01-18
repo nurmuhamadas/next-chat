@@ -63,7 +63,7 @@ const EditGroupPanel = () => {
               isLoading={isPending}
               onSubmit={(form) => {
                 updateGroup(
-                  { form, param: { groupId: id } },
+                  { data: form, groupId: id },
                   {
                     onSuccess() {
                       refetch()

@@ -63,7 +63,7 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     updateOption(
-      { param: { userId: id }, json: { notification: !muted } },
+      { userId: id, option: { notification: !muted } },
       {
         onSuccess() {
           refetchOption()
@@ -80,11 +80,11 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     blockUser(
-      { param: { blockedUserId: id } },
+      { blockedUserId: id },
       {
         onSuccess() {
           refetchBlocked()
-          queryClient.invalidateQueries({ queryKey: ["get-blocked-users"] })
+          queryClient.invalidateQueries({ queryKey: ["get-blocked-users", 20] })
         },
       },
     )
@@ -98,11 +98,11 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     unblockUser(
-      { param: { blockedUserId: id } },
+      { blockedUserId: id },
       {
         onSuccess() {
           refetchBlocked()
-          queryClient.invalidateQueries({ queryKey: ["get-blocked-users"] })
+          queryClient.invalidateQueries({ queryKey: ["get-blocked-users", 20] })
         },
       },
     )
@@ -116,7 +116,7 @@ const ChatRoomMenuPrivate = () => {
     if (!isOK) return
 
     clearChat(
-      { param: { userId: id } },
+      { userId: id },
       {
         onSuccess() {
           refetchOption()

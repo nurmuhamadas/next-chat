@@ -34,10 +34,10 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handlePinRoom = () => {
     pinRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
@@ -45,10 +45,10 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handleUnpinRoom = () => {
     unpinRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
@@ -56,10 +56,10 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handleArchiveRoom = () => {
     archiveRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )
@@ -67,10 +67,10 @@ const RoomListItemMenu = ({ room }: RoomListItemMenuProps) => {
 
   const handleDeleteRoom = () => {
     deleteRoom(
-      { param: { roomId: room.id } },
+      { roomId: room.id },
       {
         onSuccess() {
-          queryClient.invalidateQueries({ queryKey: ["rooms"] })
+          queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
         },
       },
     )

@@ -47,7 +47,7 @@ export const mapChannelModelToChannel = (
     type: channel.type,
     inviteCode: channel.inviteCode,
     totalSubscribers: channel._count.subscribers,
-    isSubscribers: channel.subscribers.length > 0,
+    isSubscriber: channel.subscribers.length > 0,
     isAdmin: channel.subscribers[0]?.isAdmin ?? false,
   }
 }

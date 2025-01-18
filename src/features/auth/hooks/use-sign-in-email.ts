@@ -17,17 +17,8 @@ const useSignInEmail = () => {
   const router = useRouter()
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["sign-in-email"].$post({
-        json,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+    mutationFn: async () => {
+      return { success: true, data: true }
     },
     onSuccess: () => {
       router.push(`/`)

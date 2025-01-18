@@ -68,11 +68,11 @@ const EditChannelPanel = () => {
               isLoading={isPending}
               onSubmit={(form) => {
                 updateChannel(
-                  { form, param: { channelId: id } },
+                  { data: form, channelId: id },
                   {
                     onSuccess() {
                       refetch()
-                      queryClient.invalidateQueries({ queryKey: ["rooms"] })
+                      queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
                       closeEditChannel()
                     },
                   },

@@ -51,7 +51,7 @@ const ChatRoom = () => {
   const isLoading = loadingGroup || loadingChannel || loadingRoom
   const isGroupMember = group?.isMember ?? false
   const isGroupAdmin = group?.isAdmin ?? false
-  const isChannelSubs = channel?.isSubscribers ?? false
+  const isChannelSubs = channel?.isSubscriber ?? false
   const isChannelAdmin = channel?.isAdmin ?? false
 
   const hideInput =
@@ -65,14 +65,12 @@ const ChatRoom = () => {
     if ((room?.totalUnreadMessages ?? 0) > 0) {
       readMessage(
         {
-          param: {
-            receiverId: id,
-            roomType: roomTypeToRoomTypeModelLower(type),
-          },
+          receiverId: id,
+          roomType: roomTypeToRoomTypeModelLower(type),
         },
         {
           onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )

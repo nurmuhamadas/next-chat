@@ -3,7 +3,7 @@ import { LoaderIcon } from "lucide-react"
 import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import useGetGroups from "@/features/group/hooks/api/use-get-groups"
-import useSearchGroups from "@/features/group/hooks/api/use-search-groups"
+import useSearchPublicGroups from "@/features/group/hooks/api/use-search-public-groups"
 import { useScopedI18n } from "@/lib/locale/client"
 
 import { useSearchQuery } from "../../hooks/use-search-query"
@@ -23,7 +23,7 @@ const SearchGroupResult = () => {
     hasNextPage: hasNextJoined,
   } = useGetGroups({
     queryKey: searchQuery,
-    limit: "5",
+    limit: 5,
   })
   const {
     data: publicGroups,
@@ -31,9 +31,9 @@ const SearchGroupResult = () => {
     isFetchingNextPage: loadingNextPublic,
     fetchNextPage: nextPublicGroups,
     hasNextPage: hasNextPublic,
-  } = useSearchGroups({
+  } = useSearchPublicGroups({
     queryKey: searchQuery,
-    limit: "5",
+    limit: 5,
   })
 
   const isLoading = loadingPublic || loadingJoined

@@ -61,13 +61,15 @@ declare interface UserSearchForMember {
 
 declare interface LastMessage {
   id: string
-  sender: string
+  name: string
   message: string | null
   time: string
 }
 
 declare interface Room {
   id: string
+  /** userId or groupId or channelId */
+  actionId: string
   type: RoomType
   name: string
   imageUrl: string | null
@@ -77,6 +79,13 @@ declare interface Room {
   isActive: boolean
   totalUnreadMessages: number
   lastMessage: LastMessage | null
+}
+
+declare interface PrivateRoom {
+  id: string
+  name: string
+  imageUrl: string | null
+  lastSeenAt: string | null
 }
 
 declare interface PrivateChatOption {
@@ -112,7 +121,6 @@ declare interface Message {
   status: MessageStatus
   attachments: Attachment[]
   isUpdated: boolean
-  updatedAt: string | null
   createdAt: string
 }
 
@@ -189,7 +197,7 @@ declare interface Channel {
   imageUrl: string | null
   inviteCode: string
   totalSubscribers: number
-  isSubscribers: boolean
+  isSubscriber: boolean
   isAdmin: boolean
 }
 

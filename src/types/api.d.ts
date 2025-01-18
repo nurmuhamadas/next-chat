@@ -3,6 +3,7 @@ declare interface SessionToken {
   username: string
   deviceId: string
   email: string
+  userAgent: string
   isProfileComplete: boolean
 }
 
@@ -16,29 +17,29 @@ declare interface UserSession {
   isProfileComplete: boolean
 }
 
-declare interface ErrorResponse {
-  success: false
-  error: {
-    message: string
-    path?: (string | number)[]
-  }
+declare interface ApiError {
+  message: string
+  path?: (string | number)[]
 }
 
-declare type ApiResponse<T> =
-  | {
-      success: true
-      data: T
-    }
-  | ErrorResponse
+declare interface ErrorResponse {
+  success: false
+  error: ApiError
+}
 
-declare type ApiCollectionResponse<T> =
-  | {
-      success: true
-      data: T[]
-      total: number
-      cursor?: string
-    }
-  | ErrorResponse
+declare type InferResponse<T> = T extends ApiResponse<infer U> ? U : never
+
+declare type ApiResponse<T> = {
+  success: true
+  data: T
+}
+
+declare type ApiCollectionResponse<T> = {
+  success: true
+  data: T[]
+  total: number
+  cursor?: string
+}
 
 // AUTH API
 declare type SignUpResponse = ApiResponse<{ username: string; email: string }>
@@ -102,11 +103,13 @@ declare type PatchGroupResponse = ApiResponse<Group>
 
 declare type GetGroupsResponse = ApiCollectionResponse<Group>
 
+declare type GetNameAvailabilityResponse = ApiResponse<boolean>
+
 declare type GetGroupResponse = ApiResponse<Group>
 
 declare type GetGroupMembersResponse = ApiCollectionResponse<GroupMember>
 
-declare type SearchGroupsResponse = ApiCollectionResponse<GroupSearch>
+declare type SearchPublicGroupsResponse = ApiCollectionResponse<GroupSearch>
 
 declare type DeleteGroupResponse = ApiResponse<{ id: string }>
 
@@ -156,13 +159,13 @@ declare type DeleteAllChannelChatResponse = ApiResponse<boolean>
 
 declare type GetChannelOptionResponse = ApiResponse<ChannelOption | null>
 
-declare type UpdateChannelNotifResponse = ApiResponse<ChannelOption>
+declare type UpdateChannelOptionResponse = ApiResponse<ChannelOption>
 
 // ROOM API
 /** Include groups and channels chat */
 declare type GetRoomListResponse = ApiCollectionResponse<Room>
 
-declare type SearchPrivateRoomResponse = ApiCollectionResponse<UserSearch>
+declare type GetPrivateRoomsResponse = ApiCollectionResponse<PrivateRoom>
 
 declare type GetRoomResponse = ApiResponse<Room>
 

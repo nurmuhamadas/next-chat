@@ -1,34 +1,26 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.groups)[":groupId"]["join"]["$post"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.groups)[":groupId"]["join"]["$post"]
->
+import { joinGroupSchema } from "../../schema"
+
+type ResponseType = InferResponse<JoinGroupResponse>
+type RequestType = {
+  groupId: string
+  data: z.infer<typeof joinGroupSchema>
+}
 
 const useJoinGroup = () => {
   const t = useScopedI18n("group.messages")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json, param }) => {
-      const response = await client.api.groups[":groupId"]["join"].$post({
-        json,
-        param,
-      })
+    mutationFn: async ({ groupId, data }) => {
+      const response = await api.groups.join(groupId, data)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("joined_group"))

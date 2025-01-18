@@ -1,23 +1,18 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-const useGroupNameAvailability = ({ groupName }: { groupName?: string }) => {
+const useGroupNameAvailability = ({
+  groupName = "",
+}: {
+  groupName?: string
+}) => {
   const query = useQuery({
     queryKey: ["get-group-name-availability", groupName],
     queryFn: async () => {
-      const response = await client.api.groups["name-availability"][
-        ":groupName"
-      ].$get({
-        param: { groupName: groupName ?? "" },
-      })
+      const response = await api.groups.getNameAvailability(groupName)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
     enabled: !!groupName,
   })

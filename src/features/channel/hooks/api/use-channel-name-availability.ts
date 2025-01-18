@@ -1,27 +1,18 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useChannelNameAvailability = ({
-  channelName,
+  channelName = "",
 }: {
   channelName?: string
 }) => {
   const query = useQuery({
     queryKey: ["get-channel-name-availability", channelName],
     queryFn: async () => {
-      const response = await client.api.channels["name-availability"][
-        ":channelName"
-      ].$get({
-        param: { channelName: channelName ?? "" },
-      })
+      const response = await api.channels.getNameAvailability(channelName)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result.data
+      return response.data
     },
     enabled: !!channelName,
   })

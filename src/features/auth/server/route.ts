@@ -137,6 +137,7 @@ const authApp = new Hono()
       userId: existingUser.id,
       username: existingUser.username,
       deviceId,
+      userAgent,
       isProfileComplete: !!existingUser.profile,
     })
 
@@ -211,6 +212,7 @@ const authApp = new Hono()
       userId: existingUser.id,
       username: existingUser.username,
       deviceId,
+      userAgent,
       isProfileComplete: !!existingUser.profile,
     })
     const [, , session] = await prisma.$transaction([
@@ -281,6 +283,7 @@ const authApp = new Hono()
       userId: existingUser.id,
       username: existingUser.username,
       deviceId,
+      userAgent,
       isProfileComplete: !!existingUser.profile,
     })
     const [, session] = await prisma.$transaction([

@@ -26,17 +26,14 @@ const CompleteProfileForm = () => {
         onClearError={() => setErrorMessage("")}
         showLogout
         onSubmit={(values) =>
-          createProfile(
-            { form: values },
-            {
-              onSuccess() {
-                router.push("/")
-              },
-              onError(error) {
-                setErrorMessage(error.message)
-              },
+          createProfile(values, {
+            onSuccess() {
+              router.push("/")
             },
-          )
+            onError(error) {
+              setErrorMessage(error.message)
+            },
+          })
         }
       />
     </Card>

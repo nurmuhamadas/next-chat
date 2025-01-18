@@ -4,6 +4,7 @@ import { useState } from "react"
 
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderIcon } from "lucide-react"
@@ -27,6 +28,8 @@ interface SignInFormProps {
   onSuccess(): void
 }
 const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
+  const route = useRouter()
+
   const t = useScopedI18n("auth")
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -61,21 +64,21 @@ const SignInForm = ({ showVerification, onSuccess }: SignInFormProps) => {
   }
 
   const onSubmit = (values: z.infer<typeof signInSchema>) => {
-    signIn(
-      { json: values },
-      {
-        onSuccess(data) {
-          if (data.success && data.data.status !== "success") {
-            setVerifyType(data.data.status)
-            onSuccess()
-            startTimer()
-          }
-        },
-        onError(error) {
-          setErrorMessage(error.message)
-        },
+    signIn(values, {
+      onSuccess(data) {
+        if (data.status !== "success") {
+          setVerifyType(data.status)
+          onSuccess()
+          startTimer()
+        }
+
+        // TODO: temporary direct login
+        route.replace("/")
       },
-    )
+      onError(error) {
+        setErrorMessage(error.message)
+      },
+    })
   }
 
   const onResend = () => {

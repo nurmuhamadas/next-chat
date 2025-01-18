@@ -88,14 +88,7 @@ const groupApp = new Hono()
     validateProfileMiddleware,
     zValidator("form", groupSchema),
     async (c) => {
-      const {
-        name,
-        image,
-        type,
-        memberIds: memberIdsStr,
-        description,
-      } = c.req.valid("form")
-      const memberIds = !!memberIdsStr ? memberIdsStr.split(",") : []
+      const { name, image, type, memberIds, description } = c.req.valid("form")
 
       const imageFile = image as unknown as File
 
@@ -194,7 +187,7 @@ const groupApp = new Hono()
       const total = result.length
       const nextCursor =
         total > 0 && total === limit ? result[total - 1].id : undefined
-      const response: SearchGroupsResponse = successCollectionResponse(
+      const response: SearchPublicGroupsResponse = successCollectionResponse(
         result.map(mapGroupModelToGroupSearch),
         total,
         nextCursor,
@@ -621,7 +614,7 @@ const groupApp = new Hono()
 
       const isAdmin = group.members.find((v) => v.userId === userId)?.isAdmin
       if (!isAdmin) {
-        throw new AuthorizationError(ERROR.ONLY_ADMIN_CAN_ADD_ADMIN)
+        throw new AuthorizationError(ERROR.ONLY_ADMIN_CAN_REMOVE_ADMIN)
       }
 
       const member = group.members.find((v) => v.userId === removedAdminId)

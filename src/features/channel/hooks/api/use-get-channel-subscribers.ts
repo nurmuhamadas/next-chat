@@ -1,28 +1,26 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
 const useGetChannelSubscribers = ({
   channelId = "",
+  queryKey,
+  limit = 20,
 }: {
   channelId?: string
+  queryKey?: string
+  limit?: number
 }) => {
   const query = useInfiniteQuery({
     queryKey: ["get-channel-subscribers", channelId],
     queryFn: async ({ pageParam }: { pageParam?: string }) => {
-      const response = await client.api.channels[":channelId"].subscribers.$get(
-        {
-          param: { channelId },
-          query: { cursor: pageParam },
-        },
-      )
+      const response = await api.channels.subscribers.get(channelId, {
+        limit,
+        query: queryKey,
+        cursor: pageParam,
+      })
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response
     },
     enabled: !!channelId,
     initialPageParam: undefined,

@@ -72,6 +72,7 @@ const userApp = new Hono()
           userId,
           username,
           deviceId,
+          userAgent,
           isProfileComplete: true,
         })
         const session = await createOrUpdateSession({

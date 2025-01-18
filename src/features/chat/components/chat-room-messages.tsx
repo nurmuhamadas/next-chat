@@ -61,7 +61,6 @@ const ChatRoomMessages = ({
   const {
     data: messages,
     isLoading: loadingMessage,
-    refetch,
     hasNextPage,
     fetchNextPage,
   } = useGetMessages({ id, roomType: type })
@@ -131,23 +130,11 @@ const ChatRoomMessages = ({
   }, [deletedMessageId, onDeletedMessageChange, isLoading, messagesStr])
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      refetch()
-    }, 5000)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [refetch])
-
-  useEffect(() => {
     if (messages.length > 0) {
       if (lastMessage.current && messages[0].id !== lastMessage.current?.id) {
         readMessage({
-          param: {
-            roomType: roomTypeToRoomTypeModelLower(type),
-            receiverId: id,
-          },
+          roomType: roomTypeToRoomTypeModelLower(type),
+          receiverId: id,
         })
       }
       lastMessage.current = messages[0]
@@ -157,15 +144,15 @@ const ChatRoomMessages = ({
   const handleJoinGroup = () => {
     if (group) {
       joinGroup(
-        {
-          param: { groupId: group.id },
-          json: { code: group.inviteCode },
-        },
+        { groupId: group.id, data: { code: group.inviteCode } },
         {
           onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
             queryClient.invalidateQueries({
               queryKey: ["get-group-by-id", id],
+            })
+            queryClient.invalidateQueries({
+              queryKey: ["get-group-members", id],
             })
             queryClient.invalidateQueries({
               queryKey: ["get-group-option", id],
@@ -179,13 +166,10 @@ const ChatRoomMessages = ({
   const handleJoinChannel = () => {
     if (channel) {
       joinChannel(
-        {
-          param: { channelId: channel.id },
-          json: { code: channel.inviteCode },
-        },
+        { channelId: channel.id, data: { code: channel.inviteCode } },
         {
           onSuccess() {
-            queryClient.invalidateQueries({ queryKey: ["rooms"] })
+            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
             queryClient.invalidateQueries({
               queryKey: ["get-channel-by-id", id],
             })

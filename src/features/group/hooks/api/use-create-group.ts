@@ -1,28 +1,34 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
+import { api } from "@/lib/api"
 import { useScopedI18n } from "@/lib/locale/client"
-import { client } from "@/lib/rpc"
 
-type ResponseType = InferResponseType<typeof client.api.groups.$post, 200>
-type RequestType = InferRequestType<typeof client.api.groups.$post>
+import { groupSchema } from "../../schema"
+
+type ResponseType = InferResponse<CreateGroupResponse>
+type RequestType = z.infer<typeof groupSchema>
 
 const useCreateGroup = () => {
   const t = useScopedI18n("group")
 
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ form }) => {
-      const response = await client.api.groups.$post({
-        form,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
+    mutationFn: async (data) => {
+      const formData = new FormData()
+      formData.append("name", data.name)
+      formData.append("type", data.type)
+      data.memberIds.map((id) => formData.append("memberIds", id))
+      if (data.description) {
+        formData.append("description", data.description)
+      }
+      if (data.image) {
+        formData.append("image", data.image)
       }
 
-      return result
+      const response = await api.groups.create(formData)
+
+      return response.data
     },
     onSuccess: () => {
       toast.success(t("messages.created"))

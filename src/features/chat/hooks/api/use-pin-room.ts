@@ -1,30 +1,19 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.rooms.pinned)[":roomId"]["$post"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.rooms.pinned)[":roomId"]["$post"]
->
+type ResponseType = InferResponse<PinRoomResponse>
+type RequestType = {
+  roomId: string
+}
 
 const usePinRoom = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ param }) => {
-      const response = await client.api.rooms.pinned[":roomId"].$post({
-        param,
-      })
+    mutationFn: async ({ roomId }) => {
+      const response = await api.rooms.pinned.add(roomId)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {},
     onError({ message }) {

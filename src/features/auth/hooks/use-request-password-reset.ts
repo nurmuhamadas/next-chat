@@ -13,17 +13,8 @@ type RequestType = InferRequestType<
 
 const useRequestPasswordReset = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json }) => {
-      const response = await client.api.auth["email-password-reset"].$post({
-        json,
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+    mutationFn: async () => {
+      return { success: true, data: { email: "" } }
     },
   })
 }

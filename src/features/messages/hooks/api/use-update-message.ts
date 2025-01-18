@@ -1,31 +1,23 @@
 import { useMutation } from "@tanstack/react-query"
-import { InferRequestType, InferResponseType } from "hono"
 import { toast } from "sonner"
+import { z } from "zod"
 
-import { client } from "@/lib/rpc"
+import { api } from "@/lib/api"
 
-type ResponseType = InferResponseType<
-  (typeof client.api.messages)[":messageId"]["$put"],
-  200
->
-type RequestType = InferRequestType<
-  (typeof client.api.messages)[":messageId"]["$put"]
->
+import { updateMessageSchema } from "../../schema"
+
+type ResponseType = InferResponse<UpdateMessageResponse>
+type RequestType = {
+  messageId: string
+  data: z.infer<typeof updateMessageSchema>
+}
 
 const useUpdateMessage = () => {
   return useMutation<ResponseType, Error, RequestType>({
-    mutationFn: async ({ json, param }) => {
-      const response = await client.api.messages[":messageId"].$put({
-        json,
-        param,
-      })
+    mutationFn: async ({ messageId, data }) => {
+      const response = await api.messages.update(messageId, data)
 
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error.message)
-      }
-
-      return result
+      return response.data
     },
     onSuccess: () => {},
     onError({ message }) {

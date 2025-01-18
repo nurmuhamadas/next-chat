@@ -29,7 +29,7 @@ const JoinInvitationButton = ({
   const handleJoin = () => {
     if (roomType === "group") {
       joinGroup(
-        { param: { groupId: roomId }, json: { code: inviteCode } },
+        { groupId: roomId, data: { code: inviteCode } },
         {
           onSuccess() {
             router.replace(`/${roomType}/${roomId}`)
@@ -39,7 +39,7 @@ const JoinInvitationButton = ({
     }
     if (roomType === "channel") {
       joinChannel(
-        { param: { channelId: roomId }, json: { code: inviteCode } },
+        { channelId: roomId, data: { code: inviteCode } },
         {
           onSuccess() {
             router.replace(`/${roomType}/${roomId}`)
