@@ -132,14 +132,21 @@ const ChatRoomMessages = ({
   useEffect(() => {
     if (messages.length > 0) {
       if (lastMessage.current && messages[0].id !== lastMessage.current?.id) {
-        readMessage({
-          roomType: type,
-          receiverId: id,
-        })
+        readMessage(
+          {
+            roomType: type,
+            receiverId: id,
+          },
+          {
+            onSuccess() {
+              queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
+            },
+          },
+        )
       }
       lastMessage.current = messages[0]
     }
-  }, [messages.length])
+  }, [messagesStr])
 
   const handleJoinGroup = () => {
     if (group) {
