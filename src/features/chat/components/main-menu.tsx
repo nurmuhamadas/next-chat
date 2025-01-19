@@ -59,7 +59,10 @@ const MainMenu = () => {
         openSettings()
         break
       case "report-bug":
-        openComingSoonInfo()
+        window.open(
+          "https://github.com/nurmuhamadas/next-chat/issues",
+          "_blank",
+        )
         break
       case "open-about":
         openComingSoonInfo()
