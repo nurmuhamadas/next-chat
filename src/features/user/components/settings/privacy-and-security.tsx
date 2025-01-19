@@ -1,6 +1,6 @@
-import { ADD_TO_GROUP_OPT, TWO_FACTOR_AUTH_OPT } from "../../constants"
 import useGetSetting from "../../../settings/hooks/use-get-setting"
 import useUpdateSetting from "../../../settings/hooks/use-update-setting"
+import { ADD_TO_GROUP_OPT, TWO_FACTOR_AUTH_OPT } from "../../constants"
 
 import SettingsContainer from "./container"
 import SettingItem from "./item"
