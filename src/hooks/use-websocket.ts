@@ -7,39 +7,43 @@ import { BASE_API_URL } from "@/lib/config"
 import { useRoomId } from "./use-room-id"
 import { useRoomType } from "./use-room-type"
 
-export default function useWebSocket() {
+export default function useWebsocket() {
   const queryClient = useQueryClient()
 
   const id = useRoomId()
   const type = useRoomType()
 
+  const [onlineUserIds, setOnlineUserIds] = useState<string[]>([])
   const [socket, setSocket] = useState<WebSocket | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    const ws = new WebSocket(`${BASE_API_URL}/ws`)
+    const ws = new WebSocket(`${BASE_API_URL}/ws/messages`)
 
     ws.onopen = () => {
-      console.log("WebSocket connected")
-      setIsConnected(true)
+      console.log("MessageSocket connected")
     }
 
-    ws.onmessage = () => {
-      queryClient.invalidateQueries({
-        queryKey: ["get-messages", id, type, 20],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ["rooms", 20],
-      })
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data) as WebSocketMessage
+
+      if (data.type === "ONLINE") {
+        setOnlineUserIds(data.data)
+      } else if (data.type === "MESSAGE") {
+        queryClient.invalidateQueries({
+          queryKey: ["get-messages", id, type, 20],
+        })
+        queryClient.invalidateQueries({
+          queryKey: ["rooms", 20],
+        })
+      }
     }
 
     ws.onclose = () => {
-      console.log("WebSocket disconnected")
-      setIsConnected(false)
+      console.log("MessageSocket disconnected")
     }
 
     ws.onerror = (event) => {
-      console.error("WebSocket error:", event)
+      console.error("MessageSocket error:", event)
     }
 
     setSocket(ws)
@@ -53,9 +57,9 @@ export default function useWebSocket() {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(message)
     } else {
-      console.error("WebSocket is not open")
+      console.error("MessageSocket is not open")
     }
   }
 
-  return { sendMessage, isConnected }
+  return { sendMessage, onlineUserIds }
 }

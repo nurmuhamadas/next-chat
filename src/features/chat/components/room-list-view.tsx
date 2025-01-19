@@ -6,7 +6,7 @@ import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import useGetSetting from "@/features/settings/hooks/use-get-setting"
-import useWebSocket from "@/hooks/use-websocket"
+import useWebsocket from "@/hooks/use-websocket"
 import { useCurrentLocale, useScopedI18n } from "@/lib/locale/client"
 
 import useGetRooms from "../hooks/api/use-get-rooms"
@@ -17,7 +17,7 @@ const RoomListView = () => {
   const t = useScopedI18n("room")
   const currentLocal = useCurrentLocale()
 
-  const {} = useWebSocket()
+  const {} = useWebsocket()
 
   const { data: settings, isLoading: settingLoading } = useGetSetting()
   const {
