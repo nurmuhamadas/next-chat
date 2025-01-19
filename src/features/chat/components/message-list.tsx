@@ -39,7 +39,7 @@ const MessageList = ({
     if (chatContainer) {
       chatContainer.scrollTop = chatContainer.scrollHeight
     }
-  }, [])
+  }, [JSON.stringify(groupedMessages)])
 
   return (
     <ScrollArea ref={chatRef} className="chat-list-scroll-area size-full">
