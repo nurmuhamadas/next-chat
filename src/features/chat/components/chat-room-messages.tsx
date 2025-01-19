@@ -106,7 +106,7 @@ const ChatRoomMessages = ({
 
       return result
     },
-    [setting?.timeFormat],
+    [setting?.timeFormat, messagesStr],
   )
 
   const groupedMessages = groupingMessage(messages)
