@@ -4,7 +4,7 @@ import { api } from "@/lib/api"
 
 type ResponseType = InferResponse<MarkMessageAsReadResponse>
 type RequestType = {
-  roomType: RoomTypeModelLower
+  roomType: RoomType
   receiverId: string
 }
 

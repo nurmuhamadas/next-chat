@@ -2,7 +2,6 @@
 
 import { ChangeEventHandler, useEffect, useRef, useState } from "react"
 
-import { useQueryClient } from "@tanstack/react-query"
 import { format } from "date-fns"
 import {
   ImageIcon,
@@ -39,8 +38,6 @@ interface ChatInputProps {
 
 const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
   const t = useScopedI18n("messages")
-
-  const queryClient = useQueryClient()
 
   const type = useRoomType()
   const id = useRoomId()
@@ -85,11 +82,6 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             setRecordedAudio(undefined)
             cancelEditMessage()
             cancelReplyMessage()
-
-            queryClient.invalidateQueries({
-              queryKey: ["get-messages", id, type, 20],
-            })
-            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )
@@ -98,12 +90,7 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
         {
           data: {
             receiverId: id,
-            roomType:
-              type === "chat"
-                ? "PRIVATE"
-                : type === "group"
-                  ? "GROUP"
-                  : "CHANNEL",
+            roomType: type,
             attachments: att,
             message,
             isEmojiOnly,
@@ -118,11 +105,6 @@ const ChatInput = ({ repliedMessage, editedMessage }: ChatInputProps) => {
             setRecordedAudio(undefined)
             cancelEditMessage()
             cancelReplyMessage()
-
-            queryClient.invalidateQueries({
-              queryKey: ["get-messages", id, type, 20],
-            })
-            queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
           },
         },
       )

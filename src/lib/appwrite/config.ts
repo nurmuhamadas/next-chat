@@ -1,5 +1,0 @@
-export const APPWRITE_SECRET_KEY = process.env.NEXT_APPWRITE_SECRET_KEY!
-
-export const APPWRITE_ENDPOINT = process.env.NEXT_APPWRITE_ENDPOINT!
-export const APPWRITE_PROJECT_ID = process.env.NEXT_APPWRITE_PROJECT_ID!
-export const STORAGE_ID = process.env.NEXT_APPWRITE_STORAGE_ID!

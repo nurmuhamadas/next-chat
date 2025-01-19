@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server"
 
 import { createI18nMiddleware } from "next-international/middleware"
 
-import { validateAuth } from "./features/auth/lib/queries"
+import { validateAuth } from "./features/auth/lib/utils"
 import {
   apiPrefix,
   authRoutes,

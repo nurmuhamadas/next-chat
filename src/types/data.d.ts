@@ -233,3 +233,13 @@ declare interface Setting {
   showLastSeen: boolean | null
   allowToAddToGroup: boolean | null
 }
+
+declare type WebSocketMessage =
+  | {
+      type: "ONLINE"
+      data: string[]
+    }
+  | {
+      type: "MESSAGE"
+      data: Message
+    }

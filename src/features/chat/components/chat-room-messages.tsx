@@ -11,11 +11,11 @@ import useJoinChannel from "@/features/channel/hooks/api/use-join-channel"
 import useJoinGroup from "@/features/group/hooks/api/use-join-group"
 import useGetMessages from "@/features/messages/hooks/api/use-get-messages"
 import useReadMessage from "@/features/messages/hooks/api/use-read-message"
-import useGetSetting from "@/features/user/hooks/api/use-get-setting"
+import useGetSetting from "@/features/settings/hooks/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
 import { useRoomType } from "@/hooks/use-room-type"
 import { useCurrentLocale, useScopedI18n } from "@/lib/locale/client"
-import { cn, formatChatTime, roomTypeToRoomTypeModelLower } from "@/lib/utils"
+import { cn, formatChatTime } from "@/lib/utils"
 
 import { useDeletedMessageId } from "../hooks/use-deleted-message-id"
 import { useEditedMessageId } from "../hooks/use-edited-message-id"
@@ -106,7 +106,7 @@ const ChatRoomMessages = ({
 
       return result
     },
-    [setting?.timeFormat],
+    [setting?.timeFormat, messagesStr],
   )
 
   const groupedMessages = groupingMessage(messages)
@@ -132,14 +132,21 @@ const ChatRoomMessages = ({
   useEffect(() => {
     if (messages.length > 0) {
       if (lastMessage.current && messages[0].id !== lastMessage.current?.id) {
-        readMessage({
-          roomType: roomTypeToRoomTypeModelLower(type),
-          receiverId: id,
-        })
+        readMessage(
+          {
+            roomType: type,
+            receiverId: id,
+          },
+          {
+            onSuccess() {
+              queryClient.invalidateQueries({ queryKey: ["rooms", 20] })
+            },
+          },
+        )
       }
       lastMessage.current = messages[0]
     }
-  }, [messages.length])
+  }, [messagesStr])
 
   const handleJoinGroup = () => {
     if (group) {

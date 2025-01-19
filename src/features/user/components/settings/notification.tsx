@@ -1,6 +1,6 @@
+import useGetSetting from "../../../settings/hooks/use-get-setting"
+import useUpdateSetting from "../../../settings/hooks/use-update-setting"
 import { NOTIFICATION_OPT } from "../../constants"
-import useGetSetting from "../../hooks/api/use-get-setting"
-import useUpdateSetting from "../../hooks/api/use-update-setting"
 
 import SettingsContainer from "./container"
 import SettingItem from "./item"

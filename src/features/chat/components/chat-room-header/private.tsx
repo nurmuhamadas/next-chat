@@ -10,9 +10,10 @@ import ChatAvatar from "@/components/chat-avatar"
 import SearchBar from "@/components/search-bar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import useGetSetting from "@/features/settings/hooks/use-get-setting"
 import useGetUserProfileById from "@/features/user/hooks/api/use-get-profile-by-id"
-import useGetSetting from "@/features/user/hooks/api/use-get-setting"
 import { useRoomId } from "@/hooks/use-room-id"
+import useWebsocket from "@/hooks/use-websocket"
 import { useCurrentLocale } from "@/lib/locale/client"
 import { cn, formatChatTime } from "@/lib/utils"
 
@@ -21,6 +22,8 @@ import ChatRoomMenuPrivate from "../chat-room-menu/private"
 
 const ChatRoomHeaderPrivate = () => {
   const router = useRouter()
+
+  const { onlineUserIds } = useWebsocket()
 
   const currentLocal = useCurrentLocale()
 
@@ -73,15 +76,21 @@ const ChatRoomHeaderPrivate = () => {
           ) : user ? (
             <>
               <h2 className="line-clamp-1 h5">{user?.name}</h2>
-              {user.lastSeenAt && (
+              {onlineUserIds.includes(id) ? (
                 <p className="line-clamp-1 text-muted-foreground caption">
-                  Last seen at{" "}
-                  {formatChatTime(
-                    user.lastSeenAt,
-                    setting?.timeFormat ?? "12-HOUR",
-                    currentLocal,
-                  )}
+                  Online
                 </p>
+              ) : (
+                user.lastSeenAt && (
+                  <p className="line-clamp-1 text-muted-foreground caption">
+                    Last seen at{" "}
+                    {formatChatTime(
+                      user.lastSeenAt,
+                      setting?.timeFormat ?? "12-HOUR",
+                      currentLocal,
+                    )}
+                  </p>
+                )
               )}
             </>
           ) : null}

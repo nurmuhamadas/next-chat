@@ -1,67 +1,20 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { PasswordResetToken, Session, VerificationToken } from "@prisma/client"
-import { compare, hash } from "bcryptjs"
-import { addDays, addMinutes, addYears, isBefore } from "date-fns"
-import { Context } from "hono"
-import { getCookie, setCookie } from "hono/cookie"
+import { cookies } from "next/headers"
+
+import { PasswordResetToken, VerificationToken } from "@prisma/client"
+import { isBefore } from "date-fns"
 import * as jwt from "hono/jwt"
 import { JwtTokenExpired, JwtTokenInvalid } from "hono/utils/jwt/types"
-import { v7 as uuidV7 } from "uuid"
 
 import { ERROR } from "@/constants/error"
 import { AUTH_SECRET } from "@/lib/config"
 import InvariantError from "@/lib/exceptions/invariant-error"
-import { prisma } from "@/lib/prisma"
 
-import { AUTH_COOKIE_KEY, DEVICE_ID_COOKIE_KEY } from "../constants"
-
-const SALT_ROUND = 10
-
-export const hashPassword = (password: string) => {
-  return hash(password, SALT_ROUND)
-}
-
-export const comparePassword = (password: string, hashedPassword: string) => {
-  return compare(password, hashedPassword)
-}
-
-export const generateSessionToken = (data: SessionToken) => {
-  return jwt.sign(
-    { ...data, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 },
-    AUTH_SECRET,
-  )
-}
-
-export const generateVerificationToken = (data: {
-  email: string
-  username: string
-}) => {
-  return jwt.sign(
-    {
-      ...data,
-      createdAt: new Date(),
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 10,
-    },
-    AUTH_SECRET,
-  )
-}
+import { AUTH_COOKIE_KEY } from "../constants"
 
 export const verifyToken = <T>(token: string): Promise<T> => {
   return jwt.verify(token, AUTH_SECRET) as Promise<T>
 }
-
-export const checkUsernameAvailability = async (username: string) => {
-  const result = await prisma.user.findUnique({
-    where: { username },
-    select: { id: true },
-  })
-
-  return !result
-}
-
-export const getTokenExpired = () => addMinutes(new Date(), 10)
-
-export const getSessionExpired = () => addDays(new Date(), 30)
 
 export const validateToken = async ({
   token,
@@ -89,28 +42,19 @@ export const validateToken = async ({
   }
 }
 
-export const setAuthCookies = (c: Context, session: Session) => {
-  const deviceId = getDeviceId(c)
-  if (!deviceId) {
-    setCookie(c, DEVICE_ID_COOKIE_KEY, session.deviceId, {
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      expires: addYears(new Date(), 1),
-    })
+export const validateAuth = async () => {
+  try {
+    const cookie = await cookies()
+    const session = cookie.get(AUTH_COOKIE_KEY)
+    if (!session) throw ""
+
+    const payload = await verifyToken<SessionToken>(session?.value)
+
+    return {
+      isLoggedIn: !!payload,
+      isProfileCompleted: payload.isProfileComplete,
+    }
+  } catch {
+    return { isLoggedIn: false, isProfileCompleted: false }
   }
-  setCookie(c, AUTH_COOKIE_KEY, session.token, {
-    path: "/",
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    expires: getSessionExpired(),
-  })
 }
-
-export const getDeviceId = (c: Context) => {
-  return getCookie(c, DEVICE_ID_COOKIE_KEY)
-}
-
-export const generateDeviceId = () => `device-${uuidV7()}-${Date.now()}`

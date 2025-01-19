@@ -15,7 +15,6 @@ import { Card } from "@/components/ui/card"
 import { Form, FormField } from "@/components/ui/form"
 import { useScopedI18n } from "@/lib/locale/client"
 
-import useRequestPasswordReset from "../hooks/use-request-password-reset"
 import { emailPasswordResetSchema } from "../schema"
 
 import AuthFormInput from "./auth-form-input"
@@ -24,17 +23,12 @@ interface ForgotPasswordFormProps {
   showEmailSent: boolean
   onSuccess(): void
 }
-const ForgotPasswordForm = ({
-  showEmailSent,
-  onSuccess,
-}: ForgotPasswordFormProps) => {
+const ForgotPasswordForm = ({ showEmailSent }: ForgotPasswordFormProps) => {
   const t = useScopedI18n("auth.forgot_password")
   const tAuth = useScopedI18n("auth")
 
   const [errorMessage, setErrorMessage] = useState("")
-  const [count, setCount] = useState(60)
-
-  const { mutate: requestEmail, isPending } = useRequestPasswordReset()
+  const [count] = useState(60)
 
   const form = useForm<z.infer<typeof emailPasswordResetSchema>>({
     resolver: zodResolver(emailPasswordResetSchema),
@@ -43,32 +37,21 @@ const ForgotPasswordForm = ({
     },
   })
 
-  const startTimer = () => {
-    const intervalId = setInterval(() => {
-      setCount((v) => {
-        if (v > 0) {
-          return v - 1
-        }
+  // const startTimer = () => {
+  //   const intervalId = setInterval(() => {
+  //     setCount((v) => {
+  //       if (v > 0) {
+  //         return v - 1
+  //       }
 
-        clearInterval(intervalId)
-        return 0
-      })
-    }, 1000)
-  }
+  //       clearInterval(intervalId)
+  //       return 0
+  //     })
+  //   }, 1000)
+  // }
 
   const onSubmit = (values: z.infer<typeof emailPasswordResetSchema>) => {
-    requestEmail(
-      { json: values },
-      {
-        onSuccess() {
-          onSuccess()
-          startTimer()
-        },
-        onError(error) {
-          setErrorMessage(error.message)
-        },
-      },
-    )
+    console.log(values)
   }
 
   if (showEmailSent) {
@@ -94,7 +77,7 @@ const ForgotPasswordForm = ({
               })
             }
           >
-            {isPending && <LoaderIcon className="size-4 animate-spin" />}{" "}
+            {true && <LoaderIcon className="size-4 animate-spin" />}{" "}
             {t("success.action")} {count > 0 && t("success.count", { count })}
           </Button>
         </p>

@@ -5,7 +5,8 @@ import { LoaderIcon } from "lucide-react"
 import ChatSkeleton from "@/components/chat-skeleton"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import useGetSetting from "@/features/user/hooks/api/use-get-setting"
+import useGetSetting from "@/features/settings/hooks/use-get-setting"
+import useWebsocket from "@/hooks/use-websocket"
 import { useCurrentLocale, useScopedI18n } from "@/lib/locale/client"
 
 import useGetRooms from "../hooks/api/use-get-rooms"
@@ -15,6 +16,8 @@ import RoomListItem from "./room-list-item"
 const RoomListView = () => {
   const t = useScopedI18n("room")
   const currentLocal = useCurrentLocale()
+
+  const {} = useWebsocket()
 
   const { data: settings, isLoading: settingLoading } = useGetSetting()
   const {

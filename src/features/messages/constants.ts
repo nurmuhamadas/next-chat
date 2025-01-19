@@ -1,6 +1,0 @@
-export const MESSAGE_STATUS: Record<MessageStatus, MessageStatus> = {
-  DEFAULT: "DEFAULT",
-  DELETED_FOR_ME: "DELETED_FOR_ME",
-  DELETED_FOR_ALL: "DELETED_FOR_ALL",
-  DELETED_BY_ADMIN: "DELETED_BY_ADMIN",
-}
